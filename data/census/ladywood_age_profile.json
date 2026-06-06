@@ -1,0 +1,12 @@
+{
+  "geography": "Ladywood ward (ward2022)",
+  "data_source": "Census 2021 TS007 (Nomis)",
+  "total_residents": 25733,
+  "under_16": 3530,
+  "working_age_16_64": 20907,
+  "elderly_65_plus": 1296,
+  "under_16_pct": 13.7,
+  "working_age_pct": 81.2,
+  "elderly_pct": 5.0,
+  "note": "Ward-level figures \u2014 applied to all stops in Ladywood ward"
+}
