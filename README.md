@@ -196,7 +196,6 @@ The remaining path to fully-observed accuracy: a direct TfWM Automatic Passenger
 | Name | Role |
 |---|---|
 | Arya Arun | Machine learning, demand model, analysis |
-| Stefan Cius | ML validation, data pipeline |
 | Chris Legge | Hardware, FPGA, Arduino |
 | Jack Booth | Unity simulation |
 
