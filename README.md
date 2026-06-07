@@ -12,7 +12,8 @@
 ---
 
 <p align="center">
-  <img src="docs/figures/FPGA.gif" width="60%" />
+  <img src="docs/figures/demo.gif" width="45%" />
+  <img src="docs/figures/FPGA.gif" width="45%" />
 </p>
 <p align="center">
   <em>The physical FPGA LED network map in action — animated demand and route display on real hardware (`fpga/bus_route.v`)</em>
