@@ -38,7 +38,7 @@ A five-layer system, end to end:
 | Layer | What it does |
 |---|---|
 | **Demand model** | XGBoost trained on 263k rows built from real Birmingham 2023–2024 weather and school-term data, with each stop's demand anchored to real TfWM concessionary smartcard journey volumes (UCL/GEoDS); predicts boardings per stop per hour |
-| **Route optimiser** | Capacitated VRP — greedy construction + 2-opt local search; 0.4% mean gap above brute-force optimal; < 2s solve time |
+| **Route optimiser** | Capacitated VRP — greedy construction + 2-opt local search; 1.16% mean gap above brute-force optimal (worst case 30.2%, 89% of routes solved exactly optimally); < 2s solve time |
 | **Web dashboard** | FastAPI + React 19 + MapLibre GL; real TfWM stop coordinates; buses animate along real Ladywood road geometry |
 | **Unity simulation** | Multi-agent bus system driven by the live ML output; same routing logic as the dashboard |
 | **FPGA LED map** | Terasic DE1-SoC driving 156 WS2812B LEDs; a physical, screen-free network display for the community |
@@ -76,13 +76,13 @@ and Framer Motion micro-interactions throughout.
 | Metric | Value |
 |---|---|
 | Demand model R² | 0.945 (RMSE 4.57 boardings) — temporal split, train 2023 / test 2024 |
-| Routing optimality gap | 2.4% mean above optimal |
+| Routing optimality gap | 1.16% mean above optimal (worst case 30.2%) |
 | Routes solved optimally | 89% |
 | Solve time | < 2 s |
 | Real stops modelled | 15 (TfWM routes 8A/8C, 80, 126) |
-| Operating cost saving | ~£10k/yr (DfT BUS0404 methodology) |
-| Break-even | ~5.5 months |
-| Social value (DfT TAG) | ~£194k/yr passenger time savings |
+| Operating cost saving | ~£14.7k/yr gross (~£13.8k/yr net of deployment cost) — DfT BUS0404 methodology |
+| Break-even | ~1.1 months |
+| Social value (DfT TAG) | ~£51.7k/yr passenger time savings |
 | Allocation-mismatch index, fixed vs. dynamic | 0.385 → 0.374 (avg. across 32 scenario/window snapshots) |
 
 All figures are reproducible — see [Getting Started](#getting-started).
@@ -224,7 +224,7 @@ A one-page map of what feeds the model and where every number in this README com
 │                         │     │                          │     │                        │
 │ • TfWM GTFS stops/roads │     │  XGBoost regressor       │     │  Capacitated VRP       │
 │ • Open-Meteo weather    │ ──▶ │  263k rows, 2023–24      │ ──▶ │  greedy + 2-opt        │
-│   (2023–24 hourly)      │     │  R² = 0.945 (temporal    │     │  0.4% gap vs. optimal  │
+│   (2023–24 hourly)      │     │  R² = 0.945 (temporal    │     │  1.16% gap vs. optimal  │
 │ • UCL/GEoDS smartcard   │     │  split, unseen 2024)     │     │  < 2s solve time       │
 │   journey volumes       │     │                          │     │                        │
 │ • Birmingham term dates │     │  predicts: boardings     │     │  outputs: per-scenario │
@@ -236,10 +236,10 @@ A one-page map of what feeds the model and where every number in this README com
                       ┌────────────────────────────┬──────────────────────────┘
                       ▼                            ▼
         ┌──────────────────────────┐   ┌──────────────────────────┐
-        │     WEB DASHBOARD        │   │   FPGA LED MAP / UNITY   │
+        │     WEB DASHBOARD        │   │      FPGA LED MAP        │
         │ FastAPI + React/MapLibre │   │  physical, screen-free   │
-        │ live demand + routes +   │   │  community-facing        │
-        │ equity overlay + story   │   │  network display         │
+        │ live demand + routes +   │   │  community-facing demand │
+        │ equity overlay + story   │   │  display at bus stops    │
         └──────────────────────────┘   └──────────────────────────┘
 ```
 
