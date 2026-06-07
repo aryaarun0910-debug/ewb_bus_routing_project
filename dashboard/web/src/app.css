@@ -221,6 +221,91 @@
 }
 .maplibregl-popup-tip { display: none !important; }
 
+/* Conditions ("what-if") panel */
+.conditions-panel {
+  top: 92px;
+  left: 20px;
+  width: min(220px, calc(100vw - 40px));
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cond-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cond-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cond-pills {
+  display: flex;
+  gap: 6px;
+}
+
+.cond-pill {
+  flex: 1;
+  font-size: 11px;
+  font-family: inherit;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 0;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.cond-pill:hover { color: var(--text); }
+
+.cond-pill.active {
+  color: #fff;
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.cond-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.cond-select:hover { background: var(--surface-strong); }
+.cond-select:focus { border-color: var(--accent-soft); }
+.cond-select option { background: #1c1c1e; color: var(--text); }
+
+.cond-row {
+  flex-direction: row;
+  gap: 16px;
+}
+
+.cond-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.cond-check input {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 /* Stop detail panel */
 .stop-panel {
   top: 20px;

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MapView from "./MapView";
 import StopPanel from "./StopPanel";
+import ConditionsPanel, { type Conditions } from "./ConditionsPanel";
 import { fetchScenarios, fetchRoutes, fetchDemand, type RouteInfo, type Stop } from "./api";
 import "./app.css";
 
@@ -25,6 +26,13 @@ function App() {
   const [demand, setDemand] = useState<Record<string, number>>({});
   const [imdOverlay, setImdOverlay] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [conditions, setConditions] = useState<Conditions>({
+    dayType: "weekday",
+    weather: "sunny",
+    specialEvent: "none",
+    isSchoolTerm: true,
+    isUniTerm: true,
+  });
 
   const win = WINDOWS[windowIdx];
 
@@ -44,12 +52,20 @@ function App() {
   }, [scenario, win.label]);
 
   useEffect(() => {
-    fetchDemand(win.hour).then((d) => setDemand(d.predictions));
-  }, [win.hour]);
+    fetchDemand(win.hour, {
+      day_type: conditions.dayType,
+      weather: conditions.weather,
+      special_event: conditions.specialEvent,
+      is_school_term: conditions.isSchoolTerm ? 1 : 0,
+      is_uni_term: conditions.isUniTerm ? 1 : 0,
+    }).then((d) => setDemand(d.predictions));
+  }, [win.hour, conditions]);
 
   return (
     <div className="app-shell">
-      <MapView hour={win.hour} routes={routes} onSelectStop={setSelectedStop} imdOverlay={imdOverlay} />
+      <MapView routes={routes} demand={demand} onSelectStop={setSelectedStop} imdOverlay={imdOverlay} />
+
+      <ConditionsPanel conditions={conditions} onChange={setConditions} />
 
       <AnimatePresence>
         {loading && (

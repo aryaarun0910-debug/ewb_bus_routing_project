@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import maplibregl, { Map as MlMap, Marker, Popup } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { fetchStops, fetchDemand, type Stop, type RouteInfo } from "./api";
+import { fetchStops, type Stop, type RouteInfo } from "./api";
 import BusLayer from "./BusLayer";
 
 // Minimalist dark basemap — Apple-Maps-at-night feel: muted greys, no clutter,
@@ -20,13 +20,13 @@ function radiusForDemand(boardings: number): number {
 }
 
 export default function MapView({
-  hour,
   routes,
+  demand,
   onSelectStop,
   imdOverlay,
 }: {
-  hour: number;
   routes: RouteInfo[];
+  demand: Record<string, number>;
   onSelectStop: (stop: Stop) => void;
   imdOverlay: boolean;
 }) {
@@ -34,7 +34,6 @@ export default function MapView({
   const mapRef = useRef<MlMap | null>(null);
   const markersRef = useRef<Record<string, { marker: Marker; el: HTMLDivElement }>>({});
   const [stops, setStops] = useState<Stop[]>([]);
-  const [demand, setDemand] = useState<Record<string, number>>({});
   const [mapInstance, setMapInstance] = useState<MlMap | null>(null);
 
   // Init map once
@@ -63,11 +62,6 @@ export default function MapView({
   useEffect(() => {
     fetchStops().then(setStops);
   }, []);
-
-  // Reload demand whenever hour changes
-  useEffect(() => {
-    fetchDemand(hour).then((d) => setDemand(d.predictions));
-  }, [hour]);
 
   // Create / update markers when stops or demand change
   useEffect(() => {
