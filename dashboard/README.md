@@ -31,6 +31,12 @@ Run it with:
 uvicorn dashboard.api:app --reload
 ```
 
+> **Windows / PowerShell:** `uvicorn` may not be on PATH (and bare `python`/`pip` can resolve to an install without the project's deps). Use:
+> ```powershell
+> py -3 -m uvicorn dashboard.api:app --reload --port 8001
+> ```
+> If you hit `WinError 10013` ("access forbidden by its access permissions") on port 8000, that port is blocked by Windows/your firewall — pick a different port with `--port`.
+
 ## Frontend (`web/`)
 
 React 19 + TypeScript + Vite + Framer Motion + MapLibre GL, styled as a
