@@ -52,7 +52,7 @@ Apple-Maps-at-night experience: a dark custom basemap, frosted-glass HUD panels,
 and Framer Motion micro-interactions throughout.
 
 <p align="center">
-  <img src="docs/figures/dashboard_stop_panel.png" width="80%" />
+  <img src="docs/figures/dashboard_live.png" width="80%" />
 </p>
 <p align="center">
   <em>The dashboard live — animated buses on real Ladywood road geometry, with the click-a-stop detail panel open</em>
