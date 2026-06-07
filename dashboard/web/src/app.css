@@ -163,11 +163,16 @@
 }
 
 .bus-marker {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-  border: 1.5px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 0 5px rgba(255, 255, 255, 0.05);
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.55));
+}
+
+.bus-marker svg {
+  display: block;
 }
 
 .scenario-row {

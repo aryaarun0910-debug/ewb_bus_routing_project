@@ -82,11 +82,19 @@ export default function BusLayer({ map, routes }: { map: MlMap | null; routes: R
     markersRef.current = routes
       .filter((r) => r.geometry.length >= 2)
       .map((r, i) => {
+        const color = BUS_COLORS[i % BUS_COLORS.length];
         const el = document.createElement("div");
         el.className = "bus-marker";
-        el.style.background = BUS_COLORS[i % BUS_COLORS.length];
         el.title = `Bus ${r.bus}: ${r.route_names.join(" → ")}`;
-        return new maplibregl.Marker({ element: el }).setLngLat(r.geometry[0]).addTo(map);
+        el.innerHTML = `
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="${color}" stroke="rgba(255,255,255,0.9)" stroke-width="1">
+            <rect x="4" y="3" width="16" height="14" rx="3" />
+            <rect x="6.5" y="5.5" width="4.5" height="3.5" rx="0.6" fill="rgba(255,255,255,0.85)" stroke="none" />
+            <rect x="13" y="5.5" width="4.5" height="3.5" rx="0.6" fill="rgba(255,255,255,0.85)" stroke="none" />
+            <circle cx="8" cy="19" r="1.6" fill="#1c1c1e" stroke="rgba(255,255,255,0.7)" />
+            <circle cx="16" cy="19" r="1.6" fill="#1c1c1e" stroke="rgba(255,255,255,0.7)" />
+          </svg>`;
+        return new maplibregl.Marker({ element: el, rotationAlignment: "map" }).setLngLat(r.geometry[0]).addTo(map);
       });
 
     startRef.current = performance.now();
@@ -111,8 +119,9 @@ export default function BusLayer({ map, routes }: { map: MlMap | null; routes: R
         if (!marker || r.geometry.length < 2) return;
         const offset = (i / Math.max(routes.length, 1)) * LOOP_MS;
         const t = ((elapsed + offset) % LOOP_MS) / LOOP_MS;
-        const { lngLat } = pointAt(r.geometry, t);
+        const { lngLat, bearing } = pointAt(r.geometry, t);
         marker.setLngLat(lngLat);
+        marker.setRotation(bearing);
       });
       rafRef.current = requestAnimationFrame(tick);
     };
