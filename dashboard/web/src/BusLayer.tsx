@@ -87,12 +87,16 @@ export default function BusLayer({ map, routes }: { map: MlMap | null; routes: R
         el.className = "bus-marker";
         el.title = `Bus ${r.bus}: ${r.route_names.join(" → ")}`;
         el.innerHTML = `
-          <svg viewBox="0 0 24 24" width="32" height="32" fill="${color}" stroke="rgba(255,255,255,0.9)" stroke-width="1">
-            <rect x="4" y="3" width="16" height="14" rx="3" />
-            <rect x="6.5" y="5.5" width="4.5" height="3.5" rx="0.6" fill="rgba(255,255,255,0.85)" stroke="none" />
-            <rect x="13" y="5.5" width="4.5" height="3.5" rx="0.6" fill="rgba(255,255,255,0.85)" stroke="none" />
-            <circle cx="8" cy="19" r="1.6" fill="#1c1c1e" stroke="rgba(255,255,255,0.7)" />
-            <circle cx="16" cy="19" r="1.6" fill="#1c1c1e" stroke="rgba(255,255,255,0.7)" />
+          <svg viewBox="0 0 16 32" width="20" height="40">
+            <!-- birds-eye bus: long rounded body, roofline, window strip, wheels -->
+            <rect x="1" y="0.5" width="14" height="31" rx="4" fill="${color}" stroke="rgba(255,255,255,0.9)" stroke-width="1" />
+            <rect x="2.4" y="2.3" width="11.2" height="6" rx="2" fill="rgba(255,255,255,0.22)" />
+            <rect x="3" y="9.5" width="10" height="16" rx="1.6" fill="rgba(20,20,22,0.55)" />
+            ${[0, 1, 2, 3, 4].map((i) => `<rect x="3.9" y="${10.7 + i * 3.05}" width="8.2" height="1.7" rx="0.5" fill="rgba(255,255,255,0.55)" />`).join("")}
+            <rect x="-0.4" y="5" width="2" height="4.5" rx="0.8" fill="#1c1c1e" stroke="rgba(255,255,255,0.5)" stroke-width="0.6" />
+            <rect x="14.4" y="5" width="2" height="4.5" rx="0.8" fill="#1c1c1e" stroke="rgba(255,255,255,0.5)" stroke-width="0.6" />
+            <rect x="-0.4" y="22" width="2" height="4.5" rx="0.8" fill="#1c1c1e" stroke="rgba(255,255,255,0.5)" stroke-width="0.6" />
+            <rect x="14.4" y="22" width="2" height="4.5" rx="0.8" fill="#1c1c1e" stroke="rgba(255,255,255,0.5)" stroke-width="0.6" />
           </svg>`;
         return new maplibregl.Marker({ element: el, rotationAlignment: "map" }).setLngLat(r.geometry[0]).addTo(map);
       });
