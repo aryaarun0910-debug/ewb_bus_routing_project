@@ -45,6 +45,32 @@ A five-layer system, end to end:
 
 ---
 
+## The Dashboard
+
+A from-scratch FastAPI + React 19 + MapLibre GL frontend, styled as a minimalist
+Apple-Maps-at-night experience: a dark custom basemap, frosted-glass HUD panels,
+and Framer Motion micro-interactions throughout.
+
+<p align="center">
+  <img src="docs/figures/dashboard_stop_panel.png" width="32%" />
+  <img src="docs/figures/dashboard_imd_overlay.png" width="32%" />
+  <img src="docs/figures/dashboard_compare.png" width="32%" />
+</p>
+<p align="center">
+  <em>Click-a-stop detail panel · IMD equity overlay · live scenario comparison</em>
+</p>
+
+| Feature | What it shows |
+|---|---|
+| **Live demand-sized stops** | Marker size and colour scale with the XGBoost model's predicted boardings, recomputed for the selected hour |
+| **Animated bus routes** | Buses follow real Ladywood road geometry (not straight lines), looping continuously per scenario/time-window |
+| **Click-a-stop detail panel** | Name, importance tier, predicted boardings, IMD score, POI count, population, crime, elevation, and routes served |
+| **IMD equity overlay** | One-click toggle that recolours every stop on a deprivation gradient (grey → red), making the equity dimension immediately visible |
+| **What-if conditions panel** | Live toggles for day type, weather, special events, and school/university term — the demand predictions update in real time, demonstrating the model's responsiveness rather than relying on static pre-computed scenarios |
+| **Scenario comparison** | Side-by-side stats (buses deployed, demand served, unserved stops, with deltas) for two scenarios in the same time window — e.g. a sunny weekday vs. a storm — showing how the optimiser reallocates capacity under disruption |
+
+---
+
 ## Key Results
 
 | Metric | Value |
