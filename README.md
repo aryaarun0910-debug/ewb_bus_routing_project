@@ -218,30 +218,7 @@ pytest
 
 A one-page map of what feeds the model and where every number in this README comes from:
 
-```
-┌─────────────────────────┐     ┌──────────────────────────┐     ┌────────────────────────┐
-│   REAL-WORLD INPUTS     │     │      DEMAND MODEL        │     │     ROUTE OPTIMISER    │
-│                         │     │                          │     │                        │
-│ • TfWM GTFS stops/roads │     │  XGBoost regressor       │     │  Capacitated VRP       │
-│ • Open-Meteo weather    │ ──▶ │  263k rows, 2023–24      │ ──▶ │  greedy + 2-opt        │
-│   (2023–24 hourly)      │     │  R² = 0.945 (temporal    │     │  1.16% gap vs. optimal  │
-│ • UCL/GEoDS smartcard   │     │  split, unseen 2024)     │     │  < 2s solve time       │
-│   journey volumes       │     │                          │     │                        │
-│ • Birmingham term dates │     │  predicts: boardings     │     │  outputs: per-scenario │
-│ • IMD 2019 / OSM POI /  │     │  per stop, per hour,     │     │  bus routes + real     │
-│   police.uk / elevation │     │  given conditions        │     │  road geometry         │
-│ • Census 2021           │     │                          │     │                        │
-└─────────────────────────┘     └──────────────────────────┘     └───────────┬────────────┘
-                                                                              │
-                      ┌────────────────────────────┬──────────────────────────┘
-                      ▼                            ▼
-        ┌──────────────────────────┐   ┌──────────────────────────┐
-        │     WEB DASHBOARD        │   │      FPGA LED MAP        │
-        │ FastAPI + React/MapLibre │   │  physical, screen-free   │
-        │ live demand + routes +   │   │  community-facing demand │
-        │ equity overlay + story   │   │  display at bus stops    │
-        └──────────────────────────┘   └──────────────────────────┘
-```
+![Methodology at a glance: real-world inputs feed the demand model, which feeds the route optimiser, whose output drives the web dashboard and FPGA LED map](docs/diagrams/methodology.png)
 
 Every number quoted in this README traces back to a script you can run yourself (see [Getting Started](#getting-started)):
 

@@ -24,14 +24,7 @@ LoRa (Long Range radio, e.g. the Semtech SX1278 chipset) trades data rate for ra
 
 ## 3. Proposed architecture
 
-```
- ┌──────────────────────────┐        433 MHz         ┌──────────────────────────┐
- │   CENTRAL HUB            │   ───── LoRa TX ─────▶ │   STOP UNIT (× N)        │
- │  Route optimiser +       │                        │  LoRa RX (UART)          │
- │  FastAPI backend         │                        │  → microcontroller/FPGA  │
- │  (existing system)       │   ◀──── ack/telemetry ─│  → drives WS2812B LEDs   │
- └──────────────────────────┘     (optional)         └──────────────────────────┘
-```
+![Proposed LoRa link: central hub (route optimiser + FastAPI backend) transmits over 433 MHz LoRa to stop units, which receive via UART, drive a microcontroller/FPGA, and light WS2812B LEDs; an optional ack/telemetry channel runs back to the hub](diagrams/lora_architecture.png)
 
 - **Hub**: the existing route-optimiser/backend gains a small broadcast service — every time a scenario re-solves (e.g. conditions change, or on a fixed cadence), it pushes a compact packet per stop (or a batched packet covering all stops on one route) out over a LoRa transmitter attached via UART/SPI.
 - **Stop unit**: a small low-power receiver (LoRa module + microcontroller, or feeding straight into the FPGA's UART pins) decodes the packet and updates the LED display accordingly — no change needed to the WS2812B driving logic already proven in `fpga/bus_route.v`, just a new data source replacing the static ROM lookup.
