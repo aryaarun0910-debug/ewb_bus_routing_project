@@ -4,6 +4,8 @@ import MapView from "./MapView";
 import StopPanel from "./StopPanel";
 import ConditionsPanel, { type Conditions } from "./ConditionsPanel";
 import ComparePanel from "./ComparePanel";
+import StoryOverlay from "./StoryOverlay";
+import { STORY } from "./story";
 import { fetchScenarios, fetchRoutes, fetchDemand, type RouteInfo, type RoutesResponse, type Stop } from "./api";
 import "./app.css";
 
@@ -47,6 +49,23 @@ function App() {
     isSchoolTerm: true,
     isUniTerm: true,
   });
+  const [storyActive, setStoryActive] = useState(false);
+  const [storyStep, setStoryStep] = useState(0);
+
+  // Apply the current story step's settings to the live dashboard state
+  useEffect(() => {
+    if (!storyActive) return;
+    const s = STORY[storyStep];
+    setScenario(s.scenario);
+    setWindowIdx(s.windowIdx);
+    if (s.imdOverlay !== undefined) setImdOverlay(s.imdOverlay);
+    if (s.comparing !== undefined) setComparing(s.comparing);
+    if (s.compareScenario !== undefined) setCompareScenario(s.compareScenario);
+    setSelectedStop(null);
+  }, [storyActive, storyStep]);
+
+  const startStory = () => { setStoryStep(0); setStoryActive(true); };
+  const exitStory = () => setStoryActive(false);
 
   const win = WINDOWS[windowIdx];
 
@@ -93,6 +112,14 @@ function App() {
       <MapView routes={routes} demand={demand} onSelectStop={setSelectedStop} imdOverlay={imdOverlay} />
 
       <ConditionsPanel conditions={conditions} onChange={setConditions} />
+
+      <StoryOverlay
+        active={storyActive}
+        step={storyStep}
+        onNext={() => setStoryStep((i) => Math.min(i + 1, STORY.length - 1))}
+        onPrev={() => setStoryStep((i) => Math.max(i - 1, 0))}
+        onExit={exitStory}
+      />
 
       <ComparePanel
         active={comparing}
@@ -211,6 +238,9 @@ function App() {
             </>
           )}
           <span className="legend-spacer" />
+          <button className="overlay-toggle story-launch" onClick={startStory}>
+            ▶ Play the story
+          </button>
           <button
             className={`overlay-toggle${comparing ? " active" : ""}`}
             onClick={() => setComparing((v) => !v)}
