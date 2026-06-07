@@ -192,6 +192,28 @@ uvicorn dashboard.api:app --port 8000
 # Open http://localhost:8000
 ```
 
+> **Windows / PowerShell:** the block above is written for bash (macOS/Linux/WSL/Git Bash). Native Windows PowerShell doesn't support `&&` chaining and may resolve `python`/`pip`/`uvicorn` to a different Python install than the one with your project dependencies. Use this instead:
+>
+> ```powershell
+> git clone https://github.com/ChrisLegge/ewb_bus_routing_project
+> cd ewb_bus_routing_project
+> py -3 -m pip install -r requirements.txt
+>
+> # 1. Generate the real-data-anchored dataset + train demand model
+> py -3 "prediction model/generate_real_demand_dataset.py"
+> py -3 "prediction model/demand_route_optimizer.py"
+>
+> # 2. Build the React frontend
+> cd dashboard/web
+> npm install
+> npm run build
+> cd ../..
+>
+> # 3. Serve the dashboard
+> py -3 -m uvicorn dashboard.api:app --port 8000
+> # Open http://localhost:8000
+> ```
+
 > The trained model (`demand_model.pkl`) and generated dataset are git-ignored — they are fully reproducible from the two steps above.
 
 ### Run the analysis scripts
