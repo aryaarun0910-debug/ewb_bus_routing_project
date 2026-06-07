@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import maplibregl, { Map as MlMap, Marker, Popup } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { fetchStops, fetchDemand, type Stop } from "./api";
+import { fetchStops, fetchDemand, type Stop, type RouteInfo } from "./api";
+import BusLayer from "./BusLayer";
 
 // Minimalist dark basemap — Apple-Maps-at-night feel: muted greys, no clutter,
 // just roads, water, and place labels turned down to a whisper.
@@ -18,12 +19,13 @@ function radiusForDemand(boardings: number): number {
   return 6 + Math.sqrt(Math.max(boardings, 0)) * 1.6;
 }
 
-export default function MapView({ hour }: { hour: number }) {
+export default function MapView({ hour, routes }: { hour: number; routes: RouteInfo[] }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markersRef = useRef<Record<string, { marker: Marker; el: HTMLDivElement }>>({});
   const [stops, setStops] = useState<Stop[]>([]);
   const [demand, setDemand] = useState<Record<string, number>>({});
+  const [mapInstance, setMapInstance] = useState<MlMap | null>(null);
 
   // Init map once
   useEffect(() => {
@@ -38,10 +40,12 @@ export default function MapView({ hour }: { hour: number }) {
     });
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     mapRef.current = map;
+    setMapInstance(map);
     return () => {
       map.remove();
       mapRef.current = null;
       markersRef.current = {};
+      setMapInstance(null);
     };
   }, []);
 
@@ -86,5 +90,10 @@ export default function MapView({ hour }: { hour: number }) {
     }
   }, [stops, demand]);
 
-  return <div ref={containerRef} className="map-canvas" />;
+  return (
+    <>
+      <div ref={containerRef} className="map-canvas" />
+      <BusLayer map={mapInstance} routes={routes} />
+    </>
+  );
 }

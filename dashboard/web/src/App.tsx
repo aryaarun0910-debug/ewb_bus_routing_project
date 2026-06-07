@@ -1,19 +1,43 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import MapView from "./MapView";
+import { fetchScenarios, fetchRoutes, type RouteInfo } from "./api";
 import "./app.css";
 
-const HOUR_LABELS: Record<number, string> = {
-  5: "Early Morning", 7: "AM Peak", 9: "Mid Morning", 11: "Lunch",
-  13: "Afternoon", 16: "PM Peak", 18: "Evening", 21: "Night",
-};
+const WINDOWS = [
+  { label: "Early Morning", hour: 6, hours: "05:00-07:00" },
+  { label: "AM Peak", hour: 8, hours: "07:00-09:00" },
+  { label: "Mid Morning", hour: 10, hours: "09:00-11:00" },
+  { label: "Lunch", hour: 12, hours: "11:00-13:00" },
+  { label: "Afternoon", hour: 14, hours: "13:00-16:00" },
+  { label: "PM Peak", hour: 17, hours: "16:00-18:00" },
+  { label: "Evening", hour: 19, hours: "18:00-21:00" },
+  { label: "Night", hour: 22, hours: "21:00-24:00" },
+];
 
 function App() {
-  const [hour, setHour] = useState(8);
+  const [scenarios, setScenarios] = useState<string[]>([]);
+  const [scenario, setScenario] = useState<string>("");
+  const [windowIdx, setWindowIdx] = useState(1); // AM Peak default
+  const [routes, setRoutes] = useState<RouteInfo[]>([]);
+
+  const win = WINDOWS[windowIdx];
+
+  useEffect(() => {
+    fetchScenarios().then((s) => {
+      setScenarios(s);
+      if (s.length) setScenario(s[0]);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!scenario) return;
+    fetchRoutes(scenario, win.label).then((r) => setRoutes(r.routes ?? []));
+  }, [scenario, win.label]);
 
   return (
     <div className="app-shell">
-      <MapView hour={hour} />
+      <MapView hour={win.hour} routes={routes} />
 
       <motion.header
         className="hud hud-top"
@@ -33,17 +57,39 @@ function App() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="time-row">
-          <span className="time-label">{String(hour).padStart(2, "0")}:00</span>
-          <span className="time-window">{HOUR_LABELS[hour] ?? "—"}</span>
+        <div className="scenario-row">
+          <select
+            className="scenario-select"
+            value={scenario}
+            onChange={(e) => setScenario(e.target.value)}
+          >
+            {scenarios.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
         </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={win.label}
+            className="time-row"
+            initial={{ opacity: 0, x: 8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
+            transition={{ duration: 0.25 }}
+          >
+            <span className="time-label">{win.hours}</span>
+            <span className="time-window">{win.label} · {routes.length} buses live</span>
+          </motion.div>
+        </AnimatePresence>
+
         <input
           type="range"
           min={0}
-          max={23}
+          max={WINDOWS.length - 1}
           step={1}
-          value={hour}
-          onChange={(e) => setHour(Number(e.target.value))}
+          value={windowIdx}
+          onChange={(e) => setWindowIdx(Number(e.target.value))}
           className="time-slider"
         />
         <div className="legend">
@@ -51,7 +97,7 @@ function App() {
           <span className="legend-dot medium" /> Medium
           <span className="legend-dot minor" /> Minor
           <span className="legend-spacer" />
-          <span className="legend-hint">Dot size = predicted boardings</span>
+          <span className="legend-hint">Dot size = predicted boardings · lines = live routes</span>
         </div>
       </motion.div>
     </div>
