@@ -20,6 +20,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from dashboard.ladywood_display import STOPS_DISPLAY
+from dashboard.demand import predict_all_stops
 
 _REPO_ROOT = Path(__file__).parent.parent
 _ROAD_PATHS = _REPO_ROOT / "data" / "gtfs" / "road_paths.json"
@@ -54,6 +55,41 @@ def get_roads():
     [lng, lat] points. The reverse direction reuses the same polyline.
     """
     return _road_paths
+
+
+@app.get("/api/demand")
+def get_demand(
+    hour: int = 8,
+    day_type: str = "weekday",
+    month: int = 9,
+    weather: str = "sunny",
+    climate_event: str = "none",
+    special_event: str = "none",
+    temperature_c: float = 16.0,
+    wind_kmh: float = 12.0,
+    precipitation_mm: float = 0.0,
+    is_school_term: int = 1,
+    is_uni_term: int = 1,
+):
+    """Live per-stop boarding predictions from the trained XGBoost model
+    for one hour, given a set of conditions (weather, calendar, events)."""
+    predictions = predict_all_stops(
+        hour=hour, day_type=day_type, month=month,
+        weather=weather, climate_event=climate_event, special_event=special_event,
+        temperature_c=temperature_c, wind_kmh=wind_kmh, precipitation_mm=precipitation_mm,
+        is_school_term=is_school_term, is_uni_term=is_uni_term,
+    )
+    return {
+        "hour": hour,
+        "conditions": {
+            "day_type": day_type, "month": month, "weather": weather,
+            "climate_event": climate_event, "special_event": special_event,
+            "temperature_c": temperature_c, "wind_kmh": wind_kmh,
+            "precipitation_mm": precipitation_mm,
+            "is_school_term": is_school_term, "is_uni_term": is_uni_term,
+        },
+        "predictions": predictions,
+    }
 
 
 @app.get("/api/health")
