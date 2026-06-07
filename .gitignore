@@ -31,6 +31,8 @@ data/gtfs/raw/
 *.pkl
 map_demand_dataset.csv
 data/synthetic/map_demand_dataset.csv
+prediction model/route_plan.json
+prediction model/route_plan_summary.txt
 
 # ─── OS / Editor / Tooling ─────────────────────────────────
 .DS_Store
