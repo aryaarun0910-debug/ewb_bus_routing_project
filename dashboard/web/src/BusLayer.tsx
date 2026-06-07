@@ -87,7 +87,7 @@ export default function BusLayer({ map, routes }: { map: MlMap | null; routes: R
         el.className = "bus-marker";
         el.title = `Bus ${r.bus}: ${r.route_names.join(" → ")}`;
         el.innerHTML = `
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="${color}" stroke="rgba(255,255,255,0.9)" stroke-width="1">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="${color}" stroke="rgba(255,255,255,0.9)" stroke-width="1">
             <rect x="4" y="3" width="16" height="14" rx="3" />
             <rect x="6.5" y="5.5" width="4.5" height="3.5" rx="0.6" fill="rgba(255,255,255,0.85)" stroke="none" />
             <rect x="13" y="5.5" width="4.5" height="3.5" rx="0.6" fill="rgba(255,255,255,0.85)" stroke="none" />
@@ -110,7 +110,7 @@ export default function BusLayer({ map, routes }: { map: MlMap | null; routes: R
   // Animation loop — each bus loops its route every ~22s, offset by index
   useEffect(() => {
     if (!map || markersRef.current.length === 0) return;
-    const LOOP_MS = 22000;
+    const LOOP_MS = 29000; // ~25% slower than the original 22s loop
 
     const tick = (now: number) => {
       const elapsed = now - startRef.current;
