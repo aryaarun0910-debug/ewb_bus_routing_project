@@ -57,6 +57,7 @@ export interface RoutesResponse {
   window: string;
   hours: string;
   demand_per_stop: Record<string, number>;
+  unserved_stops?: { stop: string; demand: number }[];
   routes: RouteInfo[];
 }
 

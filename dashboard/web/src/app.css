@@ -221,6 +221,63 @@
 }
 .maplibregl-popup-tip { display: none !important; }
 
+/* Scenario comparison panel */
+.compare-panel {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(520px, calc(100vw - 360px));
+  padding: 16px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.compare-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.compare-name {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-select {
+  width: 100%;
+  font-size: 11px;
+  padding: 6px 8px;
+}
+
+.compare-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.compare-stat .stat-value { font-size: 16px; }
+.compare-stat .stat-label { margin-left: auto; }
+
+.stat-delta {
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.delta-up { color: #30d158; }
+.delta-down { color: #ff375f; }
+
 /* Conditions ("what-if") panel */
 .conditions-panel {
   top: 92px;

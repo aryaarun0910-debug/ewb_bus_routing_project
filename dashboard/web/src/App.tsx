@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import MapView from "./MapView";
 import StopPanel from "./StopPanel";
 import ConditionsPanel, { type Conditions } from "./ConditionsPanel";
-import { fetchScenarios, fetchRoutes, fetchDemand, type RouteInfo, type Stop } from "./api";
+import ComparePanel from "./ComparePanel";
+import { fetchScenarios, fetchRoutes, fetchDemand, type RouteInfo, type RoutesResponse, type Stop } from "./api";
 import "./app.css";
 
 const WINDOWS = [
@@ -22,6 +23,10 @@ function App() {
   const [scenario, setScenario] = useState<string>("");
   const [windowIdx, setWindowIdx] = useState(1); // AM Peak default
   const [routes, setRoutes] = useState<RouteInfo[]>([]);
+  const [currentPlan, setCurrentPlan] = useState<RoutesResponse | null>(null);
+  const [comparing, setComparing] = useState(false);
+  const [compareScenario, setCompareScenario] = useState<string>("");
+  const [comparePlan, setComparePlan] = useState<RoutesResponse | null>(null);
   const [selectedStop, setSelectedStop] = useState<Stop | null>(null);
   const [demand, setDemand] = useState<Record<string, number>>({});
   const [imdOverlay, setImdOverlay] = useState(false);
@@ -47,9 +52,22 @@ function App() {
     if (!scenario) return;
     setLoading(true);
     fetchRoutes(scenario, win.label)
-      .then((r) => setRoutes(r.routes ?? []))
+      .then((r) => { setRoutes(r.routes ?? []); setCurrentPlan(r); })
       .finally(() => setLoading(false));
   }, [scenario, win.label]);
+
+  useEffect(() => {
+    if (!comparing || !compareScenario) { setComparePlan(null); return; }
+    fetchRoutes(compareScenario, win.label).then(setComparePlan);
+  }, [comparing, compareScenario, win.label]);
+
+  // Default the compare scenario to the first different one available
+  useEffect(() => {
+    if (comparing && !compareScenario) {
+      const other = scenarios.find((s) => s !== scenario);
+      if (other) setCompareScenario(other);
+    }
+  }, [comparing, compareScenario, scenarios, scenario]);
 
   useEffect(() => {
     fetchDemand(win.hour, {
@@ -66,6 +84,16 @@ function App() {
       <MapView routes={routes} demand={demand} onSelectStop={setSelectedStop} imdOverlay={imdOverlay} />
 
       <ConditionsPanel conditions={conditions} onChange={setConditions} />
+
+      <ComparePanel
+        active={comparing}
+        scenarios={scenarios}
+        scenario={scenario}
+        compareScenario={compareScenario}
+        onCompareChange={setCompareScenario}
+        current={currentPlan}
+        compare={comparePlan}
+      />
 
       <AnimatePresence>
         {loading && (
@@ -154,6 +182,12 @@ function App() {
             </>
           )}
           <span className="legend-spacer" />
+          <button
+            className={`overlay-toggle${comparing ? " active" : ""}`}
+            onClick={() => setComparing((v) => !v)}
+          >
+            {comparing ? "Comparing scenarios" : "Compare scenarios"}
+          </button>
           <button
             className={`overlay-toggle${imdOverlay ? " active" : ""}`}
             onClick={() => setImdOverlay((v) => !v)}

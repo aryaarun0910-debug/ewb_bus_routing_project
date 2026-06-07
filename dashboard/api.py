@@ -150,6 +150,7 @@ def get_routes(scenario: str, window: str):
         "window": window,
         "hours": window_plan.get("hours"),
         "demand_per_stop": window_plan.get("demand_per_stop"),
+        "unserved_stops": window_plan.get("unserved_stops"),
         "routes": routes,
     }
 
