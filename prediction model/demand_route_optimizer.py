@@ -106,10 +106,13 @@ for col in CAT_COLS:
     df[col + "_enc"] = le.fit_transform(df[col])
     encoders[col] = le
 
+_REAL_STATIC_COLS = ["imd_score", "poi_total", "population", "crime_total_2024", "elevation_m"]
+
 FEATURE_COLS = (
     [c + "_enc" for c in CAT_COLS]
     + ["hour", "month", "temperature_c", "wind_kmh", "precipitation_mm",
        "is_school_term", "is_uni_term", "stop_x", "stop_y"]
+    + [c for c in _REAL_STATIC_COLS if c in df.columns]
 )
 
 X = df[FEATURE_COLS].values
@@ -183,6 +186,17 @@ def _safe_encode(enc: LabelEncoder, value: str) -> int:
     return int(enc.transform([fallback])[0])
 
 
+# Per-stop static real-feature lookup for simulation (mirrors the columns
+# appended to map_demand_dataset.csv by generate_real_demand_dataset.py)
+_STATIC_COLS = [c for c in
+                ["imd_score", "poi_total", "population", "crime_total_2024", "elevation_m"]
+                if c in df.columns]
+_STATIC_LOOKUP = (
+    df.drop_duplicates("stop_id").set_index("stop_id")[_STATIC_COLS].to_dict("index")
+    if _STATIC_COLS else {}
+)
+
+
 def predict_stop_demand(
     stop_id, hour, day_type, month,
     weather, climate_event, special_event,
@@ -203,6 +217,9 @@ def predict_stop_demand(
         is_school_term, is_uni_term,
         s["x"], s["y"],
     ]
+    if _STATIC_COLS:
+        static = _STATIC_LOOKUP.get(stop_id, {})
+        row += [static.get(c) for c in _STATIC_COLS]
     return max(0.0, float(model.predict([row])[0]))
 
 

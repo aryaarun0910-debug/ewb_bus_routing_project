@@ -37,7 +37,7 @@ A five-layer system, end to end:
 
 | Layer | What it does |
 |---|---|
-| **Demand model** | XGBoost trained on 65k synthetic rows; predicts boardings per stop per hour across weather, season, and event conditions |
+| **Demand model** | XGBoost trained on 263k rows built from real Birmingham 2023–2024 weather and school-term data, with each stop's demand anchored to real TfWM concessionary smartcard journey volumes (UCL/GEoDS); predicts boardings per stop per hour |
 | **Route optimiser** | Capacitated VRP — greedy construction + 2-opt local search; 0.4% mean gap above brute-force optimal; < 2s solve time |
 | **Web dashboard** | FastAPI + React 19 + MapLibre GL; real TfWM stop coordinates; buses animate along real Ladywood road geometry |
 | **Unity simulation** | Multi-agent bus system driven by the live ML output; same routing logic as the dashboard |
@@ -49,9 +49,9 @@ A five-layer system, end to end:
 
 | Metric | Value |
 |---|---|
-| Demand model R² | 0.940 (RMSE 4.3 boardings) |
-| Routing optimality gap | 0.4% mean above optimal |
-| Routes solved optimally | 99% |
+| Demand model R² | 0.949 (RMSE 4.45 boardings) — real-data-anchored |
+| Routing optimality gap | 2.4% mean above optimal |
+| Routes solved optimally | 89% |
 | Solve time | < 2 s |
 | Real stops modelled | 15 (TfWM routes 8A/8C, 80, 126) |
 | Operating cost saving | ~£10k/yr (DfT BUS0404 methodology) |
@@ -60,6 +60,26 @@ A five-layer system, end to end:
 | Deprivation coverage uplift | +19.5% (IMD 2019 weighted) |
 
 All figures are reproducible — see [Getting Started](#getting-started).
+
+---
+
+## From Synthetic to Real: How the Demand Model Evolved
+
+The project started — deliberately — with a fully **synthetic** dataset (`generate_map_dataset.py`, 65k rows): hand-picked per-stop `base` demand values, sampled weather distributions, and a fixed monthly school-term flag. It was a good starting point — it let the routing optimiser, dashboard, and FPGA layers be built and tested before any real demand data existed, and it's still in the repo for comparison.
+
+We then mined as much **real, openly-licensed data** as exists for Ladywood (see [Data Sources](#data-sources) — IMD, OSM POIs, crime, elevation, Census, DfT bus stats, BODS live feeds, and critically the UCL/GEoDS concessionary smartcard journey volumes), and built `generate_real_demand_dataset.py` to retrain on it:
+
+| | Synthetic baseline | Real-data-anchored (current) |
+|---|---|---|
+| Rows | 65k, fully sampled | 263k, spans real Birmingham 2023–2024 (every real day in the weather archive) |
+| Weather | Sampled from a hand-built monthly probability table | Real Open-Meteo hourly archive — actual recorded conditions per hour |
+| School terms | Fixed flag per calendar month | Real Birmingham term + bank-holiday calendar, per real date |
+| Per-stop demand level | Hand-picked `base` value per importance tier | Anchored to real ENCTS concessionary smartcard journey volumes (UCL/GEoDS, TfWM-linked) |
+| Static features | `stop_x`, `stop_y`, `stop_importance` only | + `imd_score`, `poi_total`, `population`, `crime_total_2024`, `elevation_m` — all real, all per-stop |
+| Demand model R² | 0.940 (RMSE 4.3) | 0.949 (RMSE 4.45) |
+| What still isn't real | Everything (no observed boardings exist for these stops) | Hour-of-day demand *shape* and one-off special events — no public per-hour boarding curves or event logs exist; this is the honest residual gap (see [Caveats](#caveats)) |
+
+The R² didn't jump dramatically — it was never the point. What changed is *what the model learned from*: real weather, a real calendar, and a real (if dated and concessionary-only) ridership signal, instead of distributions we invented. That's the difference between "self-consistent with our assumptions" and "anchored to the world as it actually is."
 
 ---
 
@@ -102,9 +122,12 @@ git clone https://github.com/ChrisLegge/ewb_bus_routing_project
 cd ewb_bus_routing_project
 pip install -r requirements.txt
 
-# 1. Generate synthetic dataset + train demand model
-python "prediction model/generate_map_dataset.py"
+# 1. Generate the real-data-anchored dataset + train demand model
+python "prediction model/generate_real_demand_dataset.py"
 python "prediction model/demand_route_optimizer.py"
+
+# (the original synthetic generator is still available for comparison)
+# python "prediction model/generate_map_dataset.py"
 
 # 2. Build the React frontend
 cd dashboard/web && npm install && npm run build && cd ../..
@@ -138,19 +161,33 @@ pytest
 | Dataset | Source | Used for |
 |---|---|---|
 | TfWM GTFS feed | Transport for West Midlands (open licence) | Real stop coordinates, road geometry, service frequency validation |
-| IMD 2019 | MHCLG | Stop-level deprivation scoring |
+| **West Midlands Accessibility & Travel Passes** | **UCL/GEoDS — ENCTS concessionary smartcard data, anonymised, linked to vehicle GPS (TfWM, 2010–2016)** | **Per-stop demand anchor — replaces the synthetic `base` boarding values with real observed concessionary journey volumes** |
+| **Open-Meteo historical archive** | **Open-Meteo (ERA5/ECMWF reanalysis)** | **Real hourly Birmingham weather (2023–2024) — weather type, temperature, wind, precipitation, storm flags driving every training row** |
+| **Birmingham school term & bank holiday calendar** | **Birmingham City Council term dates + GOV.UK bank holidays API** | **Real `is_school_term` flag for every training row (was a fixed monthly synthetic flag)** |
+| IMD 2019 | MHCLG | Stop-level deprivation scoring + ML feature (`imd_score`) |
+| OSM Overpass API | OpenStreetMap | POI density per stop (hospitals, schools, workplaces, shops) — ML feature (`poi_total`) |
+| data.police.uk | UK Police open data | Street crime counts per stop, 2024 — ML feature (`crime_total_2024`) |
+| Open-Meteo Elevation API | Open-Meteo (SRTM 90m) | Stop elevation — ML feature (`elevation_m`) |
+| Census 2021 (TS007/TS045/TS058/TS061/TS062) | ONS | Age structure, car-free household rate, working-age population, commuting patterns |
+| DfT BUS0101/BUS0102/BUS09 | Department for Transport | Regional bus statistics — punctuality, patronage trends, vehicle-km |
+| BODS SIRI-VM live feed | DfT Bus Open Data Service | Live vehicle positions, delays, operator/line coverage near Ladywood |
 | DfT BUS0404 | Department for Transport | Vehicle operating costs |
 | DfT TAG A1.3 | Department for Transport | Passenger time value |
 | ONS ASHE 2023 | Office for National Statistics | Ladywood median wage |
-| Census 2021 | ONS | Car-free household rate |
 
 ---
 
 ## Caveats
 
-The demand model is trained on **synthetic data**, not observed ridership. R² = 0.94 measures self-consistency with the generator, not real-world accuracy. GTFS validation shows mean Pearson r = 0.32 against real service frequency — temporal patterns diverge (synthetic peaks AM/PM; real network peaks afternoon). Both are documented honestly in [`docs/MODEL_CARD.md`](docs/MODEL_CARD.md) and [`analysis/outputs/gtfs_validation.json`](analysis/outputs/gtfs_validation.json).
+True commercial stop-route boarding counts are **not publicly released** by TfWM (we asked the question directly — see [Data Sources](#data-sources)). `generate_real_demand_dataset.py` therefore builds the training set from real, openly-licensed inputs wherever they exist:
 
-The path to real accuracy: replace synthetic `boardings` with TfWM APC or ticketing data, retrain with a time-based train/test split.
+- **Real exogenous variables** — every row uses observed Birmingham weather (Open-Meteo hourly archive, 2023–2024), the real school-term/bank-holiday calendar, and storm flags derived from observed conditions, in place of the original sampled distributions.
+- **Real demand anchor** — each stop's relative demand level is now set from its real ENCTS concessionary smartcard journey volume (UCL/GEoDS, TfWM-linked, 2010–2016) rather than a hand-picked synthetic `base` value, with IMD/POI/crime/elevation added as genuine per-stop ML features.
+- **Still synthetic** — the *hour-of-day demand shape* (commuter-peak curves) and one-off *special events* (festivals, road closures) remain modelled, since no public per-hour boarding curves or event logs exist for these stops. This is the honest residual gap, and the reason R² = 0.949 should still be read as *self-consistency with a realistically-anchored generator*, not validated real-world accuracy.
+
+GTFS validation (`analysis/gtfs_validate.py`) compares the model's temporal pattern against real service frequency — see [`docs/MODEL_CARD.md`](docs/MODEL_CARD.md) and [`analysis/outputs/gtfs_validation.json`](analysis/outputs/gtfs_validation.json) for the full discussion.
+
+The remaining path to fully-observed accuracy: a direct TfWM Automatic Passenger Counting (APC) data request, or a manual stop-level traffic survey, to replace the smartcard-anchored + shape-modelled `boardings` with directly observed counts and a time-based train/test split.
 
 ---
 

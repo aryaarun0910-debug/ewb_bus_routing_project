@@ -1,0 +1,26 @@
+﻿filename,variable,description
+IHM_mp_lsoa_imp_10_or_more_87_percent and mp_lsoa_avl_10_or_more_81_percent,year,Year
+IHM_mp_lsoa_imp_10_or_more_87_percent and mp_lsoa_avl_10_or_more_81_percent,month,Month of the year
+IHM_mp_lsoa_imp_10_or_more_87_percent and mp_lsoa_avl_10_or_more_81_percent,orig,Origin Lower Level Super Output Area 2011 code (LSOA11CD)
+IHM_mp_lsoa_imp_10_or_more_87_percent and mp_lsoa_avl_10_or_more_81_percent,dest,Destination Lower Level Super Output Area 2011 code (LSOA11CD)
+IHM_mp_lsoa_imp_10_or_more_87_percent and mp_lsoa_avl_10_or_more_81_percent,count,Number of journeys
+TrendsLsoa60pl and TrendsLsoaDisab,month,Date (Month and Year)
+TrendsLsoa60pl and TrendsLsoaDisab,lsoa,Home Lower Level Super Output Area 2011 code (LSOA11CD) of the traveller
+TrendsLsoa60pl and TrendsLsoaDisab,n,Number of journeys
+TrendsLsoa60pl and TrendsLsoaDisab,pp,Population
+TrendsLsoa60pl and TrendsLsoaDisab,npp,Number of journeys per person
+accessibility_data_sat_incl_change and accessibility_data_tue_incl_change,oa11cd,Output Area 2011 code (OA11CD)
+accessibility_data_sat_incl_change and accessibility_data_tue_incl_change,type,Type of POI (e.g. large supermarket) to which accessibility is being calculated
+accessibility_data_sat_incl_change,[date],"Time taken from this OA to the nearest POI of this type, in minutes, on this day (a Saturday)."
+accessibility_data_tue_incl_change,[date],"Time taken from this OA to the nearest POI of this type, in minutes, on this day (a Tuesday)."
+accessibility_data_sat_incl_change,[date1]_[date2]_perc_change,"Change in time taken from this OA to the nearest facility of this type, in minutes, between these two dates (on the subsequent Saturdays)"
+accessibility_data_tue_incl_change,[date1]_[date2]_perc_change,"Change in time taken from this OA to the nearest facility of this type, in minutes, between these two dates."
+elegible_pop_wm_forecast,AREA_CODE,Local Authority District 2017 code (LAD17CD)
+elegible_pop_wm_forecast,year,Year
+elegible_pop_wm_forecast,count,Estimated eligible population count
+eligible_pop_wm and lsoaclusterpropslong,lsoa11cd,Lower Level Super Output Area 2011 code (LSOA11CD)
+eligible_pop_wm,measure,Year
+eligible_pop_wm,value,Eligible population count
+lsoaclusterpropslong,n_tot,Total population
+lsoaclusterpropslong,cluster,Travel behaviour cluster code. 1- Rarely seen. 2 - Irregular. 3 - Regularly seen. 4 - Withdrawing. 5 - Withdrawing (post-2014). 6 - Daily.
+lsoaclusterpropslong,cluster_prop,Proportion of total population in this cluster
