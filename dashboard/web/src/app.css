@@ -369,9 +369,9 @@
 /* Scenario comparison panel */
 .compare-panel {
   top: 92px;
-  left: 256px;
-  width: min(420px, calc(100vw - 620px));
-  min-width: 320px;
+  left: 296px;
+  width: min(400px, calc(100vw - 660px));
+  min-width: 300px;
   padding: 16px 22px;
   display: flex;
   flex-direction: column;

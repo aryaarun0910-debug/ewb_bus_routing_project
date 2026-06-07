@@ -111,7 +111,7 @@ function App() {
     <div className="app-shell">
       <MapView routes={routes} demand={demand} onSelectStop={setSelectedStop} imdOverlay={imdOverlay} />
 
-      <ConditionsPanel conditions={conditions} onChange={setConditions} />
+      {!storyActive && <ConditionsPanel conditions={conditions} onChange={setConditions} />}
 
       <StoryOverlay
         active={storyActive}
