@@ -1,7 +1,7 @@
 # Architecture
 
 How data flows from raw real-world sources through to the three user-facing
-outputs (web dashboard, FPGA LED map, Unity simulation). This is the technical
+outputs (web dashboard, FPGA LED map, and the legacy Unity simulation). This is the technical
 companion to the "Methodology at a Glance" diagram in the main [README](../README.md#methodology-at-a-glance).
 
 ## System overview
@@ -17,7 +17,7 @@ companion to the "Methodology at a Glance" diagram in the main [README](../READM
                                                     ┌───────────────┼───────────────┐
                                                     ▼               ▼               ▼
                                           ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-                                          │ dashboard/   │ │ fpga/        │ │ Unity        │
+                                          │ dashboard/   │ │ fpga/        │ │ Unity (legacy)│
                                           │ api.py       │ │ bus_route.v  │ │ simulation/  │
                                           │ (FastAPI)    │ │ (gen_rom.py  │ │ (Jack Booth) │
                                           │      │       │ │  → ROM       │ │              │
@@ -106,22 +106,27 @@ review (including a real timing-closure issue found in Quartus's STA report)
 and [`docs/radio_signalling_report.md`](radio_signalling_report.md) for a
 proposed architecture to make it live via LoRa radio.
 
-## Layer 4c — Unity simulation (`legacy/simulation/`, Jack Booth)
+## Layer 4c — Unity simulation — LEGACY (`legacy/simulation/`, Jack Booth)
 
-A multi-agent 3D visualisation driven by the same `route_plan.json` /
-live-ML-output pathway, communicating with hardware over an Arduino serial
-bridge. Maintained independently of the dashboard/FPGA code paths described
-above; see the simulation's own README under `legacy/simulation/`.
+A multi-agent 3D visualisation built early in the project, driven by the same
+`route_plan.json` / ML-output pathway, communicating with hardware over an
+Arduino serial bridge. **It now lives under `legacy/` and is no longer an
+active presentation layer** — the web dashboard and FPGA LED map have
+superseded it as the project's two live, maintained outputs. It's retained in
+the repo for reference and because Jack Booth's underlying multi-agent
+approach is sound; see the simulation's own README under
+`legacy/simulation/` for details on what it does and how to run it.
 
 ## Why this shape?
 
 The single most important architectural decision is that **`route_plan.json`
-is the one shared artefact** between the three presentation layers. The demand
-model and optimiser run once, offline, across every scenario/window
-combination; the dashboard, FPGA ROM generator, and Unity simulation all read
-from (or, for the dashboard's live demand panel, re-derive from the same model
-as) that one file. This guarantees the three outputs can never silently
-diverge — if the numbers on the dashboard, the LEDs, and the Unity scene ever
-disagree, it can only be because one of them is stale, which is a
+is the one shared artefact** between the presentation layers — including the
+now-legacy Unity simulation, which read from the same source as the two active
+outputs while it was maintained. The demand model and optimiser run once,
+offline, across every scenario/window combination; the dashboard and FPGA ROM
+generator both read from (or, for the dashboard's live demand panel,
+re-derive from the same model as) that one file. This guarantees the active
+outputs can never silently diverge — if the numbers on the dashboard and the
+LEDs ever disagree, it can only be because one of them is stale, which is a
 straightforward regenerate-and-redeploy fix rather than a logic bug to hunt
-across three codebases.
+across codebases.
