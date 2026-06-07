@@ -24,6 +24,7 @@ from dashboard.demand import predict_all_stops
 
 _REPO_ROOT = Path(__file__).parent.parent
 _ROAD_PATHS = _REPO_ROOT / "data" / "gtfs" / "road_paths.json"
+_ROUTE_PLAN = _REPO_ROOT / "prediction model" / "route_plan.json"
 
 app = FastAPI(title="Predictive Bus Routing API", version="0.1.0")
 
@@ -36,6 +37,29 @@ app.add_middleware(
 
 with open(_ROAD_PATHS, encoding="utf-8") as f:
     _road_paths: dict[str, list[list[float]]] = json.load(f)
+
+_route_plan: dict = {}
+if _ROUTE_PLAN.exists():
+    with open(_ROUTE_PLAN, encoding="utf-8") as f:
+        _route_plan = json.load(f)
+
+
+def _segment_path(a: str, b: str) -> list[list[float]]:
+    """Real road polyline between two stops, in travel direction a -> b."""
+    key = "|".join(sorted([a, b]))
+    path = _road_paths.get(key, [])
+    if path and sorted([a, b])[0] != a:
+        path = list(reversed(path))
+    return path
+
+
+def _route_geometry(route_stops: list[str]) -> list[list[float]]:
+    """Concatenated real road polyline following a route's full stop sequence."""
+    geometry: list[list[float]] = []
+    for a, b in zip(route_stops, route_stops[1:]):
+        seg = _segment_path(a, b)
+        geometry.extend(seg[1:] if geometry else seg)
+    return geometry
 
 
 @app.get("/api/stops")
@@ -89,6 +113,44 @@ def get_demand(
             "is_school_term": is_school_term, "is_uni_term": is_uni_term,
         },
         "predictions": predictions,
+    }
+
+
+@app.get("/api/scenarios")
+def get_scenarios():
+    """Available pre-computed scenario names (e.g. 'Weekday (Sunny, Sep)')."""
+    return list(_route_plan.keys())
+
+
+@app.get("/api/routes/{scenario}/{window}")
+def get_routes(scenario: str, window: str):
+    """Optimised routes for one scenario + time window, with real road
+    geometry attached to each route so the frontend can animate buses
+    along actual streets rather than straight lines between stops.
+
+    Example: /api/routes/Weekday (Sunny, Sep)/AM Peak
+    """
+    scenario_plan = _route_plan.get(scenario)
+    if scenario_plan is None:
+        return {"error": "unknown scenario", "available": list(_route_plan.keys())}
+    window_plan = scenario_plan.get(window)
+    if window_plan is None:
+        return {"error": "unknown window", "available": list(scenario_plan.keys())}
+
+    routes = []
+    for route in window_plan.get("routes", []):
+        stops = route["route_stops"]
+        routes.append({
+            **route,
+            "geometry": _route_geometry(stops),
+        })
+
+    return {
+        "scenario": scenario,
+        "window": window,
+        "hours": window_plan.get("hours"),
+        "demand_per_stop": window_plan.get("demand_per_stop"),
+        "routes": routes,
     }
 
 
