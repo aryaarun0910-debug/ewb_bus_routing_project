@@ -159,11 +159,12 @@ A modest but real, *measured* gain — not an assumed one. (We initially tried a
 ```
 prediction model/   XGBoost demand model + CVRP route optimiser
 dashboard/          FastAPI backend + React/MapLibre frontend
-fpga/               Verilog LED-map controller + ROM generator (see fpga/README.md)
+fpga/               Verilog LED-map controller (see fpga/README.md and Caveats)
 data/gtfs/          Real TfWM GTFS stop data, road geometry, service profiles
 scripts/            GTFS mining, stop extraction, road geometry builder
 analysis/           Economic model, equity analysis, feature explainability, GTFS validation
 docs/               Architecture, model card, design decisions, references
+tests/              pytest suite — routing invariants + API contract
 ```
 
 ---
@@ -223,6 +224,17 @@ python analysis/gtfs_validate.py       # synthetic vs real GTFS validation
 python analysis/explainability.py      # XGBoost feature importance
 python analysis/robustness_analysis.py --json   # i.i.d., sensitivity, domain-shift checks
 ```
+
+### Run tests
+
+```bash
+pytest
+```
+
+16 tests covering routing invariants (2-opt never worsens a route, respects
+vehicle capacity, near-optimal on small cases) and the API contract
+(`/api/stops`, `/api/demand`, `/api/routes/{scenario}/{window}`, error
+handling for unknown scenarios/windows). See [`tests/`](tests/).
 
 ---
 
