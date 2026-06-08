@@ -96,6 +96,11 @@ social value/yr  = £172.48 × 300 operating days            = £51,744/yr
 
 ## 6. Sustaining an open-source release without a commercial model
 
+> The figures above cover *running* costs. For what happens to the physical
+> hardware at the end of its life — WEEE compliance, named local recycling
+> partners, and modular/repairable design — see
+> [`docs/design/END_OF_LIFE.md`](END_OF_LIFE.md).
+
 1. **Civic stewardship, not vendor lock-in.** CIVIC SQUARE's Neighbourhood
    Public Square already runs a Microfactory and a Library of Things; a
    community-owned, community-repaired LED map (their existing Neighbourhood

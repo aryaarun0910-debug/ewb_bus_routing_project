@@ -7,6 +7,10 @@ limits are.
 
 ## Model details
 
+> Why XGBoost rather than ARIMA, an LSTM/GNN, or another tree ensemble? See
+> [`docs/design/MODEL_COMPARISON.md`](design/MODEL_COMPARISON.md) for the full,
+> sourced comparison — including the published results that *don't* favour us.
+
 - **Type**: XGBoost gradient-boosted regression tree ensemble
 - **Task**: predict `boardings` (passenger count) for a given Ladywood bus
   stop, hour of day, and set of conditions (day type, weather, special event,
