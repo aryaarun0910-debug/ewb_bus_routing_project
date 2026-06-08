@@ -159,13 +159,11 @@ A modest but real, *measured* gain — not an assumed one. (We initially tried a
 ```
 prediction model/   XGBoost demand model + CVRP route optimiser
 dashboard/          FastAPI backend + React/MapLibre frontend
-simulation/         Unity multi-agent simulation + Arduino serial bridge
-hardware/           Arduino FPGA LED controller
+fpga/               Verilog LED-map controller + ROM generator (see fpga/README.md)
 data/gtfs/          Real TfWM GTFS stop data, road geometry, service profiles
 scripts/            GTFS mining, stop extraction, road geometry builder
 analysis/           Economic model, equity analysis, feature explainability, GTFS validation
 docs/               Architecture, model card, design decisions, references
-tests/              pytest suite — routing invariants + API contract
 ```
 
 ---
@@ -224,12 +222,6 @@ python analysis/equity.py              # IMD 2019 deprivation analysis
 python analysis/gtfs_validate.py       # synthetic vs real GTFS validation
 python analysis/explainability.py      # XGBoost feature importance
 python analysis/robustness_analysis.py --json   # i.i.d., sensitivity, domain-shift checks
-```
-
-### Run tests
-
-```bash
-pytest
 ```
 
 ---
@@ -301,8 +293,12 @@ The remaining path to fully-observed accuracy: a direct TfWM Automatic Passenger
 
 - [Architecture](docs/ARCHITECTURE.md)
 - [Model Card](docs/MODEL_CARD.md)
+- [Why XGBoost — model technique comparison](docs/design/MODEL_COMPARISON.md)
 - [Economic model methodology](docs/design/RUNNING_COSTS.md)
+- [End-of-life & e-waste strategy](docs/design/END_OF_LIFE.md)
+- [Comparative landscape — Singapore, London, and informal-transit systems](docs/design/COMPARATIVE_LANDSCAPE.md)
 - [Stakeholder engagement design](docs/design/STAKEHOLDER_ENGAGEMENT.md)
 - [User journeys](docs/design/USER_JOURNEYS.md)
 - [Scalability](docs/design/SCALABILITY.md)
+- [Radio signalling architecture (LoRa)](docs/radio_signalling_report.md)
 - [Dashboard README](dashboard/README.md)
