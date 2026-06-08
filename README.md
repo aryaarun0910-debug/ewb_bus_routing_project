@@ -16,7 +16,8 @@
   <img src="docs/figures/FPGA.gif" width="45%" />
 </p>
 <p align="center">
-  <em>The physical FPGA LED network map in action — animated demand and route display on real hardware (`fpga/bus_route.v`)</em>
+  <em>Left: the live dashboard — animated demand and routes on the real Ladywood map (MapLibre).
+  Right: the same demand-and-route pattern reproduced on the physical FPGA LED network map (`fpga/bus_route.v`).</em>
 </p>
 
 ---
