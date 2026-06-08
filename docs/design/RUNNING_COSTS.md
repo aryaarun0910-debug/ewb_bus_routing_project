@@ -114,6 +114,63 @@ social value/yr  = £172.48 × 300 operating days            = £51,744/yr
    (Python/FastAPI, React, GTFS, NetworkX road-graph routing) — no single
    vendor, API key, or maintainer is a single point of failure.
 
+### Named precedents — and an honest reckoning with how they've struggled
+
+A reviewer specifically pushed us to go deeper here: "elaborate on the
+long-term sustainability of the open-source release without a commercial
+revenue model." The honest answer starts by admitting this is a genuinely
+hard, industry-wide problem — not a gap unique to us. The **2024 Open Source
+Software Funding Report** found that **86% of open-source contributors are
+unpaid**, and that funders systematically prefer paying for shiny new
+features over the unglamorous work of keeping something already-built alive
+([opensourcefundingsurvey2024.com](https://opensourcefundingsurvey2024.com/);
+[Digital Public Goods Alliance on the "free-rider problem" in open
+infrastructure](https://www.digitalpublicgoods.net/blog/digital-commons-and-digital-public-goods-finding-common-ground-for-policymakers)).
+Even the **OpenStreetMap Foundation** — arguably the most successful open
+geodata project in the world — runs on an annual fundraising target of
+**~£521,000** for not much more than servers and a single paid engineer
+([OSMF](https://supporting.openstreetmap.org/)), and **Code for America
+formally ended its 25,000-volunteer Brigade network in 2023**, citing that
+"it has become increasingly difficult to raise and sustain multi-year
+investment for a national [volunteer] network" — a direct, citable warning
+against assuming volunteer goodwill alone is a sustainability plan
+([Code for America](https://codeforamerica.org/news/reflections-on-the-brigade-networks-next-chapter/)).
+
+The model that *has* worked at our scale is **mySociety** (FixMyStreet,
+TheyWorkForYou) — the closest UK precedent to what we're proposing. They
+combine charitable grants (JRCT, Open Society, Hewlett, MacArthur), individual
+donations, **and** a trading subsidiary, **SocietyWorks**, which licenses and
+hosts paid versions of their open-source tools for local councils — generating
+commercial-style income *without* compromising the free, open community
+release ([mySociety](https://www.mysociety.org/about/funding/)). **Digital
+Matatus** — the Nairobi transit-mapping project that is the closest mission
+analogue to ours — followed exactly the path we'd realistically take: a
+university-consortium build seeded by a philanthropic grant (Rockefeller
+Foundation), later expanded via a second grant (Expo 2020 Dubai)
+([MIT Civic Data Design Lab](https://civicdatadesignlab.mit.edu/Digital-Matatus)).
+
+**Concrete funding routes that exist, named, for a project at exactly this
+stage and scale:**
+
+| Source | What it offers |
+|---|---|
+| National Lottery Community Fund (Awards for All) | £300–£20,000, up to 2 years, for community-benefit pilots ([tnlcommunityfund.org.uk](https://www.tnlcommunityfund.org.uk/funding/funding-programmes/national-lottery-awards-for-all-england)) |
+| West Midlands Combined Authority / TfWM | Ran a £22m Future Transport Zone trialling demand-responsive services; the West Midlands Innovation Accelerator is a live regional channel for match-funding ([WMCA](https://www.wmca.org.uk/what-we-do/economy-and-innovation/west-midlands-innovation/west-midlands-innovation-accelerator/)) |
+| Innovate UK / UKRI | The standard UK public route from pilot to scale-up; a recent policy proposal explicitly recommends ring-fencing **£7.5m/yr of a £12.5m UK open-source fund specifically for *maintenance*, not just innovation** — evidence that this exact problem is now recognised at national policy level ([British Progress](https://britishprogress.org/uk-day-one/a-uk-open-source-fund-to-support-software-innovati)) |
+| GDS Local (DSIT, launched Nov 2025) | A new government unit working directly with councils on everyday digital services — a live channel for a council adoption/hosting handoff ([GOV.UK](https://www.gov.uk/government/news/people-across-uk-to-benefit-from-easier-access-to-local-services-as-councils-get-digital-boost)) |
+
+**Our actual proposed model**, synthesising the above rather than inventing
+something untested: **grant-seeded build → proven pilot → handoff to a local
+institutional host** (Birmingham City Council / TfWM, mirroring how
+SocietyWorks operationalised mySociety's tools for councils), governed by a
+small open steering committee in the spirit of OSMF's membership board —
+university, council, and **community representatives with real decision-making
+power**, specifically to avoid the volunteer-burnout failure mode that ended
+Code for America's Brigade network. This is deliberately a *modest, named,
+precedented* plan rather than an invented commercial model — which is, we'd
+argue, the more credible thing to put in front of reviewers who have seen a
+hundred teams promise revenue streams that don't materialise.
+
 ## 7. The honest bottom line
 
 The economics here are favourable enough (≈1.1-month break-even, ~£13.8k/yr
