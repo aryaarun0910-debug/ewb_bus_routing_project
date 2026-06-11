@@ -1,0 +1,64 @@
+{
+  "weekday": {
+    "n_rows": 1018523,
+    "n_stops": 8261,
+    "pearson_overall_vs_major_curve": 0.9536251189723401,
+    "pearson_by_tier": {
+      "major": 0.9454533740450684,
+      "medium": 0.9419721533003073,
+      "minor": 0.7959065948554221
+    },
+    "observed_peak_hours": [
+      15,
+      16,
+      17
+    ],
+    "modelled_peak_hours_major": [
+      8,
+      17,
+      16
+    ],
+    "observed_hourly_shape": [
+      0.1114,
+      0.0297,
+      0.0144,
+      0.0142,
+      0.0412,
+      0.1679,
+      0.4222,
+      0.8254,
+      0.92,
+      0.6969,
+      0.6041,
+      0.619,
+      0.6728,
+      0.7092,
+      0.7599,
+      1.0,
+      0.9816,
+      0.9323,
+      0.7986,
+      0.5737,
+      0.4229,
+      0.334,
+      0.2963,
+      0.2227
+    ]
+  },
+  "saturday": {
+    "pearson_vs_major_curve": 0.6774128155342123,
+    "observed_peak_hours": [
+      14,
+      13,
+      15
+    ]
+  },
+  "sunday": {
+    "pearson_vs_major_curve": 0.5493504484675511,
+    "observed_peak_hours": [
+      13,
+      14,
+      12
+    ]
+  }
+}
