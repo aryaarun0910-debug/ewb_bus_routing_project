@@ -1,0 +1,50 @@
+{
+  "n_rows": 263160,
+  "split": "temporal (train 2023, test 2024)",
+  "params": {
+    "n_estimators": 400,
+    "max_depth": 7,
+    "learning_rate": 0.07,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "min_child_weight": 5,
+    "reg_alpha": 0.1,
+    "reg_lambda": 1.0,
+    "random_state": 42
+  },
+  "full": {
+    "r2": 0.9445,
+    "mae": 2.1605,
+    "n_features": 20
+  },
+  "ablated_no_crime": {
+    "r2": 0.945,
+    "mae": 2.1524,
+    "n_features": 19
+  },
+  "delta_r2": -0.00049,
+  "crime_permutation_importance": 0.002398,
+  "crime_importance_rank": "11 of 20",
+  "all_permutation_importances": {
+    "stop_importance_enc": 0.91048,
+    "hour": 0.864388,
+    "day_type_enc": 0.131031,
+    "special_event_enc": 0.032068,
+    "poi_total": 0.022626,
+    "precipitation_mm": 0.019089,
+    "stop_id_enc": 0.016647,
+    "month": 0.007246,
+    "stop_x": 0.007106,
+    "imd_score": 0.005572,
+    "crime_total_2024": 0.002398,
+    "elevation_m": 0.001619,
+    "temperature_c": 0.001541,
+    "weather_type_enc": 0.001231,
+    "population": 0.000914,
+    "stop_y": 0.000791,
+    "is_school_term": 0.000199,
+    "wind_kmh": 7.9e-05,
+    "is_uni_term": 5e-06,
+    "climate_event_enc": 0.0
+  }
+}
