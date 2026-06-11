@@ -80,6 +80,14 @@ DYNAMIC_VKM_REDUCTION_PCT = 12.5    # % fewer vehicle-km (conservative mid-estim
 # Average journey time for Ladywood bus trips (TfWM journey planner, 2024)
 AVERAGE_JOURNEY_MIN = 22.0          # minutes per trip
 
+# CO₂e factor for a diesel local bus, kg CO₂e per vehicle-km, as an honest
+# low–high range: DESNZ GHG Conversion Factors (local bus) low end; DfT TAG /
+# LowCVP real-world duty-cycle figures upper end. Same factor family as
+# docs/EMISSIONS_QUANTIFICATION.md; annualised on OPERATING_DAYS_PER_YR so the
+# environmental figure shares the financial model's basis (300 days, not 365).
+KGCO2E_PER_VKM_LOW  = 1.0
+KGCO2E_PER_VKM_HIGH = 1.3
+
 # Deployment hardware costs
 HARDWARE_COSTS = {
     "Terasic DE1-SoC FPGA (per hub, ×3)":   150 * 3,
@@ -189,6 +197,13 @@ def run_model() -> dict:
         additional_passengers * (CAR_FREE_HOUSEHOLD_PCT / 100)
     )
 
+    # CO₂e avoided by the vehicle-km reduction, on the same operating basis
+    # as the financial figures (OPERATING_DAYS_PER_YR)
+    vkm_saved_day    = fixed.total_vkm_day - dynamic.total_vkm_day
+    vkm_saved_yr     = vkm_saved_day * OPERATING_DAYS_PER_YR
+    co2e_saved_yr_t_low  = vkm_saved_yr * KGCO2E_PER_VKM_LOW  / 1000
+    co2e_saved_yr_t_high = vkm_saved_yr * KGCO2E_PER_VKM_HIGH / 1000
+
     return {
         "fixed_schedule": asdict(fixed),
         "dynamic_routing": asdict(dynamic),
@@ -207,6 +222,15 @@ def run_model() -> dict:
         "net_annual_saving_gbp":    round(net_annual_saving, 2),
         "breakeven_months":         round(breakeven_months, 1),
         "social_value_per_yr_gbp":  round(time_savings.social_value_per_yr, 2),
+        "emissions": {
+            "vkm_saved_per_day":        round(vkm_saved_day, 1),
+            "vkm_saved_per_year":       round(vkm_saved_yr, 0),
+            "co2e_saved_per_yr_tonnes": [round(co2e_saved_yr_t_low, 2),
+                                         round(co2e_saved_yr_t_high, 2)],
+            "kgco2e_per_vkm_range":     [KGCO2E_PER_VKM_LOW, KGCO2E_PER_VKM_HIGH],
+            "basis": f"{OPERATING_DAYS_PER_YR} operating days/yr, "
+                     "DESNZ/DfT-TAG local-bus factor range",
+        },
         "ladywood_context": {
             "car_free_household_pct":               CAR_FREE_HOUSEHOLD_PCT,
             "fuel_poverty_pct":                     FUEL_POVERTY_PCT,
@@ -251,6 +275,13 @@ def print_summary(result: dict) -> None:
     print(f"\nPassenger time savings (conservative 12% uplift):")
     print(f"  Additional passengers/day  {ts['additional_passengers_per_day']:.0f}")
     print(f"  Social value/year          £{result['social_value_per_yr_gbp']:>8,.0f}")
+
+    em = result["emissions"]
+    lo, hi = em["co2e_saved_per_yr_tonnes"]
+    print(f"\nEmissions avoided ({em['basis']}):")
+    print(f"  Vehicle-km saved/day       {em['vkm_saved_per_day']} km")
+    print(f"  Vehicle-km saved/year      {em['vkm_saved_per_year']:.0f} km")
+    print(f"  CO2e avoided/year          {lo}–{hi} tonnes")
 
     print(f"\nLadywood context:")
     print(f"  Car-free households        {lw['car_free_household_pct']}%")
