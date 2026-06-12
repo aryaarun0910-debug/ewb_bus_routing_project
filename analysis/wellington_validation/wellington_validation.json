@@ -1,0 +1,15 @@
+{
+  "period": "2020-01-01 to 2020-02-21",
+  "n_stops": 2904,
+  "suppression_note": "'5 or less' counts treated as 3 (midpoint)",
+  "tier_shape_r": {
+    "major": 0.963,
+    "medium": 0.956,
+    "minor": 0.809
+  },
+  "minor_stop_asymmetry": {
+    "am_board_alight_ratio": 0.998,
+    "pm_board_alight_ratio": 0.992,
+    "verdict": "UNTESTABLE in this dataset: every minor-stop observation is privacy-suppressed ('5 or less'), so boardings and alightings are mapped to the same midpoint and the ratio is forced toward 1.0 by construction. The asymmetric-minor-curve design hypothesis remains open, not refuted. Medium stops (mostly unsuppressed) show near-symmetry (AM 0.93 / PM 1.03), consistent with the repo's symmetric medium curve."
+  }
+}
