@@ -1,0 +1,16 @@
+{
+  "helsinki_observed_6708_stops": {
+    "n_stops": 6708,
+    "top_third_share": 0.955,
+    "middle_third_share": 0.042,
+    "bottom_third_share": 0.003,
+    "gini": 0.858
+  },
+  "ladywood_modelled_15_stops": {
+    "n_stops": 15,
+    "top_third_share": 0.732,
+    "middle_third_share": 0.211,
+    "bottom_third_share": 0.057,
+    "gini": 0.513
+  }
+}
