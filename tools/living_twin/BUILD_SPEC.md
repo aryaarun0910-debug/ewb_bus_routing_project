@@ -1,121 +1,111 @@
 # The Living Twin — Build Spec (Chris)
 
-**What it is:** the live architecture from `docs/radio_signalling_report.md`, physically
-on the demo table at Grand Finals. A Raspberry Pi 5 (the hub) polls the DfT Bus Open
-Data Service for the real vehicles on lines 8A/8C/80/126, and pushes their positions to
-an Arduino R4 UNO WiFi (the stop unit) driving a WS2812B strip/matrix — next to the
-existing DE1-SoC running the ROM snapshot. Yesterday's build and tomorrow's build, side
-by side, both real.
+**What it is:** the upgrade `docs/radio_signalling_report.md` §5 proposes, made real on
+the demo table: the existing DE1-SoC LED map, with its ROM row selection replaced — via
+one switch — by a **live UART register feed** carrying the real positions of the actual
+buses on lines 8A/8C/80/126, polled from the DfT Bus Open Data Service by a Raspberry
+Pi 5. The WS2812B driving logic does not change. The FPGA stays the solver and the star.
 
-**The on-stage sentence:** *"That light is the number 80, on Dudley Road, right now."*
+**The on-stage sentence:** *"Same board, same Verilog, one switch — and now that light
+is the number 80, on Dudley Road, right now."*
 
-**The honest framing (say it before anyone asks):** WiFi stands in for the LoRa link —
-same hub, same packet, same payload; the radio swaps in at deployment. This is exactly
-the bench prototype §7 of the radio report proposes.
+**The honest framing:** the Pi's UART wire stands in for the LoRa receiver — same
+register, same payload; the radio swaps in at deployment. This is §7's bench prototype,
+one level better: on the production display.
 
-**Timeline:** build Fri 13 – Sun 15 · integrate with Pi Mon 16 · freeze + record the
-replay file Tue 17. Nothing in this build touches the deck's critical path.
+**Timeline:** HDL Fri 13 – Sun 15 · Pi integration Mon 16 · freeze + record the replay
+file Tue 17. SW9 fallback means the existing demo is never at risk.
 
 ---
 
 ## Architecture
 
 ```
-BODS API (SIRI-VM, ~10s refresh)
-        │  HTTPS poll every 30 s  (reuses tools/bods_avl logic + .bods_key)
+BODS API (SIRI-VM, ~10 s refresh)
+        │  HTTPS poll every 30 s  (reuses tools/bods_avl poll() + .bods_key)
         ▼
-Raspberry Pi 5  ──  hub.py: poll → snap vehicles to stops → build frame
-        │  HTTP GET /frame every 5 s over WiFi (phone hotspot, not venue WiFi)
-        ▼
-Arduino R4 UNO WiFi  ──  living_twin.ino: parse frame → drive LEDs
-        ▼
-WS2812B strip (one LED per stop, 15 used; matrix fine too)
+Raspberry Pi 5 — hub.py: poll → snap vehicles to the 15 stops → 17-byte frame
+        │  UART 9600-8-N-1, Pi GPIO14 TX (3.3 V) ──► DE1-SoC GPIO RX  + common GND
+        ▼                                             (both 3.3 V — no level shifter)
+DE1-SoC — NEW: uart_rx + frame parser/register bank + mux (SW9: ROM ◄► LIVE)
+        ▼  UNCHANGED: cur_color logic, bit-bang FSM, WS2812B timing
+156-LED Ladywood map (the existing display)
 
-(optional stretch: Pi UART → DE1-SoC GPIO at 3.3 V, feeding the same frame to a
- UART register in place of the ROM row — the exact upgrade the radio report names.
- Only attempt after the Arduino path works end-to-end.)
+Optional second receiver (only if everything above works by Sunday night):
+Arduino R4 UNO WiFi as a mini stop-unit listening to the same frame relayed by the
+Pi over the hotspot — one packet, two receivers: the one-to-many broadcast, physical.
 ```
 
-## The frame format (keep it dumb)
+## The frame: 17 bytes (this number is a talking point — use it)
 
-Plain text, one line, newline-terminated — trivially parseable on the Arduino and
-trivially loggable for the replay file:
+| Byte | Meaning |
+|---|---|
+| 0 | sync `0xAA` |
+| 1–15 | one byte per stop S01–S15: `(buses_present << 4) \| demand_level` — high nibble = live vehicles snapped to that stop (0–9), low nibble = demand tier level from route_plan (0–3) |
+| 16 | checksum: XOR of bytes 1–15 |
 
-```
-F;S01:0;S02:2;S03:1;S04:0;S05:0;S06:3;S07:0;S08:1;S09:0;S10:0;S11:1;S12:0;S13:0;S14:0;S15:2
-```
+Sent every 5 s. **Seventeen bytes is exactly the "tiny periodic packet" the radio
+report's duty-cycle maths assumes** — at 9600 baud it occupies ~18 ms of airtime, which
+is the live proof that the <10% LoRa duty-cycle constraint is comfortable. Say that.
 
-`stop_id:n` where n = number of live vehicles currently nearest that stop (0–9).
-Colour mapping on the Arduino: 0 = dim base colour from the stop's demand tier
-(the route_plan layer), 1+ = bright "bus here" colour with brightness scaling by n.
-Result: the demand map glows softly underneath, and actual buses ride on top of it.
+## FPGA work (the real task — ~3 modules, all testbench-able)
 
-## Pi side — `hub.py` (~50 lines, reuse what exists)
+1. **`uart_rx.sv`** — standard 8-N-1 receiver at 9600 baud from the 50 MHz clock
+   (divider 5208; oversample or 16x tick, your call). This is a stock pattern.
+2. **`frame_rx.sv`** — byte-level FSM: wait `0xAA` → shift 15 payload bytes → verify
+   XOR → on success, latch all 15 into a register bank **atomically** (double-buffer:
+   never let the display read a half-frame); on checksum fail, drop silently.
+3. **Mux into the existing data path** — where the design currently selects a ROM row
+   via `SW[1:0]`/`SW[4:2]`: `SW9 ? live_regs : rom_row`. Colour mapping for live mode:
+   low nibble (demand) → the existing tier colours, dimmed; high nibble ≠ 0 → bright
+   "bus here" colour on that stop's LED, brightness stepping with the count.
+4. **Staleness watchdog** (the fail-safe beat): a counter reset on every valid frame;
+   if no valid frame for 60 s in live mode, drive the slow amber "no live data"
+   pulse — never hold stale data. This is `docs/FPGA_HARDENING.md` §1's fail-safe,
+   implemented, demonstrable.
+5. **Testbench:** drive `uart_rx` with a recorded byte stream (the Pi can dump frames
+   to a file) and assert the register bank matches — which conveniently also produces
+   the HDL-verification evidence the hardening punch-list asks for. Two birds.
 
-1. Copy `tools/bods_avl/collect_avl.py`'s `poll()` — it already returns
-   line/vehicle/lat/lon for the four corridors using `.bods_key`.
-2. Snap each vehicle to the nearest of the 15 stops (haversine vs
-   `data/gtfs/ladywood_stops.json`, 250 m radius; ignore vehicles between stops or
-   light the nearer one — pick one rule and keep it).
-3. Serve the frame:
+Pin notes: any 3.3 V GPIO header pin for RX; Pi GPIO14 is 3.3 V — direct wire + GND,
+no level shifter. Constrain the pin in the .qsf and treat RX as asynchronous (2-FF
+synchroniser before the UART FSM).
 
-```python
-from flask import Flask
-app = Flask(__name__)
-FRAME = "F;" + ";".join(f"S{i:02d}:0" for i in range(1, 16))
+## Pi side — `hub.py` (~60 lines, mostly reuse)
 
-@app.get("/frame")
-def frame():
-    return FRAME + "\n"
+1. Copy `poll()` from `tools/bods_avl/collect_avl.py` (it already filters the four
+   lines and uses `.bods_key` — Chris: register your own free key, 2 min, see
+   `tools/bods_avl/BODS_AVL_PIPELINE.md`; don't share keys).
+2. Snap each vehicle to the nearest stop in `data/gtfs/ladywood_stops.json`
+   (haversine, 250 m radius). Demand nibble per stop from the active route_plan
+   window (or hardcode the current window's levels — it's a demo, say so).
+3. `pyserial` on `/dev/serial0` → write the 17 bytes every 5 s.
+4. **Replay mode is not optional:** append every frame + timestamp to a log file as
+   you run; `hub.py --replay <file>` steps through a recorded day at 60× with the same
+   UART output. If the hotspot/BODS dies on stage: real data, honestly labelled
+   "recorded Tuesday", demo survives. And **SW9 down** is always the final fallback —
+   the ROM snapshot demo you already trust.
 
-# background thread: every 30 s -> poll() -> snap -> rebuild FRAME
-# replay mode:  python hub.py --replay avl_20260616.csv  (same endpoint,
-# steps through a recorded day at 60x speed - label it "recorded" on stage)
-```
+## Bench acceptance test (Monday)
 
-4. **Replay mode is not optional.** Record Tuesday's frames to a file as you go
-   (append each FRAME with a timestamp). If the hotspot dies on stage, run
-   `--replay` — real data, honestly labelled, demo survives.
+Watch a real 80 move S06 → S07 on the physical map within ~60 s of it happening on
+Dudley Road (cross-check the dashboard or BODS map). Then pull the UART wire: amber
+pulse within 60 s. Then SW9 down: ROM snapshot returns. All three behaviours = ship.
 
-## Arduino side — `living_twin.ino` (~40 lines)
+## Stage choreography (60 seconds)
 
-- Libraries: `WiFiS3` (built into the R4 core) + `Adafruit_NeoPixel`.
-- Loop: every 5 s, `GET http://<pi-ip>:5000/frame`, parse the line, set pixels, `show()`.
-- LED index = stop number − 1 (S01 → pixel 0). If using a longer strip/matrix, put the
-  15 stop pixels wherever matches your physical map and keep a lookup table.
-- Brightness: cap at ~80/255 — LEDs read better on camera and don't blind the front row.
-- Failure behaviour mirrors the FPGA hardening doc: if no frame for 60 s, switch to a
-  slow amber pulse — the "no live data" pattern, never stale data. Saying "watch what
-  it does when I kill the link" is a *demo feature*: it proves the fail-safe design live.
+1. SW9 down: "This is the build we submitted — demand baked into ROM, honestly static."
+2. SW9 up, live: "This is the same board, same Verilog, one new register — live. That
+   light is the number 80 on Dudley Road, right now."
+3. Pull the UART wire. Amber pulse. "And when the link dies it tells the truth — it
+   never shows a bus that isn't there." Reconnect.
+4. Hand the nearest judge the printed driver duty card while it resyncs.
 
-## DE1-SoC stretch goal (only if the above is done by Sunday night)
+Beat 3 — failing safely, on purpose, in front of them — is the most persuasive ten
+seconds available to this project. Rehearse it until it's boring.
 
-Pi TX (GPIO14, 3.3 V) → DE1-SoC GPIO RX. 9600-8-N-1, same frame text. A small UART
-receiver + register bank in place of the SW-selected ROM row, feeding the existing
-`cur_color` logic untouched. This is precisely the "additive next phase, no redesign"
-claim in the radio report — demonstrating even a single stop's colour changing live on
-the FPGA makes that claim physical. If timing is tight, skip it: the Arduino unit
-already proves the architecture, and the ROM-snapshot FPGA next to it tells the
-yesterday/tomorrow story.
+## Priority order for the weekend (so this never eats the critical path)
 
-## Practicalities
-
-- **Network:** phone hotspot only. Test the full chain on the hotspot before Tuesday.
-  BODS polling needs internet; the Pi↔Arduino link is local to the hotspot.
-- **Power:** Pi on its PSU; Arduino + ≤15 active LEDs is fine over USB. If you use a
-  bigger strip, inject 5 V separately and share ground.
-- **The key:** `.bods_key` lives on the Pi only. Never in git (already ignored).
-- **Bench test acceptance:** watch the real 80 move S06→S07 on the strip within ~60 s
-  of it happening on Dudley Road (cross-check against the BODS map or the dashboard).
-
-## Stage choreography (60 seconds, after the FPGA snapshot is shown)
-
-1. "This board is the snapshot we built — demand baked into ROM, honestly static."
-2. "This one is what the report proposed next. It's live." *(point)* "That light is the
-   number 80 on Dudley Road — now."
-3. Kill the hotspot. The unit drops to the amber no-data pulse. "And when the link
-   dies, it tells the truth — it never shows a bus that isn't there." Restore link.
-4. Hand the duty card to the nearest judge while the LEDs reconnect behind you.
-
-That third beat — failing safely, on purpose, in front of them — is the most
-persuasive ten seconds available to this project. Rehearse it.
+Reflection (Sunday, blocks the team) → `uart_rx` + `frame_rx` + mux (Fri–Sun) →
+LoRa security paragraph from FPGA_HARDENING (30 min) → Pi integration (Mon) →
+Arduino second receiver (only if bored) → freeze Tue 17.
