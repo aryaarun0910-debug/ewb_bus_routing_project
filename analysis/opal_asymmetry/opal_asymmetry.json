@@ -1,0 +1,21 @@
+{
+  "weekday_rows": 175583,
+  "locations": 306,
+  "total_taps": 17345046,
+  "note": "TfNSW small-count perturbation applied at source (disclosed); two weeks, Jul-Aug 2016",
+  "board_alight_ratio_by_tier": {
+    "major": {
+      "am_6_9": 1.017,
+      "pm_15_18": 1.14
+    },
+    "medium": {
+      "am_6_9": 1.674,
+      "pm_15_18": 0.759
+    },
+    "minor": {
+      "am_6_9": 1.866,
+      "pm_15_18": 0.683
+    }
+  },
+  "asymmetric_minor_design_vindicated": true
+}
