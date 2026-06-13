@@ -94,9 +94,11 @@ export default function MapView({
 
     // Normalise demand across the current window so the heat is relative.
     const maxDemand = Math.max(1, ...stops.map((s) => demand[s.stop_id] ?? 0));
-    // Which stops the current plan actually serves — unserved ones recede.
+    // Which stops the current plan actually serves. A stop the plan leaves out
+    // (while others are served) is "underserved" — it gets the amber alarm.
     const served = new Set<string>();
     for (const r of routes) for (const s of r.route_stops ?? []) served.add(s);
+    const planLoaded = served.size > 0;
 
     for (const stop of stops) {
       const boardings = demand[stop.stop_id] ?? 0;
@@ -141,30 +143,43 @@ export default function MapView({
       // t = 1 red/busy.
       const t = boardings / maxDemand;
       const heat = demandGlow(t);
-      const isServed = served.size === 0 || served.has(stop.stop_id);
+      const isServed = !planLoaded || served.has(stop.stop_id);
+      // Underserved = the plan is loaded but doesn't serve this stop.
+      const isUnderserved = planLoaded && !served.has(stop.stop_id);
       const ring = TIER_RING[stop.importance] ?? 1.5;
       const tierRing = (IMPORTANCE_COLOR[stop.importance] ?? "#8e8e93") + "66";
 
-      // Unserved stops recede — they read as "left out", reinforcing the gap.
-      entry.el.style.opacity = isServed ? "1" : "0.4";
+      // Underserved stops are alarmed (amber ring, CSS-animated); everything
+      // else sits at full strength — the cool demand colour de-emphasises quiet
+      // stops without needing to dim them.
+      entry.el.classList.toggle("underserved", isUnderserved);
+      entry.el.style.opacity = "1";
 
+      // Demand pulse only in the default (non-equity) view, for served stops.
+      const pulseOp = !imdOverlay && isServed && !isUnderserved ? 0.15 + t * 0.6 : 0;
       entry.el.style.setProperty("--glow", heat);
-      entry.el.style.setProperty("--glow-op", isServed ? (0.15 + t * 0.6).toFixed(3) : "0");
+      entry.el.style.setProperty("--glow-op", pulseOp.toFixed(3));
       entry.el.style.setProperty("--glow-scale", (0.4 + t * 1.8).toFixed(3));
 
       if (imdOverlay && stop.imd_score != null) {
-        // Equity view: fill = deprivation (redder = more deprived).
+        // Equity view: fill = deprivation, plus a soft red FIELD whose radius
+        // scales with deprivation — overlapping fields read as a heat map.
         const d = Math.max(0, Math.min(1, stop.imd_score / 60));
         const r0 = 90, g0 = 100, b0 = 110;  // muted slate baseline
         const r1 = 255, g1 = 55, b1 = 95;    // alert red (#ff375f)
         const mix = (a: number, b: number) => Math.round(a + (b - a) * d);
         entry.el.style.background = `rgb(${mix(r0, r1)}, ${mix(g0, g1)}, ${mix(b0, b1)})`;
-        entry.el.style.boxShadow = `0 0 0 ${ring}px ${tierRing}, 0 0 0 4px rgba(255,55,95,${0.05 + d * 0.18})`;
+        if (!isUnderserved)
+          entry.el.style.boxShadow =
+            `0 0 0 ${ring}px ${tierRing}, 0 0 ${18 + d * 46}px ${6 + d * 18}px rgba(255,55,95,${(0.22 + d * 0.5).toFixed(2)})`;
       } else {
         // Default view: FILL = demand heat (loud), RING = tier (quiet).
         entry.el.style.background = heat;
-        entry.el.style.boxShadow = `0 0 0 ${ring}px ${tierRing}, 0 0 16px 3px ${heat}55`;
+        if (!isUnderserved)
+          entry.el.style.boxShadow = `0 0 0 ${ring}px ${tierRing}, 0 0 16px 3px ${heat}55`;
       }
+      // Underserved alert ring is owned by CSS animation — clear any inline shadow.
+      if (isUnderserved) entry.el.style.boxShadow = "";
     }
   }, [stops, demand, routes, imdOverlay, onSelectStop]);
 

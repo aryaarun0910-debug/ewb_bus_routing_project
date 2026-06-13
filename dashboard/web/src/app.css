@@ -300,6 +300,24 @@
 .stop-dot.tier-major .stop-label { opacity: 0.95; }
 .stop-dot:hover .stop-label { opacity: 1; }
 
+/* Underserved stop — real demand the plan left out this window. It pulses an
+   amber alarm so the warning text has a place on the map: "that one, left
+   behind." Owns its box-shadow via animation (JS clears the inline shadow). */
+.stop-dot.underserved {
+  border-color: #ff9f0a;
+  animation: alert-pulse 1.5s ease-in-out infinite;
+}
+@keyframes alert-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(255, 159, 10, 0.65),
+                0 0 14px 4px rgba(255, 159, 10, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(255, 159, 10, 0.2),
+                0 0 28px 9px rgba(255, 159, 10, 0.6);
+  }
+}
+
 /* The hero stop — City Hospital. A standing teal ring + a two-line caption so
    it can be pointed to on stage: "that one — the hospital." */
 .stop-dot.hero {
