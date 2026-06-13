@@ -49,11 +49,17 @@ export default function BusLayer({ map, routes }: { map: MlMap | null; routes: R
     if (!map) return;
 
     const cleanupLines = () => {
+      // During teardown/HMR the style may already be gone — guard every call.
+      if (!map || !map.getStyle?.()) return;
       for (const r of routes) {
         const id = `${ROUTE_SOURCE_PREFIX}${r.bus}`;
-        if (map.getLayer(`${id}-case`)) map.removeLayer(`${id}-case`);
-        if (map.getLayer(id)) map.removeLayer(id);
-        if (map.getSource(id)) map.removeSource(id);
+        try {
+          if (map.getLayer(`${id}-case`)) map.removeLayer(`${id}-case`);
+          if (map.getLayer(id)) map.removeLayer(id);
+          if (map.getSource(id)) map.removeSource(id);
+        } catch {
+          /* layer/source already removed — safe to ignore */
+        }
       }
     };
 

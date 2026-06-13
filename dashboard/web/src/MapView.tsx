@@ -43,16 +43,38 @@ function demandGlow(t: number): string {
 const HERO_ID = "S06";
 const HERO_SUBLABEL = "City Hospital";
 
+// Time-of-day atmosphere — the map's light breathes with the hour: warm dawn,
+// bright noon, blue dusk, dark night. A colour wash (soft-light) tints, and a
+// navy veil darkens the evening. Returns the nearest keyframe to `hour`.
+function timeAtmosphere(hour: number): { wash: string; washOp: number; darken: number } {
+  const table = [
+    { h: 6,  c: [255, 150, 90],  o: 0.34, d: 0.10 }, // dawn — warm amber
+    { h: 8,  c: [190, 205, 255], o: 0.16, d: 0.0 },  // morning — cool, clear
+    { h: 10, c: [225, 228, 238], o: 0.08, d: 0.0 },  // mid — neutral
+    { h: 12, c: [255, 250, 235], o: 0.05, d: 0.0 },  // noon — brightest
+    { h: 14, c: [255, 222, 165], o: 0.16, d: 0.0 },  // afternoon — warm gold
+    { h: 17, c: [255, 158, 88],  o: 0.30, d: 0.06 }, // pm — golden hour
+    { h: 19, c: [90, 100, 190],  o: 0.36, d: 0.22 }, // evening — blue dusk
+    { h: 22, c: [30, 40, 85],    o: 0.46, d: 0.38 }, // night — deep blue
+  ];
+  let best = table[0];
+  for (const t of table)
+    if (Math.abs(t.h - hour) < Math.abs(best.h - hour)) best = t;
+  return { wash: `rgb(${best.c[0]}, ${best.c[1]}, ${best.c[2]})`, washOp: best.o, darken: best.d };
+}
+
 export default function MapView({
   routes,
   demand,
   onSelectStop,
   imdOverlay,
+  hour,
 }: {
   routes: RouteInfo[];
   demand: Record<string, number>;
   onSelectStop: (stop: Stop) => void;
   imdOverlay: boolean;
+  hour: number;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MlMap | null>(null);
@@ -183,9 +205,12 @@ export default function MapView({
     }
   }, [stops, demand, routes, imdOverlay, onSelectStop]);
 
+  const atm = timeAtmosphere(hour);
   return (
     <>
       <div ref={containerRef} className="map-canvas" />
+      <div className="time-tint" style={{ background: atm.wash, opacity: atm.washOp }} />
+      <div className="time-darken" style={{ opacity: atm.darken }} />
       <BusLayer map={mapInstance} routes={routes} />
     </>
   );

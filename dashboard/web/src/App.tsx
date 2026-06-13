@@ -70,7 +70,7 @@ function App() {
     if (!playing || storyActive) return;
     const id = setInterval(() => {
       setWindowIdx((i) => (i + 1) % WINDOWS.length);
-    }, 2300);
+    }, 3800);
     return () => clearInterval(id);
   }, [playing, storyActive]);
 
@@ -119,7 +119,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <MapView routes={routes} demand={demand} onSelectStop={setSelectedStop} imdOverlay={imdOverlay} />
+      <MapView routes={routes} demand={demand} onSelectStop={setSelectedStop} imdOverlay={imdOverlay} hour={win.hour} />
 
       {!storyActive && <ConditionsPanel conditions={conditions} onChange={setConditions} />}
 
@@ -173,9 +173,9 @@ function App() {
         </div>
         <div className="headline-stats">
           <HeadlineStat value="57.9%" label="households with no car" />
-          <HeadlineStat value="0.945" label="demand model R² (unseen 2024 data)" />
-          <HeadlineStat value="263k" label="rows anchored to real ridership + weather" />
-          <HeadlineStat value="1.16%" label="optimiser gap vs. brute-force optimal" />
+          <HeadlineStat value="0.945" label="demand model R² · unseen 2024" />
+          <HeadlineStat value="263k" label="real-anchored training rows" />
+          <HeadlineStat value="1.16%" label="optimiser gap vs. optimal" />
         </div>
       </motion.header>
 
