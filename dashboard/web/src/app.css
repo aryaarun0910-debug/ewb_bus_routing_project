@@ -116,6 +116,37 @@
   color: var(--text-dim);
 }
 
+.time-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.play-btn {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 2px;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+}
+.play-btn:hover { background: var(--surface-strong); transform: scale(1.06); }
+.play-btn.playing {
+  padding-left: 0;
+  color: #0a84ff;
+  border-color: rgba(10, 132, 255, 0.55);
+  background: rgba(10, 132, 255, 0.12);
+}
+
 .time-slider {
   -webkit-appearance: none;
   appearance: none;

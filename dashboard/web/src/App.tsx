@@ -33,6 +33,7 @@ function App() {
   const [scenarios, setScenarios] = useState<string[]>([]);
   const [scenario, setScenario] = useState<string>("");
   const [windowIdx, setWindowIdx] = useState(1); // AM Peak default
+  const [playing, setPlaying] = useState(false); // auto-play through the day
   const [routes, setRoutes] = useState<RouteInfo[]>([]);
   const [currentPlan, setCurrentPlan] = useState<RoutesResponse | null>(null);
   const [comparing, setComparing] = useState(false);
@@ -64,7 +65,16 @@ function App() {
     setSelectedStop(null);
   }, [storyActive, storyStep]);
 
-  const startStory = () => { setStoryStep(0); setStoryActive(true); };
+  // Auto-play: step through the day so the demand map breathes dawn → night.
+  useEffect(() => {
+    if (!playing || storyActive) return;
+    const id = setInterval(() => {
+      setWindowIdx((i) => (i + 1) % WINDOWS.length);
+    }, 2300);
+    return () => clearInterval(id);
+  }, [playing, storyActive]);
+
+  const startStory = () => { setPlaying(false); setStoryStep(0); setStoryActive(true); };
   const exitStory = () => setStoryActive(false);
 
   const win = WINDOWS[windowIdx];
@@ -201,15 +211,25 @@ function App() {
           </motion.div>
         </AnimatePresence>
 
-        <input
-          type="range"
-          min={0}
-          max={WINDOWS.length - 1}
-          step={1}
-          value={windowIdx}
-          onChange={(e) => setWindowIdx(Number(e.target.value))}
-          className="time-slider"
-        />
+        <div className="time-controls">
+          <button
+            className={`play-btn${playing ? " playing" : ""}`}
+            onClick={() => setPlaying((p) => !p)}
+            title={playing ? "Pause" : "Play the day"}
+            aria-label={playing ? "Pause" : "Play the day"}
+          >
+            {playing ? "❚❚" : "▶"}
+          </button>
+          <input
+            type="range"
+            min={0}
+            max={WINDOWS.length - 1}
+            step={1}
+            value={windowIdx}
+            onChange={(e) => { setWindowIdx(Number(e.target.value)); setPlaying(false); }}
+            className="time-slider"
+          />
+        </div>
         {currentPlan?.unserved_stops && currentPlan.unserved_stops.length > 0 && (
           <div className="unserved-row">
             <span className="unserved-icon">⚠</span>
