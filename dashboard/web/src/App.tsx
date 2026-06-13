@@ -254,24 +254,26 @@ function App() {
             <>
               <span className="legend-grad demand" /> Quiet → busy
               <span className="legend-sep" />
-              <span className="legend-ring" /> Ring = stop importance
+              <span className="legend-ring" /> Ring = importance
             </>
           )}
           <span className="legend-spacer" />
-          <button className="overlay-toggle story-launch" onClick={startStory}>
-            ▶ Play the story
+          <button className="overlay-toggle story-launch" onClick={startStory} title="Play the guided story">
+            ▶ Story
           </button>
           <button
             className={`overlay-toggle${comparing ? " active" : ""}`}
             onClick={() => setComparing((v) => !v)}
+            title="Compare two scenarios side by side"
           >
-            {comparing ? "Comparing scenarios" : "Compare scenarios"}
+            {comparing ? "Comparing" : "Compare"}
           </button>
           <button
             className={`overlay-toggle${imdOverlay ? " active" : ""}`}
             onClick={() => setImdOverlay((v) => !v)}
+            title="Toggle the IMD deprivation heat-field"
           >
-            {imdOverlay ? "Showing IMD equity overlay" : "Show IMD equity overlay"}
+            Equity overlay
           </button>
         </div>
       </motion.div>

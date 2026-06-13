@@ -67,9 +67,9 @@ export default function StopPanel({
             {showGlossary && (
               <motion.dl
                 className="glossary"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               >
                 {METRIC_DEFS.map((m) => (
