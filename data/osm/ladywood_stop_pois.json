@@ -41,17 +41,17 @@
     "lon": -1.9101,
     "radius_m": 400,
     "poi_counts": {
-      "hospitals": -1,
-      "gp_clinics": -1,
-      "pharmacies": -1,
-      "schools": -1,
-      "supermarkets": -1,
-      "convenience": -1,
-      "bus_stops": -1,
-      "workplaces": -1
+      "hospitals": 0,
+      "gp_clinics": 0,
+      "pharmacies": 0,
+      "schools": 6,
+      "supermarkets": 0,
+      "convenience": 5,
+      "bus_stops": 13,
+      "workplaces": 158
     },
     "derived_tier": "minor",
-    "data_source": "OpenStreetMap via Overpass API"
+    "data_source": "OpenStreetMap via Overpass API (re-fetched 2026-06-13; original query failed)"
   },
   "S04": {
     "stop_name": "Soho Hill",

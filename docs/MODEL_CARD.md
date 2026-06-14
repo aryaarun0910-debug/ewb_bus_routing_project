@@ -37,8 +37,9 @@ Counting (APC) data feed (see [Caveats](#known-limitations--the-honest-gap)).
 | Weather (2023–24, hourly) | **Real** | Open-Meteo historical archive |
 | School/university term dates | **Real** | Birmingham LA term + bank-holiday calendars |
 | Per-stop demand anchor | **Real** | UCL/GEoDS ENCTS concessionary smartcard journey volumes, TfWM-linked, 2010–2016 |
-| Per-stop static features (`imd_score`, `poi_total`, `population`, `crime_total_2024`, `elevation_m`) | **Real** | IMD 2019, OSM, ONS Census 2021, police.uk, elevation API |
-| **Hour-of-day demand shape** (commuter-peak curves) | **Synthetic** | Modelled — no public per-hour boarding curves exist for these stops |
+| Per-stop static **model** features (`imd_score`, `poi_total`, `population`, `elevation_m`) | **Real** | IMD 2019, OSM, ONS Census 2021, elevation API |
+| `crime_total_2024` — **displayed as context, NOT a model feature** | **Real** | police.uk. Deliberately excluded from the model: an ablation (`analysis/crime_ablation/`) showed it carried no signal (R² 0.9445 → 0.9450 *without* it) and it risks inheriting policing bias. Surfaced in the dashboard as caveated area context only |
+| **Hour-of-day demand shape** (weekday commuter peaks; weekend midday peak) | **Synthetic (weekday) / observed-shape (weekend)** | Weekday curves modelled; weekend curves now follow the empirically-observed TfL BUSTO midday-peak shape (A12 resolved) |
 | **Special events** (festivals, road closures) | **Synthetic** | Modelled — no public event/disruption logs exist for these stops |
 
 263,160 rows (every real day in the 2023–24 weather archive × 15 stops × 24
