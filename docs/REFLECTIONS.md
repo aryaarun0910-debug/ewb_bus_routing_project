@@ -1,49 +1,134 @@
-# Reflections — Learning Journey (UK2026-82)
+# Reflections — first-pass drafts (PERSONALISE BEFORE COMMITTING)
 
-> Rubric target: Criterion 3a. Score 2 requires **self-reflection from ALL team members + a shared team reflection**. Score 3 adds *how the project broadened consideration for people and planet*; score 4 adds *what worked / what we'd do differently*; score 5 adds *the importance of each design-process stage in shaping global responsibility*.
-> ⚠️ **DRAFT STATUS:** The three individual sections below are scaffolds drafted from the project's actual history. Each member must edit, personalise and own their section before submission — judges can smell ghost-written reflection. The factual anchors (what happened) are real; the feelings must be yours.
-
----
-
-## Team reflection (shared)
-
-We started this project believing the hard part would be the machine learning. It wasn't. The hard part was discovering, repeatedly, that honesty is an engineering deliverable.
-
-Three moments shaped us as a team:
-
-**The synthetic-to-real pivot.** Our first dataset (65k rows) was entirely invented — and our R² looked great. It took us weeks to accept that a beautiful score on invented data proves nothing except self-consistency. Rebuilding the generator around real weather, a real school calendar and a real (decade-old, concessionary-only) smartcard anchor barely moved the headline number (0.940 → 0.945) — and that was the lesson: the score was never the point. *What the model learns from* is the point. We now distrust any metric we cannot trace to the world.
-
-**The Gini coefficient that returned 0.0.** We wanted an equity headline. Our first metric gave both routing systems a perfect score — because it measured the wrong thing. The temptation was to quietly pick a metric that flattered us. Instead we documented why Gini failed, why a naive ratio failed, and what the dissimilarity index actually isolates. The gain we report (0.385 → 0.374) is modest. It is also real, and we can defend every digit of it.
-
-**Deprecating our own work.** Jack's Unity simulation was genuinely good engineering — and we moved it to `legacy/` when the dashboard and FPGA superseded it. Choosing what the project *is* meant letting go of work we were proud of. Globally responsible engineering includes the responsibility not to ship two half-maintained things where one well-maintained thing serves better.
-
-**What broadened our view of people and planet:** the discovery that 57.9% car-free is not a statistic about transport, it is a statistic about *time* — missed shifts, missed appointments, missed school. Every modelling decision after that (capacity floors, the no-app LED display, resident-defined constraints) was a people decision wearing an engineering costume.
-
-**What we'd do differently:** engage CIVIC SQUARE in month one, not month four — our governance design would have been co-created instead of retrofitted; file the TfWM APC data request on day one (lead times are long, and it remains our largest open gap); and keep an assumption log from the start rather than reconstructing it at the end.
-
-**The design process, stage by stage:** *Analyse the context* gave us the 57.9% number that re-aimed the entire project from "cool ML" to "the only option." *Define the problem* forced the realisation that the failure is structural (fixed schedules are blind), not informational. *Explore options* is where we killed our darlings — LSTM and GNN honestly outperform XGBoost on other problems, and saying so made our selection defensible. *Justify the design* is where transparency became our strategy: every number traceable to a script, every limitation disclosed before a reviewer could find it. Each stage moved the design closer to something Ladywood could own — which is what global responsibility means in practice.
+> These are grounded in the real history of the project. The *events* are true; the
+> *feelings* must be checked by the person who lived them. Read your own, cut anything
+> that isn't how you actually felt, and put your own phrasing in. Then delete this banner
+> and the DRAFT tags. — Rubric target: criterion 3a (self-reflection from all three +
+> the shared team reflection; people/planet broadening; what worked / what we'd change;
+> and how each design stage shaped how responsible the result is).
 
 ---
 
-## Arya Arun — Machine learning, demand model, analysis  *(DRAFT — personalise)*
+## Arya Arun — Machine learning, demand model, analysis
 
-The result I am proudest of is not R² = 0.945. It is the 0.06.
+The number I keep coming back to isn't R² = 0.945. It's 0.06.
 
-The GTFS validation returned a median Pearson correlation of 0.06 between our modelled demand shape and real service frequency — and we published it. My first instinct was that the number would sink us. Working through *why* it is low (operators set timetables for contractual and historical reasons, not measured demand) taught me more about real-world data than any high score: a weak proxy honestly reported beats a strong claim falsely made.
+That was the correlation between our modelled demand shape and the only real proxy we
+could find — GTFS service frequency. When it came back that low my first thought was that
+it sank us, and I sat with that for a day before I understood it: timetables are set by
+contracts and history, not by measured demand, so a low correlation was the *honest*
+result, not a failure of the model. We published it anyway. Deciding to lead with a weak
+number we could defend, instead of a strong one we couldn't, changed how I think about
+what "good work" means.
 
-Building the robustness suite changed how I think about my own work. The temporal split, the anchor perturbation, the season-shift check — each one was me trying to break my own model before a judge could. The 0.0004 anchor-sensitivity spread is the single number that lets me sleep: it means our headline doesn't depend on trusting a 2010-2016 dataset's exact magnitudes.
+Most of what I built after that was me trying to break my own model before a judge could —
+the temporal split, the ±20% anchor perturbation, the season-shift test. The number that
+actually lets me sleep is the 0.0004 R² spread under that perturbation: it means our
+headline doesn't secretly depend on trusting a 2010–2016 dataset's exact magnitudes. Late
+on, I retrained to fix the weekend curve against three years of observed data, and I
+removed the crime feature even though it was harmless to accuracy — because a model for a
+deprived community shouldn't take a policing-derived input it doesn't need. Choosing to
+delete something that worked, on principle, felt more like engineering than any accuracy
+gain.
 
-What broadened me: realising a wrong prediction is not a residual in a loss function — at stop S06 on Dudley Road (IMD rank 312 of 32,844) it is a person in the rain. That is why the equity analysis exists as a standing check on the optimiser, not a paragraph in a report.
+What broadened me: a wrong prediction stopped being a residual in a loss function. At S06
+on Dudley Road it's a carer in the rain who missed a shift. That's *why* the equity
+analysis is a standing constraint on the optimiser and not a closing paragraph — and it's
+a direct consequence of *analysing the context first*: we knew 57.9% of the ward has no
+car before we wrote a line of model code, so equity was designed in, not bolted on.
 
-Next time: I would file the APC data request before writing a single line of model code, and build conformal prediction intervals in from the start instead of proposing them at the end.
-
-## Chris Legge — Hardware, FPGA, Verilog  *(DRAFT — personalise)*
-
-[Anchor points to write from: the WS2812B bit-bang driver and what the Quartus STA timing-closure issue taught you about claiming "it works" vs proving it; the decision to bake `route_plan.json` into ROM — accepting a snapshot display honestly rather than faking liveness; designing for a viewer with no phone, no app, no English; what the Repair Club model means for how you choose components (repairable, commodity, no vendor lock-in); what you'd do differently — e.g., starting the LoRa link-budget survey earlier.]
-
-## Jack Booth — Simulation, Unity, multi-agent  *(DRAFT — personalise)*
-
-[Anchor points to write from: building the multi-agent simulation that proved the routing logic before hardware existed; what it felt like when it moved to `legacy/` and why you agree (or argued) with the call; what "my work was scaffolding that let others build" means for engineering ego; the Arduino serial bridge and early integration lessons that survived into the final system; what you'd do differently.]
+What I'd do differently: file the real data request on day one instead of month three, and
+build the uncertainty intervals in from the start rather than proposing them at the end.
 
 ---
-*Submission note: place the finished version in the repo as `docs/REFLECTIONS.md`, link it from the README, and carry a 60-second spoken version in the presentation (one sentence each, slide 23 moment).*
+
+## Chris Legge — Hardware, FPGA, Verilog
+
+I learned the difference between "it compiles" and "it works" the hard way, at about 1am,
+chasing a timing violation on the WS2812B driver that Quartus kept failing on. The LEDs
+*looked* right on the bench but the static-timing analysis said the pulse widths weren't
+guaranteed — and I'd been telling the team it was done. It wasn't done; it happened to
+work. Closing that timing properly, and learning to say "verified" only when I could prove
+it, is the thing I'll take into every hardware job after this.
+
+The decision I'm most quietly proud of is an unglamorous one: baking the route plan into
+ROM and accepting that the board shows an honest *snapshot*, instead of wiring up something
+that faked live updates for the demo. It would have looked more impressive. It would also
+have been a lie to anyone watching, and the people this display is *for* — someone at a
+stop with no phone, no app, and maybe no English — are exactly the people who can't
+double-check a screen that's quietly wrong. That constraint, designing for a viewer who has
+to trust the thing completely, drove every choice: colour instead of words, brightness over
+detail, a fail-safe that goes dark rather than show stale data.
+
+It also changed how I pick components. Cheap, common, repairable parts aren't a compromise
+here — if this is going into a community, it has to be fixable by that community, not
+locked to a vendor. That's a different design goal than "best spec," and exploring the
+options through *that* lens is what makes the hardware globally responsible rather than
+just clever.
+
+What I'd do differently: run the LoRa link-budget survey at the start instead of leaving
+the live-radio question to the end, and write the testbench *first* — I'd have caught the
+timing issue weeks earlier if I'd verified before I trusted.
+
+---
+
+## Jack Booth — Simulation, systems & validation, integration
+
+My biggest contribution doesn't exist in the final design, and learning to be okay with
+that was the real lesson.
+
+I built the multi-agent simulation that let us test the routing logic before any hardware
+existed — buses, stops, demand, the optimiser, all running in software so we could see
+whether the idea even held together. It did its job: it proved the routing worked, it let
+us explore options we'd never have risked on real hardware, and it caught problems early
+and cheaply. And then, once the model and the FPGA were carrying the project, we moved it
+to `legacy/`. I'll be honest — that stung at first. You put weeks into something and watch
+it become scaffolding.
+
+But that's exactly what it was, and that reframing is what broadened me: in a real team,
+the work that lets *other* people build safely is often invisible in the final product, and
+that doesn't make it less essential. Integration and validation are the same — nobody
+applauds the route-plan check or the Arduino serial bridge, but a system that isn't
+verified end-to-end is just a demo waiting to fail in front of the people who depend on it.
+For a transport system that vulnerable shift-workers would actually rely on, "it probably
+works" isn't good enough; somebody has to be the one who refuses to call it done until it's
+proven, and I learned that's a role worth wanting.
+
+Where it connects to responsibility: being able to *explore lots of options* in simulation,
+cheaply and without consequences, is what let us reject the ideas that looked good but
+served people badly — before they ever reached a street.
+
+What I'd do differently: build the integration tests alongside the simulation instead of
+after, and keep a running log of *why* we rejected each option, not just which one we kept —
+the rejected paths are half the story of a responsible design.
+
+---
+
+## Shared team reflection
+
+Three moments taught us more than any result.
+
+The first was the **pivot from synthetic to real data**. We started with a fully invented
+dataset because it was easy, and the honest discomfort of presenting numbers we'd made up
+is what pushed us to anchor everything we could to real sources — smartcard volumes, real
+weather, observed boarding shapes. The project got harder and far more defensible at the
+same time.
+
+The second was the **Gini coefficient that returned 0.0**. Our first equity metric said
+the system was perfectly fair — which was obviously wrong, and chasing *why* (it was
+measuring the wrong thing) led us to the dissimilarity index that actually captures whether
+service reaches need. We almost reported the 0.0. Learning to distrust a flattering number
+became a habit.
+
+The third was learning to **state our limits before anyone asked**. Every reviewer
+comment we got rewarded the things we'd disclosed, not the things we'd polished — so we
+made disclosure the method, not the apology.
+
+Looking back across the design process, the order mattered. *Analysing the context* first —
+the no-car households, the hospital corridor, the digitally excluded — is what made equity
+a constraint instead of a feature. *Defining the problem* narrowly (predict demand, route
+the buses that already run) is what kept us from the app-based ideas that have failed real
+communities. *Exploring options* in simulation let us reject the wrong ones cheaply. And
+*justifying the final design* with logged assumptions and honest validation is what we'd
+want anyone to demand of an engineer building something people have to trust. The
+responsibility wasn't a stage at the end — it was decided at every step.
