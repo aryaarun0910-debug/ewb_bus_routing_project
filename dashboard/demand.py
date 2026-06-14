@@ -38,7 +38,12 @@ _STOP_IMPORTANCE = {
     "S13": "minor", "S14": "minor", "S15": "minor",
 }
 
+# Columns surfaced to the dashboard for DISPLAY (incl. crime as caveated area
+# context). The MODEL feature set deliberately excludes crime_total_2024 — see
+# analysis/crime_ablation/ — so the prediction row must use _MODEL_STATIC_COLS,
+# not the full display set, or it won't match the trained model.
 _STATIC_COLS = ["imd_score", "poi_total", "population", "crime_total_2024", "elevation_m"]
+_MODEL_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m"]
 
 
 def _load_bundle():
@@ -66,7 +71,10 @@ def _load_static_lookup() -> dict[str, dict]:
 
 _model, _encoders = _load_bundle()
 _static_lookup = _load_static_lookup()
-_static_cols = [c for c in _STATIC_COLS if c in next(iter(_static_lookup.values()), {})]
+# Display lookup may include crime; the model row must not — filter to the model
+# feature set, preserving the training column order.
+_model_static_cols = [c for c in _MODEL_STATIC_COLS
+                      if c in next(iter(_static_lookup.values()), {})]
 
 
 def _safe_encode(enc: LabelEncoder, value: str) -> int:
@@ -96,9 +104,9 @@ def predict_stop_demand(
         is_school_term, is_uni_term,
         x, y,
     ]
-    if _static_cols:
+    if _model_static_cols:
         static = _static_lookup.get(stop_id, {})
-        row += [static.get(c) for c in _static_cols]
+        row += [static.get(c) for c in _model_static_cols]
     return max(0.0, float(_model.predict([row])[0]))
 
 

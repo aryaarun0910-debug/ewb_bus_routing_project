@@ -51,7 +51,9 @@ CAT_COLS = [
     "stop_id", "stop_importance", "day_type",
     "weather_type", "climate_event", "special_event",
 ]
-_REAL_STATIC_COLS = ["imd_score", "poi_total", "population", "crime_total_2024", "elevation_m"]
+# crime_total_2024 deliberately excluded — mirrors the deployed model
+# (demand_route_optimizer.py); see analysis/crime_ablation/.
+_REAL_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m"]
 
 XGB_PARAMS = dict(
     n_estimators=400, max_depth=7, learning_rate=0.07,

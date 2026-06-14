@@ -14,7 +14,7 @@
 ### 1.2 Crime data as a feature can import policing bias
 **Mechanism.** `crime_total_2024` (police.uk) is a *recorded-crime* count — it measures police activity as much as crime. If the model learns "high-crime → high demand" from it, service allocation inherits any patrol bias.
 **Affected.** Over-policed micro-areas; trust in the system among residents who already distrust data systems.
-**Mitigation.** Crime is one of five static features with low permutation importance (`analysis/explainability.py`); it informs *context* (stop-level need) not *eligibility*. The feature can be ablated with negligible R² cost — that ablation should be published.
+**Mitigation (done).** We ablated the feature (`analysis/crime_ablation/`): it carried no signal — with 15 stops a static per-stop count is redundant with stop identity — and removing it slightly *improved* out-of-year generalisation (R² 0.9445 → 0.9450). So we **removed `crime_total_2024` from the model entirely**. No policing-derived input remains in the routing model; crime is still surfaced in the dashboard as caveated area context, but it never influences service allocation. *Tested and deleted* — the strongest possible answer to the redlining critique.
 **Residual.** Document the ablation; let residents vote the feature in or out at governance Phase 2.
 
 ### 1.3 The concessionary anchor over-weights older/disabled travel patterns

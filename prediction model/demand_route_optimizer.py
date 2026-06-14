@@ -105,7 +105,14 @@ for col in CAT_COLS:
     df[col + "_enc"] = le.fit_transform(df[col])
     encoders[col] = le
 
-_REAL_STATIC_COLS = ["imd_score", "poi_total", "population", "crime_total_2024", "elevation_m"]
+# NOTE: crime_total_2024 was deliberately REMOVED as a model feature. An ablation
+# (analysis/crime_ablation/) showed it carried no signal — with 15 stops a static
+# per-stop count is redundant with stop identity — and removing it slightly
+# *improved* out-of-year generalisation (R² 0.9445 → 0.9450). Excluding it also
+# removes any policing-derived input and the redlining/bias risk that comes with
+# it. Crime is still surfaced in the dashboard as caveated area context, but it
+# never influences routing.
+_REAL_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m"]
 
 FEATURE_COLS = (
     [c + "_enc" for c in CAT_COLS]
@@ -196,11 +203,10 @@ def _safe_encode(enc: LabelEncoder, value: str) -> int:
     return int(enc.transform([fallback])[0])
 
 
-# Per-stop static real-feature lookup for simulation (mirrors the columns
-# appended to map_demand_dataset.csv by generate_real_demand_dataset.py)
-_STATIC_COLS = [c for c in
-                ["imd_score", "poi_total", "population", "crime_total_2024", "elevation_m"]
-                if c in df.columns]
+# Per-stop static real-feature lookup for simulation. Must mirror the model's
+# FEATURE_COLS exactly (crime_total_2024 excluded — see _REAL_STATIC_COLS above),
+# so a prediction row matches the trained feature set.
+_STATIC_COLS = [c for c in _REAL_STATIC_COLS if c in df.columns]
 _STATIC_LOOKUP = (
     df.drop_duplicates("stop_id").set_index("stop_id")[_STATIC_COLS].to_dict("index")
     if _STATIC_COLS else {}

@@ -42,16 +42,21 @@ The tree ensemble can split on `stop_id_enc` directly, so a static per-stop cova
 no information the model doesn't already have. Crime counts at this granularity are pure
 redundancy; the tiny negative ΔR² is the cost of giving the trees a spurious split candidate.
 
-## Recommendation (for the team to action)
+## Outcome — DONE (2026-06-14)
 
-1. **Remove `crime_total_2024` from `_REAL_STATIC_COLS`** in the dataset generator and
-   optimizer, regenerate, retrain, and update the reported metrics (they will not get worse).
-2. Keep this ablation in the repo as the documented reason — the *process* (suspect feature
-   → test → remove) is itself rubric evidence for 2a's "identifying, verifying and logging
+1. ✅ **`crime_total_2024` removed from the model** — dropped from `_REAL_STATIC_COLS`
+   in `demand_route_optimizer.py`, from `robustness_analysis.py`, and from the
+   prediction feature row in `dashboard/demand.py`. The dataset and retrain were
+   regenerated; the deployed model no longer takes any policing-derived input.
+   Re-running `robustness_analysis.py` with crime removed left the metrics *identical*
+   (temporal R² 0.9445, random 0.9485), confirming the feature carried zero signal.
+2. ✅ Ablation kept in the repo as the documented reason — the *process* (suspect feature
+   → test → remove) is rubric evidence for 2a's "identifying, verifying and logging
    assumptions."
-3. Update `UNINTENDED_CONSEQUENCES.md` §1.2: the crime-feature mitigation is no longer
-   "ablation to publish + resident vote" — it is **"feature tested and removed; no proxy
-   for policing intensity remains in the model."** Stronger, simpler, finished.
+3. ✅ `UNINTENDED_CONSEQUENCES.md` §1.2 updated: the mitigation is now **"feature tested
+   and removed; no policing-derived input remains in the routing model."**
+   Crime is still *displayed* in the dashboard as caveated area context — but it never
+   influences routing. Stronger, simpler, finished.
 
 ## The spoken answer (when the redlining question comes)
 
