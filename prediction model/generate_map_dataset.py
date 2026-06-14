@@ -218,13 +218,36 @@ STOP_NEIGHBORS = {
 # 5.  HOURLY DEMAND PROFILES
 # ─────────────────────────────────────────────────────────────────────────────
 
+# Empirically-observed weekend boarding shapes (normalised, peak = 1.0), derived
+# from three consecutive years of TfL BUSTO per-stop quarter-hour boardings
+# (analysis/weekend_curve/). Real UK weekend demand is a single broad midday peak
+# (~13:00), NOT a flattened weekday commuter double-peak — which is why the old
+# scaled-weekday weekends correlated with reality at only r = 0.677 (Sat) / 0.549
+# (Sun). These shapes correlate at r ≈ 1.0 across all three observed years.
+EMP_SAT_SHAPE = [0.20, 0.07, 0.03, 0.02, 0.03, 0.12, 0.27, 0.37, 0.49, 0.66,
+                 0.78, 0.88, 0.96, 1.00, 0.99, 0.98, 0.98, 0.96, 0.86, 0.70,
+                 0.55, 0.43, 0.40, 0.35]
+EMP_SUN_SHAPE = [0.12, 0.02, 0.01, 0.02, 0.05, 0.11, 0.24, 0.31, 0.40, 0.59,
+                 0.73, 0.84, 0.95, 1.00, 0.96, 0.93, 0.91, 0.84, 0.73, 0.60,
+                 0.48, 0.37, 0.32, 0.24]
+
+
 def _wd_sat_sun(wd, sat_scale, sun_scale, sat_mid_boost=None):
-    """Build sat/sun dicts from a weekday dict."""
-    sat = {h: (wd[h][0] * sat_scale, wd[h][1] * sat_scale) for h in range(24)}
-    sun = {h: (wd[h][0] * sun_scale, wd[h][1] * sun_scale) for h in range(24)}
-    if sat_mid_boost:
-        for h in sat_mid_boost:
-            sat[h] = (sat[h][0] * 1.30, sat[h][1] * 1.30)
+    """Build sat/sun dicts from a weekday dict.
+
+    The weekend SHAPE comes from observed data (EMP_SAT/SUN_SHAPE — a single
+    midday peak); `sat_scale`/`sun_scale` set the weekend peak LEVEL relative to
+    the tier's weekday peak (weekends carry fewer riders overall). Weekend flows
+    are modelled symmetrically (boarding ≈ alighting): unlike weekday commuting,
+    leisure/shopping trips are same-day round trips without a strong AM-out /
+    PM-in asymmetry. `sat_mid_boost` is retained for signature compatibility but
+    is now redundant — the observed shape already peaks at midday.
+    """
+    wd_peak = max(wd[h][0] for h in range(24))
+    sat = {h: (EMP_SAT_SHAPE[h] * wd_peak * sat_scale,
+               EMP_SAT_SHAPE[h] * wd_peak * sat_scale) for h in range(24)}
+    sun = {h: (EMP_SUN_SHAPE[h] * wd_peak * sun_scale,
+               EMP_SUN_SHAPE[h] * wd_peak * sun_scale) for h in range(24)}
     return sat, sun
 
 
@@ -374,144 +397,148 @@ def sample_wind(weather):
 DAY_TYPES     = ["weekday", "saturday", "sunday"]
 N_SCENARIOS   = 5   # representative day samples per (month × day_type)
 
-rows = []
-scenario_counter = 0
 
-for month in range(1, 13):
-    for day_type in DAY_TYPES:
-        for scenario_idx in range(N_SCENARIOS):
-            scenario_counter += 1
+# Build + write the synthetic dataset only when run as a script — importing
+# this module (e.g. by generate_real_demand_dataset.py) must NOT write the CSV.
+if __name__ == "__main__":
+    rows = []
+    scenario_counter = 0
 
-            # Sample day-level conditions (shared by all stops this day)
-            weather = sample_weather(month)
-            temp    = sample_temp(month, weather)
-            wind    = sample_wind(weather)
-            precip  = PRECIP[weather]
+    for month in range(1, 13):
+        for day_type in DAY_TYPES:
+            for scenario_idx in range(N_SCENARIOS):
+                scenario_counter += 1
 
-            # Climate event (rare)
-            climate = random.choices(CLIMATE_EVENTS,
-                                     weights=CLIMATE_EVENT_PROBS)[0]
+                # Sample day-level conditions (shared by all stops this day)
+                weather = sample_weather(month)
+                temp    = sample_temp(month, weather)
+                wind    = sample_wind(weather)
+                precip  = PRECIP[weather]
 
-            # Special event (slightly more likely in summer / Dec)
-            if month in (6, 7, 8, 12):
-                sp_wts = [0.86, 0.03, 0.04, 0.03, 0.03, 0.01]
-            else:
-                sp_wts = SPECIAL_EVENT_PROBS
-            special = random.choices(SPECIAL_EVENTS, weights=sp_wts)[0]
+                # Climate event (rare)
+                climate = random.choices(CLIMATE_EVENTS,
+                                         weights=CLIMATE_EVENT_PROBS)[0]
 
-            for stop in STOPS:
-                for hour in range(24):
-                    boardings, alightings = get_demand(
-                        stop, hour, day_type, month,
-                        weather, special, climate)
+                # Special event (slightly more likely in summer / Dec)
+                if month in (6, 7, 8, 12):
+                    sp_wts = [0.86, 0.03, 0.04, 0.03, 0.03, 0.01]
+                else:
+                    sp_wts = SPECIAL_EVENT_PROBS
+                special = random.choices(SPECIAL_EVENTS, weights=sp_wts)[0]
 
-                    # ── Occupancy proxy ───────────────────────────────────────
-                    occ_base = {"major": 65, "medium": 50, "minor": 35}
-                    occ = occ_base[stop["importance"]]
-                    if hour in {7, 8, 16, 17, 18} and day_type == "weekday":
-                        occ = min(98, occ + random.randint(15, 35))
-                    elif day_type == "saturday" and 10 <= hour <= 16:
-                        occ = min(90, occ + random.randint(5, 20))
-                    occ = max(5, occ + random.randint(-10, 10))
+                for stop in STOPS:
+                    for hour in range(24):
+                        boardings, alightings = get_demand(
+                            stop, hour, day_type, month,
+                            weather, special, climate)
 
-                    rows.append({
-                        "stop_id":          stop["id"],
-                        "stop_name":        stop["name"],
-                        "stop_x":           stop["x"],
-                        "stop_y":           stop["y"],
-                        "stop_importance":  stop["importance"],
-                        "day_scenario":     scenario_counter,
-                        "month":            month,
-                        "month_name":       MONTH_NAMES[month],
-                        "day_type":         day_type,
-                        "hour":             hour,
-                        "time_label":       f"{hour:02d}:00",
-                        "weather_type":     weather,
-                        "temperature_c":    temp,
-                        "wind_kmh":         wind,
-                        "precipitation_mm": precip,
-                        "climate_event":    climate,
-                        "special_event":    special,
-                        "is_school_term":   SCHOOL_TERM[month],
-                        "is_uni_term":      UNI_TERM[month],
-                        "boardings":        boardings,
-                        "alightings":       alightings,
-                        "net_flow":         boardings - alightings,
-                        "occupancy_pct":    occ,
-                    })
+                        # ── Occupancy proxy ───────────────────────────────────────
+                        occ_base = {"major": 65, "medium": 50, "minor": 35}
+                        occ = occ_base[stop["importance"]]
+                        if hour in {7, 8, 16, 17, 18} and day_type == "weekday":
+                            occ = min(98, occ + random.randint(15, 35))
+                        elif day_type == "saturday" and 10 <= hour <= 16:
+                            occ = min(90, occ + random.randint(5, 20))
+                        occ = max(5, occ + random.randint(-10, 10))
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 10.  WRITE CSV
-# ─────────────────────────────────────────────────────────────────────────────
+                        rows.append({
+                            "stop_id":          stop["id"],
+                            "stop_name":        stop["name"],
+                            "stop_x":           stop["x"],
+                            "stop_y":           stop["y"],
+                            "stop_importance":  stop["importance"],
+                            "day_scenario":     scenario_counter,
+                            "month":            month,
+                            "month_name":       MONTH_NAMES[month],
+                            "day_type":         day_type,
+                            "hour":             hour,
+                            "time_label":       f"{hour:02d}:00",
+                            "weather_type":     weather,
+                            "temperature_c":    temp,
+                            "wind_kmh":         wind,
+                            "precipitation_mm": precip,
+                            "climate_event":    climate,
+                            "special_event":    special,
+                            "is_school_term":   SCHOOL_TERM[month],
+                            "is_uni_term":      UNI_TERM[month],
+                            "boardings":        boardings,
+                            "alightings":       alightings,
+                            "net_flow":         boardings - alightings,
+                            "occupancy_pct":    occ,
+                        })
 
-FIELDNAMES = [
-    "stop_id", "stop_name", "stop_x", "stop_y", "stop_importance",
-    "day_scenario", "month", "month_name", "day_type",
-    "hour", "time_label",
-    "weather_type", "temperature_c", "wind_kmh", "precipitation_mm",
-    "climate_event", "special_event",
-    "is_school_term", "is_uni_term",
-    "boardings", "alightings", "net_flow", "occupancy_pct",
-]
+    # ─────────────────────────────────────────────────────────────────────────────
+    # 10.  WRITE CSV
+    # ─────────────────────────────────────────────────────────────────────────────
 
-OUT = Path(__file__).parent / "map_demand_dataset.csv"
-with open(OUT, "w", newline="", encoding="utf-8") as f:
-    writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
-    writer.writeheader()
-    writer.writerows(rows)
+    FIELDNAMES = [
+        "stop_id", "stop_name", "stop_x", "stop_y", "stop_importance",
+        "day_scenario", "month", "month_name", "day_type",
+        "hour", "time_label",
+        "weather_type", "temperature_c", "wind_kmh", "precipitation_mm",
+        "climate_event", "special_event",
+        "is_school_term", "is_uni_term",
+        "boardings", "alightings", "net_flow", "occupancy_pct",
+    ]
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 11.  SUMMARY STATS
-# ─────────────────────────────────────────────────────────────────────────────
+    OUT = Path(__file__).parent / "map_demand_dataset.csv"
+    with open(OUT, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        writer.writeheader()
+        writer.writerows(rows)
 
-print(f"Written : {OUT}")
-print(f"Rows    : {len(rows):,}")
-print(f"Stops   : {len(STOPS)}")
-print()
+    # ─────────────────────────────────────────────────────────────────────────────
+    # 11.  SUMMARY STATS
+    # ─────────────────────────────────────────────────────────────────────────────
 
-# Per-stop average weekday boardings/day
-print(f"{'Stop':<22} {'Importance':<10} {'Avg weekday board/day':>22}")
-print("-" * 58)
-for stop in STOPS:
-    wd_rows = [r for r in rows if r["stop_id"] == stop["id"]
-               and r["day_type"] == "weekday"]
-    # Group by scenario and sum hours, then average across scenarios
-    by_scen = {}
-    for r in wd_rows:
-        by_scen.setdefault(r["day_scenario"], 0)
-        by_scen[r["day_scenario"]] += r["boardings"]
-    avg = sum(by_scen.values()) / max(len(by_scen), 1)
-    print(f"  {stop['name']:<20} {stop['importance']:<10} {avg:>18.0f}")
+    print(f"Written : {OUT}")
+    print(f"Rows    : {len(rows):,}")
+    print(f"Stops   : {len(STOPS)}")
+    print()
 
-print()
+    # Per-stop average weekday boardings/day
+    print(f"{'Stop':<22} {'Importance':<10} {'Avg weekday board/day':>22}")
+    print("-" * 58)
+    for stop in STOPS:
+        wd_rows = [r for r in rows if r["stop_id"] == stop["id"]
+                   and r["day_type"] == "weekday"]
+        # Group by scenario and sum hours, then average across scenarios
+        by_scen = {}
+        for r in wd_rows:
+            by_scen.setdefault(r["day_scenario"], 0)
+            by_scen[r["day_scenario"]] += r["boardings"]
+        avg = sum(by_scen.values()) / max(len(by_scen), 1)
+        print(f"  {stop['name']:<20} {stop['importance']:<10} {avg:>18.0f}")
 
-# Weather distribution in dataset
-weather_counts = {}
-for r in rows:
-    weather_counts[r["weather_type"]] = weather_counts.get(r["weather_type"], 0) + 1
-total = len(rows)
-print("Weather distribution:")
-for wt in WEATHER_TYPES:
-    pct = 100 * weather_counts.get(wt, 0) / total
-    print(f"  {wt:<16}: {pct:5.1f}%")
+    print()
 
-print()
+    # Weather distribution in dataset
+    weather_counts = {}
+    for r in rows:
+        weather_counts[r["weather_type"]] = weather_counts.get(r["weather_type"], 0) + 1
+    total = len(rows)
+    print("Weather distribution:")
+    for wt in WEATHER_TYPES:
+        pct = 100 * weather_counts.get(wt, 0) / total
+        print(f"  {wt:<16}: {pct:5.1f}%")
 
-# Special events present
-se_counts = {}
-for r in rows:
-    if r["special_event"] != "none":
-        se_counts[r["special_event"]] = se_counts.get(r["special_event"], 0) + 1
-print("Special events in dataset:")
-for ev, cnt in sorted(se_counts.items()):
-    print(f"  {ev:<14}: {cnt:,} rows")
+    print()
 
-print()
-print("Sample — North Hub weekday AM peak (all weather types seen):")
-sample = [r for r in rows if r["stop_id"] == "S01"
-          and r["day_type"] == "weekday" and r["hour"] == 8]
-sample.sort(key=lambda r: r["boardings"], reverse=True)
-print(f"  {'Weather':<16} {'Temp':>6} {'Board':>6} {'Alight':>7} {'Occ%':>6}")
-for r in sample[:10]:
-    print(f"  {r['weather_type']:<16} {r['temperature_c']:>5.1f}C"
-          f" {r['boardings']:>6} {r['alightings']:>7} {r['occupancy_pct']:>5}%")
+    # Special events present
+    se_counts = {}
+    for r in rows:
+        if r["special_event"] != "none":
+            se_counts[r["special_event"]] = se_counts.get(r["special_event"], 0) + 1
+    print("Special events in dataset:")
+    for ev, cnt in sorted(se_counts.items()):
+        print(f"  {ev:<14}: {cnt:,} rows")
+
+    print()
+    print("Sample — North Hub weekday AM peak (all weather types seen):")
+    sample = [r for r in rows if r["stop_id"] == "S01"
+              and r["day_type"] == "weekday" and r["hour"] == 8]
+    sample.sort(key=lambda r: r["boardings"], reverse=True)
+    print(f"  {'Weather':<16} {'Temp':>6} {'Board':>6} {'Alight':>7} {'Occ%':>6}")
+    for r in sample[:10]:
+        print(f"  {r['weather_type']:<16} {r['temperature_c']:>5.1f}C"
+              f" {r['boardings']:>6} {r['alightings']:>7} {r['occupancy_pct']:>5}%")
