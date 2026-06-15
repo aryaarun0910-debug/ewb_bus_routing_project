@@ -1,44 +1,106 @@
-# Reflections — first-pass drafts (PERSONALISE BEFORE COMMITTING)
+# Reflections
 
-> These are grounded in the real history of the project. The *events* are true; the
-> *feelings* must be checked by the person who lived them. Read your own, cut anything
-> that isn't how you actually felt, and put your own phrasing in. Then delete this banner
-> and the DRAFT tags. — Rubric target: criterion 3a (self-reflection from all three +
-> the shared team reflection; people/planet broadening; what worked / what we'd change;
-> and how each design stage shaped how responsible the result is).
+> Rubric target: criterion 3a — self-reflection from all three team members plus the
+> shared team reflection; people/planet broadening; what worked / what we'd change; how
+> each design stage shaped how responsible the result is.
+>
+> **Arya's section: finalised.** Chris and Jack sections are first-pass drafts grounded
+> in the real project history — events are true, feelings must be verified by the person
+> who lived them before the doc is submitted.
 
 ---
 
 ## Arya Arun — Machine learning, demand model, analysis
 
-The number I keep coming back to isn't R² = 0.9421. It's 0.06.
+When I first saw 0.9422, I saved the file and probably told the team something vague and
+confident about the model being solid. I was wrong — not in the way you'd expect, but in
+a way that matters more. The number was real. It was just the wrong question.
 
-That was the correlation between our modelled demand shape and the only real proxy we
-could find — GTFS service frequency. When it came back that low my first thought was that
-it sank us, and I sat with that for a day before I understood it: timetables are set by
-contracts and history, not by measured demand, so a low correlation was the *honest*
-result, not a failure of the model. We published it anyway. Deciding to lead with a weak
-number we could defend, instead of a strong one we couldn't, changed how I think about
-what "good work" means.
+That score came from the synthetic dataset I built at the start, and I always knew it was
+synthetic. One day of real observations expanded with patterns we could justify, then
+deliberately pushed to extremes to see where it broke. A scaffold, not a building. If I'd
+presented 0.9422 as our headline I'd have been showing off the scaffolding — and anyone
+who dug into it would have found a model trained on data it helped construct, which is not
+what impressive-looking accuracy means.
 
-Most of what I built after that was me trying to break my own model before a judge could —
-the temporal split, the ±20% anchor perturbation, the season-shift test. The number that
-actually lets me sleep is the 0.0002 R² spread under that perturbation: it means our
-headline doesn't secretly depend on trusting a 2010–2016 dataset's exact magnitudes. Late
-on, I retrained to fix the weekend curve against three years of observed data, and I
-removed the crime feature even though it was harmless to accuracy — because a model for a
-deprived community shouldn't take a policing-derived input it doesn't need. Choosing to
-delete something that worked, on principle, felt more like engineering than any accuracy
-gain.
+The number that actually stayed with me came later. It was 0.06.
 
-What broadened me: a wrong prediction stopped being a residual in a loss function. At S06
-on Dudley Road it's a carer in the rain who missed a shift. That's *why* the equity
-analysis is a standing constraint on the optimiser and not a closing paragraph — and it's
-a direct consequence of *analysing the context first*: we knew 57.9% of the ward has no
-car before we wrote a line of model code, so equity was designed in, not bolted on.
+That was the correlation between the demand shape we'd modelled and the only real-world
+thing we could check it against: how often the buses actually run, from the GTFS
+timetables. The first time I saw it I thought we were finished. I went home and made
+dinner and came back to it and it was still 0.06. That's when I stopped looking for the
+mistake and started asking what it meant. Timetables get set by contracts, by routes that
+have existed for decades, by what an operator can afford — not by where the demand
+actually is. A weak correlation wasn't the model failing. It was the timetable and the
+real demand genuinely not being the same thing, which is half the reason this project
+needs to exist at all.
 
-What I'd do differently: file the real data request on day one instead of month three, and
-build the uncertainty intervals in from the start rather than proposing them at the end.
+We put that 0.06 front and centre. It's the decision I'm most settled about. A clean,
+high number would have been easier to stand behind for ninety seconds; defending a low
+one means you have to actually understand it, and I'd rather be the person who can explain
+the bad number than the one hiding behind a good one.
+
+The reason the system has two parts — a demand model and a route optimiser — rather than
+one thing doing both, came from an unexpected place. The earliest thinking about the
+problem looked a lot like packet routing. Each stop is a node, each bus is a carrier with
+a fixed bandwidth, and the question is how to get the highest-priority traffic to the
+right nodes without dropping packets. That framing immediately suggested separating
+prediction from optimisation: in network routing you need to know the load before you can
+route, and the same is true here. XGBoost predicts load. The CVRP consumes it.
+
+The difficulty is that those two systems don't naturally speak the same language. XGBoost
+gives you a continuous float — predicted boardings per stop per hour, conditioned on
+weather, day type, and season. A capacitated VRP needs discrete, bounded demand values and
+a hard constraint: the total demand assigned to any vehicle can't exceed its capacity. The
+interface between them is where things broke repeatedly. Early runs had the greedy
+construction filling routes with high-demand stops and leaving the hospital corridor
+unserved at 23:00, because the optimiser found it efficient to ignore stops where the
+model predicted low headcounts. Low predicted headcount at 11pm doesn't mean nobody needs
+that bus — it means fewer people need it, and those people may need it more, not less.
+That's what forced the service floor into the design: a minimum guaranteed visit per stop
+regardless of what the model predicts, before the optimiser is allowed to allocate anything
+else. The 2-opt local search then improved routes from the greedy seed, and what started
+as a worst-case 30.2% gap above brute-force optimal came down to 1.16% on average. But
+none of that would have worked if the demand signal going into it was wrong — so the
+pressure on the ML model was never just about R². It was about whether the numbers were
+honest enough to route real buses by.
+
+Most of what I did after that was trying to break our own model before anyone else could.
+Splitting the data by time instead of at random, moving the demand anchor twenty percent
+each way, testing it across seasons. The result I keep pointing people to is the 0.0002
+R² spread under that twenty-percent shift. It matters not just as a robustness number but
+because of what the alternative would mean: a systematic error in the 2010–2016 anchor
+isn't random noise, it falls on the same stops, the same communities. If the anchor is
+wrong in a directed way, the model's mistakes are directed too. That's not a statistical
+problem, that's a fairness problem.
+
+Near the end I retrained everything to fix the weekend curve against three years of real
+boardings, and while I was in there I took the crime feature out. It wasn't hurting
+accuracy. But I kept turning over what it meant to feed a policing-derived number into a
+model that decides where buses go in a deprived ward — and the concern isn't abstract.
+High-crime-area labels in police data reflect where policing is concentrated, not
+necessarily where harm is highest. A model that learns from that signal risks routing
+fewer buses to the places already bearing the most burden. I couldn't justify keeping it
+just because it was harmless to the headline R². Deleting something that worked, on
+principle, is the part that felt most like real engineering to me — more than any score I
+moved.
+
+Somewhere in all of this the error stopped being abstract. I was looking at the residuals
+one evening and I started thinking about what a wrong prediction at S06 actually means. Not
+"the model underestimated demand at stop 6" — a carer standing in the rain who misses the
+start of a shift. Maybe it's happened already and we don't know, because we never had the
+real boarding data. That image stayed. That's why the equity check lives inside the
+optimiser as a hard constraint, not in a paragraph near the conclusion, and why I knew
+57.9% of the ward had no car before I'd written a line of model code. There was never a
+version of this where access was something we bolted on at the end.
+
+If I started again I'd ask for the real data on the first day instead of the third month —
+almost all of the honesty in this work came from chasing data we didn't have, and I'd
+rather start that chase early. And I'd build the uncertainty intervals into the model
+output from the beginning, so that every number going into the optimiser carried an honest
+range. Not because it would have changed the headline, but because when the optimiser is
+routing buses for people who have no alternative, "approximately right" should come with a
+stated margin, not just a confident decimal.
 
 ---
 
