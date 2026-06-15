@@ -39,9 +39,11 @@ rubric points or risk the demo. Tick them off.
 1. 🔴 **Execute the Sunday retrain** (after the team signs off):
    - Adopt the empirical weekend curve → replace the weekend factors in `PROFILE_FN`
      (`prediction model/generate_map_dataset.py`) with those in
-     `analysis/weekend_curve/empirical_weekend_curve.json` (r jumps 0.677/0.549 → 1.000/0.999).
-   - Remove `crime_total_2024` from `_REAL_STATIC_COLS` (model improved without it — R²
-     0.9445 → 0.9450).
+     `analysis/weekend_curve/empirical_weekend_curve.json` (shapes are now *derived* from
+     TfL BUSTO data — r ≈ 1.0 by construction; independent check is shape stability
+     r ≥ 0.998 across 3 years. A12 RESOLVED).
+   - Remove `crime_total_2024` from `_REAL_STATIC_COLS` (model: R²
+     0.9418 → 0.9421 without it; crime permutation importance = 0.000279, rank 16/20).
    - Re-fetch the **Jewellery Quarter (S03) POI** via OSM Overpass (currently all -1 = a
      "no data" sentinel summing to -8) and regenerate `data/osm/ladywood_stop_pois.json`.
    - Regenerate dataset → retrain → update quoted metrics everywhere (they won't get worse).

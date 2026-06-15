@@ -4,7 +4,9 @@
 the demo table: the existing DE1-SoC LED map, with its ROM row selection replaced — via
 one switch — by a **live UART register feed** carrying the real positions of the actual
 buses on lines 8A/8C/80/126, polled from the DfT Bus Open Data Service by a Raspberry
-Pi 5. The WS2812B driving logic does not change. The FPGA stays the solver and the star.
+Pi 5. The WS2812B driving logic does not change. The FPGA stays the display/edge device and
+the star — the solving (XGBoost demand model + CVRP optimiser) happens offline and is
+baked into the ROM snapshot or pushed as the demand nibble in the live frame.
 
 **The on-stage sentence:** *"Same board, same Verilog, one switch — and now that light
 is the number 80, on Dudley Road, right now."*
