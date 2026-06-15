@@ -29,9 +29,11 @@ def haversine_m(lat1, lon1, lat2, lon2):
     return 6371000 * 2 * math.asin(math.sqrt(h))
 
 stops = json.loads(STOPS_JSON.read_text())
-stops = [{"id": s["id"], "name": s.get("name", ""), "lat": s["lat"],
-          "lon": s["lon"]} for s in (stops["stops"] if isinstance(stops, dict)
-                                     else stops)]
+stops = [{"id": s.get("id") or s["stop_id"],
+          "name": s.get("name", ""),
+          "lat": s["lat"],
+          "lon": s.get("lon") or s["lng"]}
+         for s in (stops["stops"] if isinstance(stops, dict) else stops)]
 
 files = sorted(RAW.glob("avl_*.csv"))
 if not files:

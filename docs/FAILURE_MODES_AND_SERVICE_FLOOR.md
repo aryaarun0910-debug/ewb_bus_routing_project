@@ -94,8 +94,9 @@ ironic for a Birmingham-traffic project. The honest answer:
 - Route plans are **recomputed per time-window** (peak vs off-peak differ structurally), so
   congestion *is* captured at the coarse band level even though it isn't modelled
   continuously.
-- Live within-window congestion is a **named Phase-2 input**: BODS live vehicle feeds (already
-  snapshotted in `data/bods/`) are the data source for dynamic edge costs.
+- Live within-window congestion is a **named Phase-2 input**: BODS live vehicle feeds
+  (collector live since 2026-06-12; 4-day AVL archive in `beast/beyond/bods_avl/avl_raw/`)
+  are the data source for dynamic edge costs.
 - State it as a bounded limitation in the assumption log, not an undisclosed gap.
 
 ---
