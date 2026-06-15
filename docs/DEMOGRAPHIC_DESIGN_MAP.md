@@ -16,3 +16,17 @@
 
 ## How to use this in the presentation
 One slide, headline *"Designed for who actually lives here."* — three rows max spoken aloud (28.6% → LEDs; shift workers → 24/7 windows; 57.9% → the whole point), with this full table in the appendix/repo. Every number already has a source in the project's data inventory; no new claims are introduced.
+
+---
+
+**Footnote — geographic scope of the 57.9% figure.**
+The 57.9% is the Ladywood **Ward** (E05010826) aggregate from Census 2021 TS045. A reader who independently queries car-free rates may encounter a different figure depending on geography:
+
+| Geography | No-car household rate (Census 2021 TS045) | Source level |
+|---|---|---|
+| Ladywood **Ward** | **57.9%** (cited here) | Ward aggregate — the correct unit for this project's route network |
+| Stop-level LSOAs in this model | 30.8% (S10, Ladywood Fire Station) — 63.9% (S05, Five Ways) | Per-LSOA; see `data/census/ladywood_car_availability.json` |
+| Birmingham **City** | ~40–44% (ONS 2021) | Local Authority aggregate |
+| England | ~26% (ONS 2021) | National |
+
+The ward level is the correct headline because the route network serves all Ladywood Ward residents, not just those in specific LSOAs. The inter-LSOA variation (30.8%–63.9%) is also informative: the one outlier — S10's 30.8% — is the Ladywood Fire Station LSOA, which contains the Broad Street corridor with higher-income apartment developments not representative of the ward's bus-dependent majority.
