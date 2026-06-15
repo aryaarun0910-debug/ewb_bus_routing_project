@@ -1,576 +1,599 @@
 {
   "S01": {
-    "lsoa": "E01013761",
+    "lsoa": "E01033615",
     "stop_name": "New Street Station",
     "annual_journeys_60plus": {},
     "annual_journeys_disabled": {},
-    "eligible_population_by_year": {},
+    "eligible_population_by_year": {
+      "2008": 22,
+      "2009": 16,
+      "2010": 15,
+      "2011": 15,
+      "2012": 13,
+      "2013": 16,
+      "2014": 21,
+      "2015": 29,
+      "2016": 31
+    },
     "travel_behaviour_clusters": null,
     "cluster_total_population": null,
-    "smartcard_outbound_journeys_2014_2016": null,
-    "smartcard_inbound_journeys_2014_2016": null,
-    "smartcard_internal_journeys_2014_2016": null,
+    "smartcard_outbound_journeys_2014_2016": 58571.0,
+    "smartcard_inbound_journeys_2014_2016": 120791.0,
+    "smartcard_internal_journeys_2014_2016": 3638.0,
     "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
   },
   "S02": {
-    "lsoa": "E01009099",
+    "lsoa": "E01033624",
     "stop_name": "Spring St",
     "annual_journeys_60plus": {
-      "2010": 5754.0,
-      "2011": 27309.0,
-      "2012": 27627.0,
-      "2013": 25795.0,
-      "2014": 29068.0,
-      "2015": 25461.0,
-      "2016": 11274.0
-    },
-    "annual_journeys_disabled": {
-      "2010": 1594.0,
-      "2011": 6711.0,
-      "2012": 5929.0,
-      "2013": 6555.0,
-      "2014": 7300.0,
-      "2015": 5151.0,
-      "2016": 932.0
-    },
-    "eligible_population_by_year": {
-      "2008": 283,
-      "2009": 269,
-      "2010": 248,
-      "2011": 246,
-      "2012": 250,
-      "2013": 239,
-      "2014": 235,
-      "2015": 243,
-      "2016": 234
-    },
-    "travel_behaviour_clusters": {
-      "rarely_seen": 0.5931,
-      "irregular": 0.131,
-      "withdrawing": 0.1103,
-      "daily": 0.1655
-    },
-    "cluster_total_population": 145,
-    "smartcard_outbound_journeys_2014_2016": 7075.0,
-    "smartcard_inbound_journeys_2014_2016": 1871.0,
-    "smartcard_internal_journeys_2014_2016": 330.0,
-    "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
-  },
-  "S03": {
-    "lsoa": "E01009158",
-    "stop_name": "Jewellery Quarter Station",
-    "annual_journeys_60plus": {
-      "2010": 4795.0,
-      "2011": 32358.0,
-      "2012": 35778.0,
-      "2013": 36212.0,
-      "2014": 35404.0,
-      "2015": 31400.0,
-      "2016": 14530.0
-    },
-    "annual_journeys_disabled": {
-      "2010": 1661.0,
-      "2011": 7168.0,
-      "2012": 6236.0,
-      "2013": 6646.0,
-      "2014": 7740.0,
-      "2015": 7150.0,
-      "2016": 3183.0
-    },
-    "eligible_population_by_year": {
-      "2008": 278,
-      "2009": 279,
-      "2010": 268,
-      "2011": 278,
-      "2012": 257,
-      "2013": 259,
-      "2014": 255,
-      "2015": 287,
-      "2016": 272
-    },
-    "travel_behaviour_clusters": {
-      "rarely_seen": 0.4923,
-      "irregular": 0.1026,
-      "regular": 0.0718,
-      "withdrawing": 0.0667,
-      "withdrawing_post_2014": 0.1026,
-      "daily": 0.1641
-    },
-    "cluster_total_population": 195,
-    "smartcard_outbound_journeys_2014_2016": 3258.0,
-    "smartcard_inbound_journeys_2014_2016": 1010.0,
-    "smartcard_internal_journeys_2014_2016": 130.0,
-    "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
-  },
-  "S04": {
-    "lsoa": "E01009146",
-    "stop_name": "Soho Hill",
-    "annual_journeys_60plus": {
-      "2010": 5516.0,
-      "2011": 23933.0,
-      "2012": 25466.0,
-      "2013": 24416.0,
-      "2014": 24893.0,
-      "2015": 24578.0,
-      "2016": 13301.0
-    },
-    "annual_journeys_disabled": {
-      "2010": 1725.0,
-      "2011": 11265.0,
-      "2012": 14525.0,
-      "2013": 14408.0,
-      "2014": 11376.0,
-      "2015": 7708.0,
-      "2016": 2616.0
-    },
-    "eligible_population_by_year": {
-      "2008": 148,
-      "2009": 156,
-      "2010": 156,
-      "2011": 160,
-      "2012": 158,
-      "2013": 158,
-      "2014": 154,
-      "2015": 142,
-      "2016": 142
-    },
-    "travel_behaviour_clusters": {
-      "rarely_seen": 0.3619,
-      "irregular": 0.1333,
-      "regular": 0.1524,
-      "withdrawing_post_2014": 0.1143,
-      "daily": 0.2381
-    },
-    "cluster_total_population": 105,
-    "smartcard_outbound_journeys_2014_2016": 11907.0,
-    "smartcard_inbound_journeys_2014_2016": 11026.0,
-    "smartcard_internal_journeys_2014_2016": 526.0,
-    "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
-  },
-  "S05": {
-    "lsoa": "E01009057",
-    "stop_name": "Five Ways (Metro)",
-    "annual_journeys_60plus": {
-      "2010": 11244.0,
-      "2011": 50504.0,
-      "2012": 50907.0,
-      "2013": 49813.0,
-      "2014": 48724.0,
-      "2015": 42862.0,
-      "2016": 19250.0
-    },
-    "annual_journeys_disabled": {
-      "2010": 1090.0,
-      "2011": 7903.0,
-      "2012": 9639.0,
-      "2013": 10880.0,
-      "2014": 13365.0,
-      "2015": 13224.0,
-      "2016": 4428.0
-    },
-    "eligible_population_by_year": {
-      "2008": 233,
-      "2009": 231,
-      "2010": 241,
-      "2011": 227,
-      "2012": 215,
-      "2013": 210,
-      "2014": 201,
-      "2015": 193,
-      "2016": 180
-    },
-    "travel_behaviour_clusters": {
-      "rarely_seen": 0.3926,
-      "irregular": 0.0798,
-      "regular": 0.0798,
-      "withdrawing": 0.1043,
-      "withdrawing_post_2014": 0.1166,
-      "daily": 0.227
-    },
-    "cluster_total_population": 163,
-    "smartcard_outbound_journeys_2014_2016": null,
-    "smartcard_inbound_journeys_2014_2016": null,
-    "smartcard_internal_journeys_2014_2016": null,
-    "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
-  },
-  "S06": {
-    "lsoa": "E01009129",
-    "stop_name": "Dudley Rd",
-    "annual_journeys_60plus": {
-      "2010": 6897.0,
-      "2011": 30099.0,
-      "2012": 28014.0,
-      "2013": 27836.0,
-      "2014": 27937.0,
-      "2015": 22442.0,
-      "2016": 12202.0
-    },
-    "annual_journeys_disabled": {
-      "2010": 1160.0,
-      "2011": 6029.0,
-      "2012": 6826.0,
-      "2013": 6763.0,
-      "2014": 7747.0,
-      "2015": 4223.0
-    },
-    "eligible_population_by_year": {
-      "2008": 200,
-      "2009": 185,
-      "2010": 185,
-      "2011": 178,
-      "2012": 179,
-      "2013": 177,
-      "2014": 166,
-      "2015": 164,
-      "2016": 153
-    },
-    "travel_behaviour_clusters": {
-      "rarely_seen": 0.469,
-      "irregular": 0.1062,
-      "regular": 0.1062,
-      "withdrawing": 0.0973,
-      "daily": 0.2212
-    },
-    "cluster_total_population": 113,
-    "smartcard_outbound_journeys_2014_2016": 878.0,
-    "smartcard_inbound_journeys_2014_2016": 32.0,
-    "smartcard_internal_journeys_2014_2016": null,
-    "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
-  },
-  "S07": {
-    "lsoa": "E01009111",
-    "stop_name": "Five Ways Station",
-    "annual_journeys_60plus": {
-      "2010": 5292.0,
-      "2011": 23255.0,
-      "2012": 23939.0,
-      "2013": 21799.0,
-      "2014": 22953.0,
-      "2015": 21031.0,
-      "2016": 10972.0
+      "2010": 3296.0,
+      "2011": 14812.0,
+      "2012": 15700.0,
+      "2013": 15105.0,
+      "2014": 14046.0,
+      "2015": 12051.0,
+      "2016": 6159.0
     },
     "annual_journeys_disabled": {},
     "eligible_population_by_year": {
-      "2008": 270,
-      "2009": 277,
-      "2010": 273,
-      "2011": 272,
-      "2012": 269,
-      "2013": 269,
-      "2014": 252,
-      "2015": 254,
-      "2016": 253
+      "2008": 97,
+      "2009": 104,
+      "2010": 102,
+      "2011": 109,
+      "2012": 113,
+      "2013": 110,
+      "2014": 105,
+      "2015": 104,
+      "2016": 97
     },
     "travel_behaviour_clusters": {
-      "rarely_seen": 0.5859,
-      "irregular": 0.1515,
-      "regular": 0.1111,
-      "withdrawing": 0.0758,
-      "daily": 0.0758
+      "rarely_seen": 0.5,
+      "daily": 0.5
     },
-    "cluster_total_population": 198,
-    "smartcard_outbound_journeys_2014_2016": 1401.0,
+    "cluster_total_population": 28,
+    "smartcard_outbound_journeys_2014_2016": 1976.0,
+    "smartcard_inbound_journeys_2014_2016": 634.0,
+    "smartcard_internal_journeys_2014_2016": null,
+    "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
+  },
+  "S03": {
+    "lsoa": "E01033559",
+    "stop_name": "Jewellery Quarter Station",
+    "annual_journeys_60plus": {},
+    "annual_journeys_disabled": {
+      "2014": 555.0,
+      "2015": 1177.0
+    },
+    "eligible_population_by_year": {
+      "2008": 14,
+      "2009": 14,
+      "2010": 17,
+      "2011": 19,
+      "2012": 13,
+      "2013": 9,
+      "2014": 22,
+      "2015": 20,
+      "2016": 22
+    },
+    "travel_behaviour_clusters": {
+      "rarely_seen": 1.0
+    },
+    "cluster_total_population": 13,
+    "smartcard_outbound_journeys_2014_2016": 6730.0,
+    "smartcard_inbound_journeys_2014_2016": 6321.0,
+    "smartcard_internal_journeys_2014_2016": 386.0,
+    "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
+  },
+  "S04": {
+    "lsoa": "E01033638",
+    "stop_name": "Soho Hill",
+    "annual_journeys_60plus": {
+      "2010": 10396.0,
+      "2011": 47959.0,
+      "2012": 51196.0,
+      "2013": 50241.0,
+      "2014": 56943.0,
+      "2015": 40800.0,
+      "2016": 15459.0
+    },
+    "annual_journeys_disabled": {
+      "2010": 1157.0,
+      "2011": 5702.0,
+      "2012": 6108.0,
+      "2013": 7904.0,
+      "2014": 8928.0,
+      "2015": 6075.0
+    },
+    "eligible_population_by_year": {
+      "2008": 197,
+      "2009": 199,
+      "2010": 195,
+      "2011": 183,
+      "2012": 179,
+      "2013": 178,
+      "2014": 165,
+      "2015": 161,
+      "2016": 152
+    },
+    "travel_behaviour_clusters": {
+      "rarely_seen": 0.4058,
+      "irregular": 0.1304,
+      "withdrawing": 0.0942,
+      "withdrawing_post_2014": 0.1667,
+      "daily": 0.2029
+    },
+    "cluster_total_population": 138,
+    "smartcard_outbound_journeys_2014_2016": 5696.0,
+    "smartcard_inbound_journeys_2014_2016": 10255.0,
+    "smartcard_internal_journeys_2014_2016": 522.0,
+    "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
+  },
+  "S05": {
+    "lsoa": "E01033639",
+    "stop_name": "Five Ways (Metro)",
+    "annual_journeys_60plus": {
+      "2010": 4214.0,
+      "2011": 20053.0,
+      "2012": 20015.0,
+      "2013": 18955.0,
+      "2014": 21620.0,
+      "2015": 19348.0,
+      "2016": 7397.0
+    },
+    "annual_journeys_disabled": {
+      "2010": 1437.0,
+      "2011": 7969.0,
+      "2012": 11990.0,
+      "2013": 10863.0,
+      "2014": 10157.0,
+      "2015": 7940.0,
+      "2016": 4156.0
+    },
+    "eligible_population_by_year": {
+      "2008": 137,
+      "2009": 130,
+      "2010": 123,
+      "2011": 114,
+      "2012": 108,
+      "2013": 106,
+      "2014": 109,
+      "2015": 90,
+      "2016": 91
+    },
+    "travel_behaviour_clusters": {
+      "rarely_seen": 0.4545,
+      "irregular": 0.2182,
+      "daily": 0.3273
+    },
+    "cluster_total_population": 55,
+    "smartcard_outbound_journeys_2014_2016": 10355.0,
+    "smartcard_inbound_journeys_2014_2016": 16892.0,
+    "smartcard_internal_journeys_2014_2016": 353.0,
+    "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
+  },
+  "S06": {
+    "lsoa": "E01009153",
+    "stop_name": "Dudley Rd",
+    "annual_journeys_60plus": {
+      "2010": 10130.0,
+      "2011": 43517.0,
+      "2012": 45771.0,
+      "2013": 44694.0,
+      "2014": 44177.0,
+      "2015": 36722.0,
+      "2016": 17094.0
+    },
+    "annual_journeys_disabled": {
+      "2010": 1322.0,
+      "2011": 9184.0,
+      "2012": 13845.0,
+      "2013": 13734.0,
+      "2014": 13608.0,
+      "2015": 12220.0,
+      "2016": 4175.0
+    },
+    "eligible_population_by_year": {
+      "2008": 246,
+      "2009": 242,
+      "2010": 259,
+      "2011": 251,
+      "2012": 240,
+      "2013": 234,
+      "2014": 227,
+      "2015": 218,
+      "2016": 205
+    },
+    "travel_behaviour_clusters": {
+      "rarely_seen": 0.3077,
+      "irregular": 0.1302,
+      "regular": 0.1243,
+      "withdrawing": 0.1183,
+      "withdrawing_post_2014": 0.1006,
+      "daily": 0.2189
+    },
+    "cluster_total_population": 169,
+    "smartcard_outbound_journeys_2014_2016": 17487.0,
+    "smartcard_inbound_journeys_2014_2016": 9343.0,
+    "smartcard_internal_journeys_2014_2016": 775.0,
+    "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
+  },
+  "S07": {
+    "lsoa": "E01033626",
+    "stop_name": "Five Ways Station",
+    "annual_journeys_60plus": {
+      "2010": 3426.0,
+      "2011": 17370.0,
+      "2012": 14970.0,
+      "2013": 15146.0,
+      "2014": 12097.0,
+      "2015": 11676.0,
+      "2016": 6954.0
+    },
+    "annual_journeys_disabled": {},
+    "eligible_population_by_year": {
+      "2008": 88,
+      "2009": 84,
+      "2010": 83,
+      "2011": 84,
+      "2012": 75,
+      "2013": 67,
+      "2014": 68,
+      "2015": 71,
+      "2016": 65
+    },
+    "travel_behaviour_clusters": {
+      "rarely_seen": 0.6216,
+      "daily": 0.3784
+    },
+    "cluster_total_population": 37,
+    "smartcard_outbound_journeys_2014_2016": 103.0,
     "smartcard_inbound_journeys_2014_2016": null,
     "smartcard_internal_journeys_2014_2016": null,
     "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
   },
   "S08": {
-    "lsoa": "E01009127",
+    "lsoa": "E01009143",
     "stop_name": "Icknield Port Rd",
     "annual_journeys_60plus": {
-      "2010": 7951.0,
-      "2011": 35964.0,
-      "2012": 35451.0,
-      "2013": 34739.0,
-      "2014": 34428.0,
-      "2015": 28953.0,
-      "2016": 12742.0
+      "2010": 6796.0,
+      "2011": 27485.0,
+      "2012": 26501.0,
+      "2013": 25096.0,
+      "2014": 24293.0,
+      "2015": 19893.0,
+      "2016": 10499.0
     },
     "annual_journeys_disabled": {
-      "2010": 1548.0,
-      "2011": 7278.0,
-      "2012": 7019.0,
-      "2013": 5742.0,
-      "2014": 5480.0,
-      "2015": 6281.0,
-      "2016": 2236.0
+      "2010": 1192.0,
+      "2011": 8299.0,
+      "2012": 8130.0,
+      "2013": 6563.0,
+      "2014": 7765.0,
+      "2015": 4903.0,
+      "2016": 268.0
     },
     "eligible_population_by_year": {
-      "2008": 205,
-      "2009": 207,
-      "2010": 208,
-      "2011": 196,
-      "2012": 199,
-      "2013": 193,
-      "2014": 185,
-      "2015": 174,
-      "2016": 172
+      "2008": 179,
+      "2009": 175,
+      "2010": 188,
+      "2011": 168,
+      "2012": 163,
+      "2013": 156,
+      "2014": 151,
+      "2015": 166,
+      "2016": 153
     },
     "travel_behaviour_clusters": {
-      "rarely_seen": 0.4677,
-      "irregular": 0.1048,
-      "regular": 0.1048,
-      "withdrawing": 0.0887,
-      "daily": 0.2339
+      "rarely_seen": 0.6957,
+      "daily": 0.3043
     },
-    "cluster_total_population": 124,
-    "smartcard_outbound_journeys_2014_2016": null,
-    "smartcard_inbound_journeys_2014_2016": null,
-    "smartcard_internal_journeys_2014_2016": null,
+    "cluster_total_population": 69,
+    "smartcard_outbound_journeys_2014_2016": 7190.0,
+    "smartcard_inbound_journeys_2014_2016": 7863.0,
+    "smartcard_internal_journeys_2014_2016": 959.0,
     "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
   },
   "S09": {
-    "lsoa": "E01009097",
+    "lsoa": "E01033640",
     "stop_name": "Belgrave Interchange",
     "annual_journeys_60plus": {
-      "2010": 13793.0,
-      "2011": 59959.0,
-      "2012": 57217.0,
-      "2013": 56875.0,
-      "2014": 53137.0,
-      "2015": 47369.0,
-      "2016": 21612.0
+      "2010": 5370.0,
+      "2011": 23103.0,
+      "2012": 21480.0,
+      "2013": 20821.0,
+      "2014": 20219.0,
+      "2015": 16856.0,
+      "2016": 8319.0
     },
     "annual_journeys_disabled": {
-      "2010": 1445.0,
-      "2011": 8103.0,
-      "2012": 9039.0,
-      "2013": 8969.0,
-      "2014": 7495.0,
-      "2015": 4983.0,
-      "2016": 1040.0
+      "2014": 434.0
     },
     "eligible_population_by_year": {
-      "2008": 401,
-      "2009": 407,
-      "2010": 415,
-      "2011": 397,
-      "2012": 389,
-      "2013": 383,
-      "2014": 372,
-      "2015": 353,
-      "2016": 335
+      "2008": 121,
+      "2009": 124,
+      "2010": 123,
+      "2011": 101,
+      "2012": 100,
+      "2013": 90,
+      "2014": 87,
+      "2015": 83,
+      "2016": 77
     },
     "travel_behaviour_clusters": {
-      "rarely_seen": 0.4016,
-      "irregular": 0.0984,
-      "regular": 0.1148,
-      "withdrawing": 0.0861,
-      "withdrawing_post_2014": 0.0984,
-      "daily": 0.2008
+      "rarely_seen": 0.4792,
+      "irregular": 0.2708,
+      "daily": 0.25
     },
-    "cluster_total_population": 244,
-    "smartcard_outbound_journeys_2014_2016": null,
-    "smartcard_inbound_journeys_2014_2016": null,
-    "smartcard_internal_journeys_2014_2016": null,
+    "cluster_total_population": 48,
+    "smartcard_outbound_journeys_2014_2016": 3925.0,
+    "smartcard_inbound_journeys_2014_2016": 2126.0,
+    "smartcard_internal_journeys_2014_2016": 197.0,
     "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
   },
   "S10": {
-    "lsoa": "E01009133",
+    "lsoa": "E01009140",
     "stop_name": "Ladywood Fire Station",
     "annual_journeys_60plus": {
-      "2010": 10449.0,
-      "2011": 48143.0,
-      "2012": 45369.0,
-      "2013": 43302.0,
-      "2014": 42241.0,
-      "2015": 37263.0,
-      "2016": 17335.0
+      "2010": 10763.0,
+      "2011": 52288.0,
+      "2012": 53458.0,
+      "2013": 58017.0,
+      "2014": 60021.0,
+      "2015": 51487.0,
+      "2016": 25455.0
     },
     "annual_journeys_disabled": {
-      "2010": 2309.0,
-      "2011": 12065.0,
-      "2012": 11049.0,
-      "2013": 11390.0,
-      "2014": 10667.0,
-      "2015": 7417.0,
-      "2016": 2592.0
+      "2010": 1404.0,
+      "2011": 7961.0,
+      "2012": 8469.0,
+      "2013": 7719.0,
+      "2014": 8494.0,
+      "2015": 5538.0,
+      "2016": 1165.0
     },
     "eligible_population_by_year": {
-      "2008": 299,
-      "2009": 289,
-      "2010": 285,
-      "2011": 257,
-      "2012": 248,
-      "2013": 241,
-      "2014": 241,
-      "2015": 238,
-      "2016": 232
+      "2008": 293,
+      "2009": 303,
+      "2010": 301,
+      "2011": 308,
+      "2012": 300,
+      "2013": 293,
+      "2014": 289,
+      "2015": 285,
+      "2016": 278
     },
     "travel_behaviour_clusters": {
-      "rarely_seen": 0.3825,
-      "irregular": 0.0984,
-      "regular": 0.1093,
-      "withdrawing": 0.0929,
-      "withdrawing_post_2014": 0.0874,
-      "daily": 0.2295
+      "rarely_seen": 0.3952,
+      "irregular": 0.1734,
+      "regular": 0.1008,
+      "withdrawing": 0.0726,
+      "withdrawing_post_2014": 0.0726,
+      "daily": 0.1855
     },
-    "cluster_total_population": 183,
-    "smartcard_outbound_journeys_2014_2016": 5068.0,
-    "smartcard_inbound_journeys_2014_2016": 503.0,
-    "smartcard_internal_journeys_2014_2016": 254.0,
+    "cluster_total_population": 248,
+    "smartcard_outbound_journeys_2014_2016": 3923.0,
+    "smartcard_inbound_journeys_2014_2016": 443.0,
+    "smartcard_internal_journeys_2014_2016": 130.0,
     "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
   },
   "S11": {
-    "lsoa": "E01009063",
+    "lsoa": "E01009143",
     "stop_name": "Edgbaston Village Metro",
-    "annual_journeys_60plus": {},
-    "annual_journeys_disabled": {},
-    "eligible_population_by_year": {},
-    "travel_behaviour_clusters": null,
-    "cluster_total_population": null,
-    "smartcard_outbound_journeys_2014_2016": null,
-    "smartcard_inbound_journeys_2014_2016": null,
-    "smartcard_internal_journeys_2014_2016": null,
+    "annual_journeys_60plus": {
+      "2010": 6796.0,
+      "2011": 27485.0,
+      "2012": 26501.0,
+      "2013": 25096.0,
+      "2014": 24293.0,
+      "2015": 19893.0,
+      "2016": 10499.0
+    },
+    "annual_journeys_disabled": {
+      "2010": 1192.0,
+      "2011": 8299.0,
+      "2012": 8130.0,
+      "2013": 6563.0,
+      "2014": 7765.0,
+      "2015": 4903.0,
+      "2016": 268.0
+    },
+    "eligible_population_by_year": {
+      "2008": 179,
+      "2009": 175,
+      "2010": 188,
+      "2011": 168,
+      "2012": 163,
+      "2013": 156,
+      "2014": 151,
+      "2015": 166,
+      "2016": 153
+    },
+    "travel_behaviour_clusters": {
+      "rarely_seen": 0.6957,
+      "daily": 0.3043
+    },
+    "cluster_total_population": 69,
+    "smartcard_outbound_journeys_2014_2016": 7190.0,
+    "smartcard_inbound_journeys_2014_2016": 7863.0,
+    "smartcard_internal_journeys_2014_2016": 959.0,
     "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
   },
   "S12": {
-    "lsoa": "E01009119",
+    "lsoa": "E01009152",
     "stop_name": "Summerfield Park",
     "annual_journeys_60plus": {
-      "2010": 8167.0,
-      "2011": 36449.0,
-      "2012": 36435.0,
-      "2013": 36677.0,
-      "2014": 38503.0,
-      "2015": 34823.0,
-      "2016": 16359.0
+      "2010": 10863.0,
+      "2011": 46713.0,
+      "2012": 46915.0,
+      "2013": 43428.0,
+      "2014": 46591.0,
+      "2015": 44300.0,
+      "2016": 20963.0
     },
     "annual_journeys_disabled": {
-      "2011": 2309.0,
-      "2012": 1376.0,
-      "2013": 1063.0,
-      "2014": 2978.0,
-      "2015": 1342.0
+      "2010": 1804.0,
+      "2011": 10486.0,
+      "2012": 10890.0,
+      "2013": 11675.0,
+      "2014": 14422.0,
+      "2015": 11152.0,
+      "2016": 2223.0
     },
     "eligible_population_by_year": {
-      "2008": 390,
-      "2009": 390,
-      "2010": 391,
-      "2011": 397,
-      "2012": 406,
-      "2013": 406,
-      "2014": 394,
-      "2015": 392,
-      "2016": 387
+      "2008": 199,
+      "2009": 206,
+      "2010": 208,
+      "2011": 220,
+      "2012": 217,
+      "2013": 207,
+      "2014": 209,
+      "2015": 204,
+      "2016": 208
     },
     "travel_behaviour_clusters": {
-      "rarely_seen": 0.5724,
-      "irregular": 0.1207,
-      "regular": 0.069,
-      "withdrawing": 0.0724,
-      "withdrawing_post_2014": 0.0517,
-      "daily": 0.1138
+      "rarely_seen": 0.4307,
+      "withdrawing": 0.1606,
+      "withdrawing_post_2014": 0.0803,
+      "daily": 0.3285
     },
-    "cluster_total_population": 290,
-    "smartcard_outbound_journeys_2014_2016": 9488.0,
-    "smartcard_inbound_journeys_2014_2016": 16151.0,
-    "smartcard_internal_journeys_2014_2016": 1297.0,
+    "cluster_total_population": 137,
+    "smartcard_outbound_journeys_2014_2016": 12798.0,
+    "smartcard_inbound_journeys_2014_2016": 4779.0,
+    "smartcard_internal_journeys_2014_2016": 625.0,
     "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
   },
   "S13": {
-    "lsoa": "E01009121",
+    "lsoa": "E01009346",
     "stop_name": "City Rd Medical Centre",
     "annual_journeys_60plus": {
-      "2010": 13385.0,
-      "2011": 56184.0,
-      "2012": 50906.0,
-      "2013": 50221.0,
-      "2014": 48292.0,
-      "2015": 42205.0,
-      "2016": 19539.0
+      "2010": 5494.0,
+      "2011": 23184.0,
+      "2012": 25156.0,
+      "2013": 26442.0,
+      "2014": 26188.0,
+      "2015": 23020.0,
+      "2016": 12702.0
     },
     "annual_journeys_disabled": {
-      "2010": 2440.0,
-      "2011": 12883.0,
-      "2012": 14940.0,
-      "2013": 14249.0,
-      "2014": 19037.0,
-      "2015": 16295.0,
-      "2016": 7385.0
+      "2010": 2196.0,
+      "2011": 9982.0,
+      "2012": 9479.0,
+      "2013": 9761.0,
+      "2014": 10416.0,
+      "2015": 7246.0,
+      "2016": 413.0
     },
     "eligible_population_by_year": {
-      "2008": 425,
-      "2009": 420,
-      "2010": 416,
-      "2011": 406,
-      "2012": 388,
-      "2013": 377,
-      "2014": 364,
-      "2015": 352,
-      "2016": 336
+      "2008": 126,
+      "2009": 115,
+      "2010": 113,
+      "2011": 112,
+      "2012": 115,
+      "2013": 122,
+      "2014": 132,
+      "2015": 128,
+      "2016": 135
     },
     "travel_behaviour_clusters": {
-      "rarely_seen": 0.488,
-      "irregular": 0.11,
-      "regular": 0.0859,
-      "withdrawing": 0.1031,
-      "withdrawing_post_2014": 0.055,
-      "daily": 0.1581
+      "rarely_seen": 0.6,
+      "daily": 0.4
     },
-    "cluster_total_population": 291,
-    "smartcard_outbound_journeys_2014_2016": 4865.0,
-    "smartcard_inbound_journeys_2014_2016": 2315.0,
-    "smartcard_internal_journeys_2014_2016": 70.0,
+    "cluster_total_population": 65,
+    "smartcard_outbound_journeys_2014_2016": 3394.0,
+    "smartcard_inbound_journeys_2014_2016": 2789.0,
+    "smartcard_internal_journeys_2014_2016": 165.0,
     "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
   },
   "S14": {
-    "lsoa": "E01013524",
+    "lsoa": "E01010062",
     "stop_name": "Mencap Centre",
-    "annual_journeys_60plus": {},
-    "annual_journeys_disabled": {},
-    "eligible_population_by_year": {},
-    "travel_behaviour_clusters": null,
-    "cluster_total_population": null,
-    "smartcard_outbound_journeys_2014_2016": null,
-    "smartcard_inbound_journeys_2014_2016": null,
-    "smartcard_internal_journeys_2014_2016": null,
+    "annual_journeys_60plus": {
+      "2010": 13127.0,
+      "2011": 59995.0,
+      "2012": 65723.0,
+      "2013": 65222.0,
+      "2014": 66347.0,
+      "2015": 58097.0,
+      "2016": 28676.0
+    },
+    "annual_journeys_disabled": {
+      "2010": 2466.0,
+      "2011": 14398.0,
+      "2012": 14438.0,
+      "2013": 13947.0,
+      "2014": 18400.0,
+      "2015": 12031.0,
+      "2016": 5451.0
+    },
+    "eligible_population_by_year": {
+      "2008": 317,
+      "2009": 315,
+      "2010": 315,
+      "2011": 312,
+      "2012": 295,
+      "2013": 272,
+      "2014": 272,
+      "2015": 285,
+      "2016": 289
+    },
+    "travel_behaviour_clusters": {
+      "rarely_seen": 0.3532,
+      "irregular": 0.1101,
+      "regular": 0.1101,
+      "withdrawing": 0.0872,
+      "withdrawing_post_2014": 0.1009,
+      "daily": 0.2385
+    },
+    "cluster_total_population": 218,
+    "smartcard_outbound_journeys_2014_2016": 26952.0,
+    "smartcard_inbound_journeys_2014_2016": 18866.0,
+    "smartcard_internal_journeys_2014_2016": 1385.0,
     "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
   },
   "S15": {
-    "lsoa": "E01009117",
+    "lsoa": "E01009153",
     "stop_name": "Summerfield Crescent",
     "annual_journeys_60plus": {
-      "2010": 10912.0,
-      "2011": 46682.0,
-      "2012": 44652.0,
-      "2013": 44018.0,
-      "2014": 46040.0,
-      "2015": 32864.0,
-      "2016": 15409.0
+      "2010": 10130.0,
+      "2011": 43517.0,
+      "2012": 45771.0,
+      "2013": 44694.0,
+      "2014": 44177.0,
+      "2015": 36722.0,
+      "2016": 17094.0
     },
     "annual_journeys_disabled": {
-      "2010": 1857.0,
-      "2011": 8502.0,
-      "2012": 11473.0,
-      "2013": 9642.0,
-      "2014": 10927.0,
-      "2015": 6033.0,
-      "2016": 295.0
+      "2010": 1322.0,
+      "2011": 9184.0,
+      "2012": 13845.0,
+      "2013": 13734.0,
+      "2014": 13608.0,
+      "2015": 12220.0,
+      "2016": 4175.0
     },
     "eligible_population_by_year": {
-      "2008": 261,
-      "2009": 263,
-      "2010": 263,
+      "2008": 246,
+      "2009": 242,
+      "2010": 259,
       "2011": 251,
-      "2012": 247,
-      "2013": 248,
-      "2014": 234,
-      "2015": 223,
-      "2016": 213
+      "2012": 240,
+      "2013": 234,
+      "2014": 227,
+      "2015": 218,
+      "2016": 205
     },
     "travel_behaviour_clusters": {
-      "rarely_seen": 0.3933,
-      "irregular": 0.1404,
-      "regular": 0.0674,
-      "withdrawing": 0.1236,
-      "withdrawing_post_2014": 0.0843,
-      "daily": 0.191
+      "rarely_seen": 0.3077,
+      "irregular": 0.1302,
+      "regular": 0.1243,
+      "withdrawing": 0.1183,
+      "withdrawing_post_2014": 0.1006,
+      "daily": 0.2189
     },
-    "cluster_total_population": 178,
-    "smartcard_outbound_journeys_2014_2016": 6197.0,
-    "smartcard_inbound_journeys_2014_2016": 690.0,
-    "smartcard_internal_journeys_2014_2016": 279.0,
+    "cluster_total_population": 169,
+    "smartcard_outbound_journeys_2014_2016": 17487.0,
+    "smartcard_inbound_journeys_2014_2016": 9343.0,
+    "smartcard_internal_journeys_2014_2016": 775.0,
     "data_source": "UCL/GEoDS West Midlands Accessibility and Travel Passes (ENCTS concessionary smartcard, TfWM, 2010-2016)"
   }
 }

@@ -1,88 +1,91 @@
 {
   "S01": {
-    "lsoa": "E01013761",
+    "lsoa": "E01033615",
     "stop_name": "New Street Station",
-    "note": "not in Birmingham LA download"
+    "pop_aged_16plus": 1026,
+    "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S02": {
-    "lsoa": "E01009099",
+    "lsoa": "E01033624",
     "stop_name": "Spring St",
-    "pop_aged_16plus": 1310,
+    "pop_aged_16plus": 1312,
     "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S03": {
-    "lsoa": "E01009158",
+    "lsoa": "E01033559",
     "stop_name": "Jewellery Quarter Station",
-    "pop_aged_16plus": 1705,
+    "pop_aged_16plus": 1400,
     "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S04": {
-    "lsoa": "E01009146",
+    "lsoa": "E01033638",
     "stop_name": "Soho Hill",
-    "pop_aged_16plus": 2104,
+    "pop_aged_16plus": 1352,
     "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S05": {
-    "lsoa": "E01009057",
+    "lsoa": "E01034948",
     "stop_name": "Five Ways (Metro)",
-    "pop_aged_16plus": 1458,
+    "pop_aged_16plus": 1480,
     "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S06": {
-    "lsoa": "E01009129",
+    "lsoa": "E01009153",
     "stop_name": "Dudley Rd",
-    "pop_aged_16plus": 1194,
+    "pop_aged_16plus": 1708,
     "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S07": {
-    "lsoa": "E01009111",
+    "lsoa": "E01033626",
     "stop_name": "Five Ways Station",
-    "pop_aged_16plus": 1203,
+    "pop_aged_16plus": 974,
     "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S08": {
-    "lsoa": "E01009127",
+    "lsoa": "E01009143",
     "stop_name": "Icknield Port Rd",
-    "pop_aged_16plus": 1147,
+    "pop_aged_16plus": 1332,
     "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S09": {
-    "lsoa": "E01009097",
+    "lsoa": "E01033640",
     "stop_name": "Belgrave Interchange",
-    "pop_aged_16plus": 1546,
+    "pop_aged_16plus": 1587,
     "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S10": {
-    "lsoa": "E01009133",
+    "lsoa": "E01009140",
     "stop_name": "Ladywood Fire Station",
-    "pop_aged_16plus": 1134,
+    "pop_aged_16plus": 1822,
     "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S11": {
-    "lsoa": "E01009063",
+    "lsoa": "E01009143",
     "stop_name": "Edgbaston Village Metro",
-    "note": "not in Birmingham LA download"
+    "pop_aged_16plus": 1332,
+    "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S12": {
-    "lsoa": "E01009119",
+    "lsoa": "E01009152",
     "stop_name": "Summerfield Park",
-    "pop_aged_16plus": 1171,
+    "pop_aged_16plus": 1586,
     "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S13": {
-    "lsoa": "E01009121",
+    "lsoa": "E01009346",
     "stop_name": "City Rd Medical Centre",
-    "note": "not in Birmingham LA download"
+    "pop_aged_16plus": 1205,
+    "data_source": "Census 2021 TS062 (Nomis)"
   },
   "S14": {
-    "lsoa": "E01013524",
+    "lsoa": "E01010062",
     "stop_name": "Mencap Centre",
     "note": "not in Birmingham LA download"
   },
   "S15": {
-    "lsoa": "E01009117",
+    "lsoa": "E01009153",
     "stop_name": "Summerfield Crescent",
-    "pop_aged_16plus": 1443,
+    "pop_aged_16plus": 1708,
     "data_source": "Census 2021 TS062 (Nomis)"
   }
 }
