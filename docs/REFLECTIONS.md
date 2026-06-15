@@ -136,33 +136,57 @@ timing issue weeks earlier if I'd verified before I trusted.
 
 ## Jack Booth — Simulation, systems & validation, integration
 
-My biggest contribution doesn't exist in the final design, and learning to be okay with
-that was the real lesson.
+The thing I'm proudest of building isn't in what we're submitting now, and getting okay
+with that was the real lesson.
 
-I built the multi-agent simulation that let us test the routing logic before any hardware
-existed — buses, stops, demand, the optimiser, all running in software so we could see
-whether the idea even held together. It did its job: it proved the routing worked, it let
-us explore options we'd never have risked on real hardware, and it caught problems early
-and cheaply. And then, once the model and the FPGA were carrying the project, we moved it
-to `legacy/`. I'll be honest — that stung at first. You put weeks into something and watch
-it become scaffolding.
+I built the Unity simulation — the part that let us watch the idea run before any of it
+was real. A static map became a fully animated, ML-driven network with buses moving inside
+about two weeks, and once it worked it turned into the thing everyone else tested against:
+Arya's model fed routes straight into it, and a serial bridge I wrote pushed the same data
+out to Chris's LED board so the screen and the hardware always agreed. The fiddly part was
+never the animation — it was the seam between Unity and Python. Getting the model's output
+into the simulation reliably cost me an extra week chasing a serial link that worked four
+times out of five.
 
-But that's exactly what it was, and that reframing is what broadened me: in a real team,
-the work that lets *other* people build safely is often invisible in the final product, and
-that doesn't make it less essential. Integration and validation are the same — nobody
-applauds the route-plan check or the Arduino serial bridge, but a system that isn't
-verified end-to-end is just a demo waiting to fail in front of the people who depend on it.
-For a transport system that vulnerable shift-workers would actually rely on, "it probably
-works" isn't good enough; somebody has to be the one who refuses to call it done until it's
-proven, and I learned that's a role worth wanting.
+That fraction matters. A link that works four times out of five doesn't fail obviously —
+it fails silently. The screen would show one route, the LED board would show another, and
+every test we ran in between would be testing a lie. I didn't fully clock that risk until
+I was deep into the week trying to close it, and I don't think I explained to the others
+exactly what would have gone wrong if I hadn't. If the serial bridge had stayed unreliable,
+Chris and Arya would have been building on results from a system that was quietly
+contradicting itself — and they'd have had no way to know.
 
-Where it connects to responsibility: being able to *explore lots of options* in simulation,
-cheaply and without consequences, is what let us reject the ideas that looked good but
-served people badly — before they ever reached a street.
+Moving fast had a cost I didn't clock at the time. I was shipping features quicker than
+I was writing down why I'd built them the way I had, and more than once the others had to
+reverse-engineer my decisions to work alongside them. There was a specific pairing session
+— I don't remember exactly when — where I watched someone try to understand a choice I'd
+made and realised I couldn't explain it either, not clearly. The decision had felt obvious
+when I made it, and three weeks later it was opaque to me. We fixed it by logging the
+integration choices the moment we made them, in the session, instead of trying to
+reconstruct them afterwards. That habit probably did more for the project than any feature
+I added.
 
-What I'd do differently: build the integration tests alongside the simulation instead of
-after, and keep a running log of *why* we rejected each option, not just which one we kept —
-the rejected paths are half the story of a responsible design.
+When we rebuilt the front end for the finals, the Unity sim became legacy. That stung —
+you put weeks into something and watch it turn into scaffolding. But scaffolding is exactly
+what it was, and I've stopped seeing that as a lesser thing. The work that lets other
+people build safely is usually invisible in the final product, and a system nobody verified
+end-to-end is just a demo waiting to fail in front of the people who'd actually depend on
+it. The person who depends on this isn't in a position to diagnose a display that's quietly
+wrong — someone standing at the Dudley Road stop with no phone, no app, and a shift
+starting in twelve minutes doesn't get to say "I think the routing data is stale." They
+just miss the bus. Being the one who insists on proving it works before calling it done
+turned out to be a role worth wanting.
+
+The other thing the simulation gave us: the option to throw ideas away cheaply. A bad
+routing design in simulation costs nothing to discover and discard. The same discovery on
+a live route costs someone a journey. We tried more bad ideas inside Unity than we'd
+have dared to on the real network, and the thing we submitted is what was left after most
+of them failed.
+
+What I'd do differently: write the integration tests alongside the simulation rather than
+after it, and keep a log of *why* we rejected each option, not just which one we kept. The
+discarded paths are half the reasoning behind the design we landed on, and right now that
+reasoning lives only in whoever was in the room at the time.
 
 ---
 
