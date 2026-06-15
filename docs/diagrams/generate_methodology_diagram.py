@@ -52,7 +52,7 @@ inputs = box(0.4, 4.5, 3.7, 3.2, "REAL-WORLD INPUTS",
 
 model = box(4.5, 4.5, 3.7, 3.2, "DEMAND MODEL",
             ["XGBoost regressor", "263k rows, 2023–24",
-             "R² = 0.945 (temporal", "  split, unseen 2024)", "",
+             "R² = 0.9421 (temporal", "  split, unseen 2024)", "",
              "predicts: boardings per", "stop, per hour, given", "conditions"])
 
 optimiser = box(8.6, 4.5, 4.0, 3.2, "ROUTE OPTIMISER",

@@ -32,7 +32,8 @@ from sklearn.metrics import r2_score, mean_absolute_error
 from sklearn.inspection import permutation_importance
 
 HERE = Path(__file__).parent
-DATA = HERE / "prediction model" / "map_demand_dataset.csv"
+_REPO_ROOT = HERE.parent.parent
+DATA = _REPO_ROOT / "prediction model" / "map_demand_dataset.csv"
 
 print("Loading dataset...")
 df = pd.read_csv(DATA)

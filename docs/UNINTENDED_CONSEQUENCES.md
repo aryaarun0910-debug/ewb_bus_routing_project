@@ -14,13 +14,13 @@
 ### 1.2 Crime data as a feature can import policing bias
 **Mechanism.** `crime_total_2024` (police.uk) is a *recorded-crime* count — it measures police activity as much as crime. If the model learns "high-crime → high demand" from it, service allocation inherits any patrol bias.
 **Affected.** Over-policed micro-areas; trust in the system among residents who already distrust data systems.
-**Mitigation (done).** We ablated the feature (`analysis/crime_ablation/`): it carried no signal — with 15 stops a static per-stop count is redundant with stop identity — and removing it slightly *improved* out-of-year generalisation (R² 0.9445 → 0.9450). So we **removed `crime_total_2024` from the model entirely**. No policing-derived input remains in the routing model; crime is still surfaced in the dashboard as caveated area context, but it never influences service allocation. *Tested and deleted* — the strongest possible answer to the redlining critique.
+**Mitigation (done).** We ablated the feature (`analysis/crime_ablation/`): it carried no signal — with 15 stops a static per-stop count is redundant with stop identity — and removing it slightly *improved* out-of-year generalisation (R² 0.9418 → 0.9421). So we **removed `crime_total_2024` from the model entirely**. No policing-derived input remains in the routing model; crime is still surfaced in the dashboard as caveated area context, but it never influences service allocation. *Tested and deleted* — the strongest possible answer to the redlining critique.
 **Residual.** Document the ablation; let residents vote the feature in or out at governance Phase 2.
 
 ### 1.3 The concessionary anchor over-weights older/disabled travel patterns
 **Mechanism.** ENCTS smartcard data (2010–2016) is predominantly 60+ and disabled passengers; anchoring relative demand to it tilts the baseline toward their travel geography.
 **Affected.** Younger commuters and shift workers whose stop ranking may be understated.
-**Mitigation.** Tier clamping bounds the anchor's influence; ±20% sensitivity shows the model learns *shape*, not anchor scale (R² spread 0.0004). Notably, this is the rare bias that errs *toward* the most transport-dependent groups.
+**Mitigation.** Tier clamping bounds the anchor's influence; ±20% sensitivity shows the model learns *shape*, not anchor scale (R² spread 0.0002). Notably, this is the rare bias that errs *toward* the most transport-dependent groups.
 **Residual.** Replace anchor on first APC delivery; until then, named in MODEL_CARD ethics section.
 
 ### 1.4 "The algorithm said so" — data-driven service as cover for cuts

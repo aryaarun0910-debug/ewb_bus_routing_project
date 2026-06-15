@@ -73,7 +73,7 @@ and Framer Motion micro-interactions throughout.
 
 | Metric | Value |
 |---|---|
-| Demand model R² | 0.945 (RMSE 4.57 boardings) — temporal split, train 2023 / test 2024 |
+| Demand model R² | 0.9421 (RMSE 4.13, MAE 2.11 boardings) — temporal split, train 2023 / test 2024 |
 | Routing optimality gap | 1.16% mean above optimal (worst case 30.2%) |
 | Routes solved optimally | 89% |
 | Solve time | < 2 s |
@@ -81,7 +81,7 @@ and Framer Motion micro-interactions throughout.
 | Operating cost saving | ~£14.7k/yr gross (~£13.8k/yr net of deployment cost) — DfT BUS0404 methodology |
 | Break-even | ~1.1 months |
 | Social value (DfT TAG) | ~£51.7k/yr passenger time savings |
-| Allocation-mismatch index, fixed vs. dynamic | 0.385 → 0.374 (avg. across 32 scenario/window snapshots) |
+| Allocation-mismatch index, fixed vs. dynamic | 0.348 → 0.344 (avg. across 32 scenario/window snapshots) |
 
 All figures are reproducible — see [Getting Started](#getting-started).
 
@@ -90,7 +90,7 @@ All figures are reproducible — see [Getting Started](#getting-started).
   <img src="docs/figures/chart_equity.png" width="38%" />
 </p>
 <p align="center">
-  <em>Left: R² holds steady (0.937–0.949) across six independent validation checks — see <a href="#model-validation--robustness">Model Validation</a>. Right: the dynamic optimiser tracks real predicted demand more closely than a fixed schedule can, averaged across every scenario the model was run against — see <a href="#equity">Equity</a>.</em>
+  <em>Left: R² holds steady (0.926–0.942) across six independent validation checks — see <a href="#model-validation--robustness">Model Validation</a>. Right: the dynamic optimiser tracks real predicted demand more closely than a fixed schedule can, averaged across every scenario the model was run against — see <a href="#equity">Equity</a>.</em>
 </p>
 
 ---
@@ -108,7 +108,7 @@ We then mined as much **real, openly-licensed data** as exists for Ladywood (see
 | School terms | Fixed flag per calendar month | Real Birmingham term + bank-holiday calendar, per real date |
 | Per-stop demand level | Hand-picked `base` value per importance tier | Anchored to real ENCTS concessionary smartcard journey volumes (UCL/GEoDS, TfWM-linked) |
 | Static features | `stop_x`, `stop_y`, `stop_importance` only | + `imd_score`, `poi_total`, `population`, `crime_total_2024`, `elevation_m` — all real, all per-stop |
-| Demand model R² | 0.940 (RMSE 4.3), random 80/20 split | 0.945 (RMSE 4.57), **temporal split** — train on 2023, test on unseen 2024 |
+| Demand model R² | 0.940 (RMSE 4.3), random 80/20 split | 0.9421 (RMSE 4.13), **temporal split** — train on 2023, test on unseen 2024 |
 | What still isn't real | Everything (no observed boardings exist for these stops) | Hour-of-day demand *shape* and one-off special events — no public per-hour boarding curves or event logs exist; this is the honest residual gap (see [Caveats](#caveats)) |
 
 The R² didn't jump dramatically — it was never the point. What changed is *what the model learned from*: real weather, a real calendar, and a real (if dated and concessionary-only) ridership signal, instead of distributions we invented. That's the difference between "self-consistent with our assumptions" and "anchored to the world as it actually is."
@@ -121,11 +121,11 @@ A single random-split R² is not enough to trust a demand model — it can hide 
 
 | Check | Result | What it tells us |
 |---|---|---|
-| **i.i.d. / independence** — random split vs. temporal split (train 2023 → test 2024) | R² 0.949 (random) vs. 0.945 (temporal); gap = 0.004 | The model isn't leaning on row-level leakage between train and test — it generalises to a genuinely unseen year almost as well as to shuffled rows from the same period |
-| **Sensitivity** — perturb the smartcard demand anchor by ±20% and retrain | R² spread = 0.0004 across baseline / −20% / +20% | The headline accuracy isn't an artefact of the exact (decade-old, concessionary-only) magnitude fixed by the smartcard anchor — the model is learning the *shape* of demand (by stop, time, weather), not the absolute scale of one source |
-| **Domain shift** — train on one year/season, test on the other | Year shift avg R² = 0.945; season shift avg R² = 0.934 | Cross-year and cross-season transfer retain most of the in-distribution score — the model is mostly capturing stable structure (which stops are busy, when, in what weather), not memorising one year's quirks. The modest season-shift drop (0.945 → 0.934) is the honest bound on how far this model should be trusted to extrapolate without retraining |
+| **i.i.d. / independence** — random split vs. temporal split (train 2023 → test 2024) | R² 0.9424 (random) vs. 0.9421 (temporal); gap = 0.0002 | The model isn't leaning on row-level leakage between train and test — it generalises to a genuinely unseen year almost as well as to shuffled rows from the same period |
+| **Sensitivity** — perturb the smartcard demand anchor by ±20% and retrain | R² spread = 0.0002 across baseline / −20% / +20% (0.9412 / 0.9413 / 0.9414) | The headline accuracy isn't an artefact of the exact (decade-old, concessionary-only) magnitude fixed by the smartcard anchor — the model is learning the *shape* of demand (by stop, time, weather), not the absolute scale of one source |
+| **Domain shift** — train on one year/season, test on the other | Year shift avg R² = 0.9405; season shift avg R² = 0.9257 | Cross-year and cross-season transfer retain most of the in-distribution score — the model is mostly capturing stable structure (which stops are busy, when, in what weather), not memorising one year's quirks. The modest season-shift drop (0.9421 → 0.9257) is the honest bound on how far this model should be trusted to extrapolate without retraining |
 
-This is also why the **headline R² changed from 0.949 (random 80/20 split) to 0.945 (temporal split, train-2023/test-2024)** between the table above and this one — the temporal figure is the one we now report as primary, because it's the one that can't be inflated by within-period leakage.
+This is also why the **headline R² changed from 0.9424 (random 80/20 split) to 0.9421 (temporal split, train-2023/test-2024)** between the table above and this one — the temporal figure is the one we now report as primary, because it's the one that can't be inflated by within-period leakage.
 
 ---
 
@@ -147,8 +147,8 @@ So `analysis/equity.py` computes an **allocation-mismatch index** — the standa
 
 | Routing | Allocation-mismatch index | What it means |
 |---|---|---|
-| Fixed schedule | **0.385** | Same buses, same stops, regardless of how demand shifts with weather or time of day |
-| Dynamic optimiser | **0.374** | Reallocates toward wherever predicted need has actually moved this hour |
+| Fixed schedule | **0.348** | Same buses, same stops, regardless of how demand shifts with weather or time of day |
+| Dynamic optimiser | **0.344** | Reallocates toward wherever predicted need has actually moved this hour |
 
 A modest but real, *measured* gain — not an assumed one. (We initially tried a Gini coefficient of service-per-stop coverage here; it returned 0.0 for both routing types because the static coverage tables are identical, and a naive service÷demand ratio Gini was distorted by stops with near-zero predicted demand. The dissimilarity index above is the metric that actually isolates what changes between a fixed and an adaptive system — see the methodology note in [`equity.py`](analysis/equity.py) for the full reasoning.)
 
@@ -248,8 +248,8 @@ Every number quoted in this README traces back to a script you can run yourself 
 
 | Claim | Computed by | Output |
 |---|---|---|
-| R² = 0.945, robustness across 6 checks | `analysis/robustness_analysis.py` | [`robustness.json`](analysis/outputs/robustness.json) |
-| Allocation-mismatch 0.385 → 0.374 | `analysis/equity.py` | [`equity.json`](analysis/outputs/equity.json) |
+| R² = 0.9421, robustness across 6 checks | `analysis/robustness_analysis.py` | [`robustness.json`](analysis/outputs/robustness.json) |
+| Allocation-mismatch 0.348 → 0.344 | `analysis/equity.py` | [`equity.json`](analysis/outputs/equity.json) |
 | Operating cost saving, break-even, social value | `analysis/cost_model.py` | DfT BUS0404 / TAG A1.3 methodology |
 | Synthetic vs. real GTFS pattern match | `analysis/gtfs_validate.py` | [`gtfs_validation.json`](analysis/outputs/gtfs_validation.json) |
 | Feature importance (what drives demand) | `analysis/explainability.py` | XGBoost permutation importance |
@@ -283,7 +283,7 @@ True commercial stop-route boarding counts are **not publicly released** by TfWM
 
 - **Real exogenous variables** — every row uses observed Birmingham weather (Open-Meteo hourly archive, 2023–2024), the real school-term/bank-holiday calendar, and storm flags derived from observed conditions, in place of the original sampled distributions.
 - **Real demand anchor** — each stop's relative demand level is now set from its real ENCTS concessionary smartcard journey volume (UCL/GEoDS, TfWM-linked, 2010–2016) rather than a hand-picked synthetic `base` value, with IMD/POI/crime/elevation added as genuine per-stop ML features.
-- **Still synthetic** — the *hour-of-day demand shape* (commuter-peak curves) and one-off *special events* (festivals, road closures) remain modelled, since no public per-hour boarding curves or event logs exist for these stops. This is the honest residual gap, and the reason R² = 0.949 should still be read as *self-consistency with a realistically-anchored generator*, not validated real-world accuracy.
+- **Still synthetic** — the *hour-of-day demand shape* (commuter-peak curves) and one-off *special events* (festivals, road closures) remain modelled, since no public per-hour boarding curves or event logs exist for these stops. This is the honest residual gap, and the reason R² = 0.9421 should still be read as *self-consistency with a realistically-anchored generator*, not validated real-world accuracy.
 
 GTFS validation (`analysis/gtfs_validate.py`) compares the model's temporal pattern against real service frequency — see [`docs/MODEL_CARD.md`](docs/MODEL_CARD.md) and [`analysis/outputs/gtfs_validation.json`](analysis/outputs/gtfs_validation.json) for the full discussion.
 

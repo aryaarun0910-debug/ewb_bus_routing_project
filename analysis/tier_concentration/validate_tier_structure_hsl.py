@@ -20,9 +20,14 @@ import numpy as np
 import pandas as pd
 
 HERE = Path(__file__).parent
-HSL = HERE.parent / "international" / "helsinki_stop_boardings.csv"
-LADYWOOD = (HERE.parent.parent / "hardening" / "ablation" /
-            "prediction model" / "map_demand_dataset.csv")
+_REPO_ROOT = HERE.parent.parent
+# NOTE: helsinki_stop_boardings.csv is a manually-downloaded HSL open-data
+# export (6,708-stop boardings) that is not committed to the repo -- this
+# script cannot currently be run; paths corrected for reproducibility only.
+# See analysis/tier_concentration/tier_structure_hsl.json for the prior
+# output of this script.
+HSL = HERE / "helsinki_stop_boardings.csv"
+LADYWOOD = _REPO_ROOT / "prediction model" / "map_demand_dataset.csv"
 
 def tier_shares(per_stop: pd.Series) -> dict:
     """Share of total boardings captured by each volume tercile of stops."""

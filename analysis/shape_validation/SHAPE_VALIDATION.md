@@ -12,11 +12,11 @@ This analysis closes that loop with the strongest public evidence that exists:
 
 > *"We could not observe Ladywood's boarding curves — nobody publicly can. So we tested our modelled curves against the best observed data in the country: TfL's per-stop, per-quarter-hour boarding counts. Across 2.3 million boardings at 8,261 stops, our weekday shape correlates at r = 0.94–0.95 for major and medium stops. The shape we modelled is the shape UK cities actually have."*
 
-And there's a poetic symmetry a presenter can use: the shape correlation (≈0.945) happens to equal the model's own temporal-split R² (0.945).
+And there's a useful symmetry a presenter can use: the shape correlation (0.94–0.95 for major/medium) and the model's own temporal-split R² (0.9421) land in the same band — the demand model's accuracy and the shape prior it was built on are mutually reinforcing, even though the two numbers are no longer expected to coincide exactly after retrains.
 
 ## The honest caveats (state them before anyone asks)
 
-1. **London is not Ladywood.** This validates the *shape family* (UK urban dual-peak weekday), not Ladywood's specific levels or stop ranking. Levels come from the smartcard anchor; ranking sensitivity is separately bounded (±20% → R² spread 0.0004).
+1. **London is not Ladywood.** This validates the *shape family* (UK urban dual-peak weekday), not Ladywood's specific levels or stop ranking. Levels come from the smartcard anchor; ranking sensitivity is separately bounded (±20% → R² spread 0.0002).
 2. **The minor-stop curve diverges (r = 0.796) — and the reason is informative.** The project's "minor" curve was deliberately designed asymmetric: residential endpoint stops board heavily in the AM peak and mostly *alight* in the PM (commuters coming home). Observed low-volume London stops show a more symmetric dual peak — many are quiet central stops, not residential endpoints. The divergence is a *tier-taxonomy* difference, not a peak-timing error: observed and modelled peaks still land at 07:00–08:00 and 16:00–17:00.
 3. **Tier mapping is by volume tercile.** London stops were assigned major/medium/minor by total boardings (top/middle/bottom third) to mirror the repo's importance tiers. Other mappings are possible; the headline correlations are robust to the obvious alternatives (quartiles, network-wide curve: r = 0.945 vs the major curve).
 4. **Autumn 2023, term-time typical day** — consistent with the comparison purpose (the repo's curves are term-time weekday baselines before seasonal multipliers).

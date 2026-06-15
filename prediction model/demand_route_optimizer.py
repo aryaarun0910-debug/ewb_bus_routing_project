@@ -112,7 +112,7 @@ for col in CAT_COLS:
 # NOTE: crime_total_2024 was deliberately REMOVED as a model feature. An ablation
 # (analysis/crime_ablation/) showed it carried no signal — with 15 stops a static
 # per-stop count is redundant with stop identity — and removing it slightly
-# *improved* out-of-year generalisation (R² 0.9445 → 0.9450). Excluding it also
+# *improved* out-of-year generalisation (R² 0.9418 → 0.9421). Excluding it also
 # removes any policing-derived input and the redlining/bias risk that comes with
 # it. Crime is still surfaced in the dashboard as caveated area context, but it
 # never influences routing.

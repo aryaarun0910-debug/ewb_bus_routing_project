@@ -63,7 +63,7 @@ ingestion = box(0.4, 4.6, 2.6, 2.0, "scripts/",
 # Layer 2 — demand model
 demand = box(3.6, 4.6, 3.0, 2.0, "prediction model/",
              ["generate_real_demand_", "dataset.py",
-              "→ demand_model.pkl", "(XGBoost, R²=0.945)"])
+              "→ demand_model.pkl", "(XGBoost, R²=0.9421)"])
 
 # Layer 3 — optimiser
 optimiser = box(7.2, 4.6, 3.0, 2.0, "prediction model/",

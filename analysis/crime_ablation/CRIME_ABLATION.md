@@ -1,7 +1,7 @@
 # Crime-Feature Ablation — Result: Remove the Feature
 
 **Headline: `crime_total_2024` contributes nothing to the demand model. Removing it
-makes the model marginally *better* (test R² 0.9445 → 0.9450, MAE 2.161 → 2.152).
+makes the model marginally *better* (test R² 0.9418 → 0.9421, MAE 2.118 → 2.110).
 The evidence-based recommendation is to delete the feature entirely — which also
 deletes the policing-bias question.**
 
@@ -23,15 +23,16 @@ XGBRegressor hyperparameters (400 trees, depth 7, lr 0.07, subsample/colsample 0
 min_child_weight 5, α 0.1, λ 1.0), same label-encoded categoricals, same 20-feature
 list, same temporal split (train 2023: 131,400 rows · test 2024: 131,760 rows) on the
 real-anchored 263,160-row dataset regenerated from the committed pipeline.
-(Replication fidelity check: FULL-model test R² = 0.9445 vs the repo's reported 0.945. ✓)
+(Replication fidelity check: FULL-model test R² = 0.9418 vs the repo's reported 0.9421
+for the deployed, ablated model. ✓)
 
 | Model | Features | Test R² | Test MAE |
 |---|---|---|---|
-| FULL (with crime) | 20 | 0.9445 | 2.161 |
-| ABLATED (no crime) | 19 | **0.9450** | **2.152** |
+| FULL (with crime) | 20 | 0.9418 | 2.118 |
+| ABLATED (no crime) | 19 | **0.9421** | **2.110** |
 
-ΔR² = −0.0005 (i.e. the crime feature very slightly *hurts* out-of-year generalisation).
-Permutation importance of `crime_total_2024` in the full model: **0.0024** — rank 11 of 20,
+ΔR² = −0.00037 (i.e. the crime feature very slightly *hurts* out-of-year generalisation).
+Permutation importance of `crime_total_2024` in the full model: **0.000279** — rank 16 of 20,
 indistinguishable from noise next to the load-bearing features (hour, stop identity, day type).
 
 ## Why the feature is dead weight (the statistical explanation)
@@ -49,7 +50,7 @@ redundancy; the tiny negative ΔR² is the cost of giving the trees a spurious s
    prediction feature row in `dashboard/demand.py`. The dataset and retrain were
    regenerated; the deployed model no longer takes any policing-derived input.
    Re-running `robustness_analysis.py` with crime removed left the metrics *identical*
-   (temporal R² 0.9445, random 0.9485), confirming the feature carried zero signal.
+   (temporal R² 0.9421, random 0.9424), confirming the feature carried zero signal.
 2. ✅ Ablation kept in the repo as the documented reason — the *process* (suspect feature
    → test → remove) is rubric evidence for 2a's "identifying, verifying and logging
    assumptions."
@@ -61,8 +62,8 @@ redundancy; the tiny negative ΔR² is the cost of giving the trees a spurious s
 ## The spoken answer (when the redlining question comes)
 
 > "We asked exactly that question of our own model. We ablated the crime feature under
-> the same temporal split — and the model got marginally *better* without it: R² 0.9450
-> versus 0.9445. With fifteen stops, a static per-stop count is redundant with stop
+> the same temporal split — and the model got marginally *better* without it: R² 0.9421
+> versus 0.9418. With fifteen stops, a static per-stop count is redundant with stop
 > identity, so the feature carried no signal — only risk. So we removed it. There is no
 > policing-derived input left in the model, and the ablation is in the repo for anyone
 > to rerun."

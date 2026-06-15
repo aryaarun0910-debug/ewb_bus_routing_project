@@ -11,7 +11,7 @@
 
 ## Arya Arun — Machine learning, demand model, analysis
 
-The number I keep coming back to isn't R² = 0.945. It's 0.06.
+The number I keep coming back to isn't R² = 0.9421. It's 0.06.
 
 That was the correlation between our modelled demand shape and the only real proxy we
 could find — GTFS service frequency. When it came back that low my first thought was that
@@ -23,7 +23,7 @@ what "good work" means.
 
 Most of what I built after that was me trying to break my own model before a judge could —
 the temporal split, the ±20% anchor perturbation, the season-shift test. The number that
-actually lets me sleep is the 0.0004 R² spread under that perturbation: it means our
+actually lets me sleep is the 0.0002 R² spread under that perturbation: it means our
 headline doesn't secretly depend on trusting a 2010–2016 dataset's exact magnitudes. Late
 on, I retrained to fix the weekend curve against three years of observed data, and I
 removed the crime feature even though it was harmless to accuracy — because a model for a

@@ -173,7 +173,7 @@ function App() {
         </div>
         <div className="headline-stats">
           <HeadlineStat value="57.9%" label="households with no car" />
-          <HeadlineStat value="0.945" label="demand model R² · unseen 2024" />
+          <HeadlineStat value="0.9421" label="demand model R² · unseen 2024" />
           <HeadlineStat value="263k" label="real-anchored training rows" />
           <HeadlineStat value="1.16%" label="optimiser gap vs. optimal" />
         </div>

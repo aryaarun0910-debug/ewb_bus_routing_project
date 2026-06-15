@@ -73,7 +73,7 @@ Honesty matters here as much as anywhere else in this project:
   *requires* local co-design to elicit realistic profiles — you cannot copy
   the model's learned weights into a different context and expect them to
   mean anything. (This is the same honesty principle behind the [Model
-  Card](../MODEL_CARD.md)'s insistence that Ladywood's own R²=0.945 measures
+  Card](../MODEL_CARD.md)'s insistence that Ladywood's own R²=0.9421 measures
   self-consistency with a realistically-anchored generator, not validated
   real-world accuracy — the same caution applies, more strongly, to any
   cross-context transfer.)
