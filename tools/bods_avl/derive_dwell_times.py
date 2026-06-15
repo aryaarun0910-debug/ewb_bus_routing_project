@@ -16,11 +16,9 @@ import numpy as np
 import pandas as pd
 
 HERE = Path(__file__).parent
+_REPO_ROOT = HERE.parent.parent
 RAW = HERE / "avl_raw"
-# Repo stop coordinates (copy of data/gtfs/ladywood_stops.json) — adjust path
-# to your local clone if running outside the beast workspace.
-STOPS_JSON = (HERE.parent.parent / "hardening" / "ablation" / "data" / "gtfs"
-              / "ladywood_stops.json")
+STOPS_JSON = _REPO_ROOT / "data" / "gtfs" / "ladywood_stops.json"
 SNAP_RADIUS_M = 50.0
 MIN_DWELL_S, MAX_DWELL_S = 10, 300       # outside this: traffic hold / layover
 
