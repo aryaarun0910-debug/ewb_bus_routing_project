@@ -171,8 +171,8 @@
     "n_high_deprivation_stops": 8,
     "n_high_dep_unserved_by_fixed": 0,
     "high_dep_unserved_names": [],
-    "allocation_mismatch_fixed": 0.385,
-    "allocation_mismatch_dynamic": 0.374,
+    "allocation_mismatch_fixed": 0.363,
+    "allocation_mismatch_dynamic": 0.363,
     "mismatch_snapshots_compared": 32
   },
   "data_source": "MHCLG English Indices of Deprivation 2019 (IMD 2019), LSOA level",
