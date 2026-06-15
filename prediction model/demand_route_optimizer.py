@@ -9,7 +9,11 @@ demand_route_optimizer.py
 5. For each 2-hour window, runs a greedy Vehicle-Routing optimizer
    that re-routes 3 buses along the road network to maximise
    predicted passengers served
-6. Outputs
+6. Applies a minimum-service floor (docs/FAILURE_MODES_AND_SERVICE_FLOOR.md
+   §1b): any stop left unvisited for SERVICE_FLOOR_WINDOWS consecutive
+   windows is force-added to the cheapest-to-reach route, regardless of
+   predicted demand
+7. Outputs
      demand_model.pkl      — trained XGBoost + encoders
      route_plan.json       — complete route plan with demand scores
      route_plan_summary.txt — human-readable summary
@@ -273,6 +277,12 @@ ROUTE_BUDGET_MIN = 70      # max one-way route time in minutes
 MIN_DEMAND_VISIT = 2.0     # don't bother visiting a stop below this threshold
 BUS_CAPACITY     = 320.0   # passengers a bus can serve across the window
 
+# Minimum-service floor (docs/FAILURE_MODES_AND_SERVICE_FLOOR.md §1b): a stop
+# can go at most this many consecutive TIME_WINDOWS without being visited,
+# regardless of predicted demand. TIME_WINDOWS are 2-3h each, so
+# SERVICE_FLOOR_WINDOWS=2 bounds the worst-case gap at roughly 4-6h.
+SERVICE_FLOOR_WINDOWS = 2
+
 
 def path_time(order: list[str]) -> float:
     """Total shortest-path travel time along an ordered open route."""
@@ -389,6 +399,63 @@ def route_gaps(routes: list[dict]) -> list[float]:
             gaps.append(100.0 * (got - opt) / opt)
     return gaps
 
+
+def apply_service_floor(routes: list[dict], demand: dict[str, float],
+                         windows_since_served: dict[str, int]) -> list[str]:
+    """
+    Enforce the minimum-service floor (docs/FAILURE_MODES_AND_SERVICE_FLOOR.md
+    §1b): every stop must be visited at least once every SERVICE_FLOOR_WINDOWS
+    consecutive time windows, regardless of predicted demand.
+
+    Mutates `routes` in place: any stop that has breached the floor is
+    force-inserted into whichever route can reach it most cheaply, and its
+    counter is reset. `windows_since_served` is mutated in place and tracks
+    consecutive unvisited windows per stop across the whole scenario day.
+
+    This is a hard constraint and takes precedence over ROUTE_BUDGET_MIN —
+    a floor insertion may push a route's travel time above the soft budget.
+
+    Returns the list of stop_ids force-added by the floor this window.
+    """
+    served = {s for r in routes for s in r["route_stops"]}
+    floor_additions: list[str] = []
+
+    for sid in STOP_IDS:
+        if sid in served:
+            windows_since_served[sid] = 0
+            continue
+
+        windows_since_served[sid] += 1
+        if windows_since_served[sid] < SERVICE_FLOOR_WINDOWS:
+            continue
+        if not routes:
+            continue
+
+        # Find the cheapest insertion point across all routes.
+        best_route, best_tt, best_pos = None, float("inf"), None
+        for r in routes:
+            for pos, anchor in enumerate(r["route_stops"]):
+                tt = ALL_PATHS[anchor].get(sid, float("inf"))
+                if tt < best_tt:
+                    best_tt, best_route, best_pos = tt, r, pos
+        if best_route is None:
+            continue
+
+        best_route["route_stops"].insert(best_pos + 1, sid)
+        best_route["route_stops"]    = two_opt(best_route["route_stops"])
+        best_route["route_names"]    = [STOP_MAP[s]["name"] for s in best_route["route_stops"]]
+        best_route["route_time_min"] = round(path_time(best_route["route_stops"]), 1)
+        best_route["stop_demand"][sid] = demand.get(sid, 0.0)
+        best_route["total_demand"] = round(
+            min(sum(best_route["stop_demand"].values()), BUS_CAPACITY), 1
+        )
+        best_route.setdefault("service_floor_stops", []).append(sid)
+
+        windows_since_served[sid] = 0
+        floor_additions.append(sid)
+
+    return floor_additions
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 8.  SIMULATE FOUR CONTRASTING DAYS
 # ─────────────────────────────────────────────────────────────────────────────
@@ -463,6 +530,7 @@ for scenario in SCENARIO_DAYS:
     summary_lines.append(f"{'='*70}")
 
     scenario_plan = {}
+    windows_since_served = {sid: 0 for sid in STOP_IDS}
 
     for window_name, hours in TIME_WINDOWS:
         hour_range = f"{hours[0]:02d}:00-{hours[-1]+1:02d}:00"
@@ -473,6 +541,9 @@ for scenario in SCENARIO_DAYS:
         # ── Run optimizer ─────────────────────────────────────────────────────
         routes = greedy_route(demand)
         optimality_gaps.extend(route_gaps(routes))
+
+        # ── Enforce the minimum-service floor ──────────────────────────────────
+        floor_additions = apply_service_floor(routes, demand, windows_since_served)
 
         # ── Identify any unserved stops ───────────────────────────────────────
         served = {s for r in routes for s in r["route_stops"]}
@@ -488,6 +559,7 @@ for scenario in SCENARIO_DAYS:
             "routes":          routes,
             "unserved_stops":  [{"stop": STOP_MAP[s]["name"], "demand": d}
                                  for s, d in unserved],
+            "service_floor_additions": [STOP_MAP[s]["name"] for s in floor_additions],
         }
 
         # ── Console output ────────────────────────────────────────────────────
@@ -514,6 +586,12 @@ for scenario in SCENARIO_DAYS:
                                    for s, d in unserved[:4]))
             print(us_line)
             block.append(us_line)
+
+        if floor_additions:
+            sf_line = ("  >> Service floor: forced visit to "
+                       + ", ".join(STOP_MAP[s]["name"] for s in floor_additions))
+            print(sf_line)
+            block.append(sf_line)
 
         # Build summary
         summary_lines.append(f"\n  [{hour_range}]  {window_name}")
