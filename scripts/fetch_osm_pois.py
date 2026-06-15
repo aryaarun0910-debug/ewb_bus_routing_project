@@ -45,23 +45,27 @@ OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 RADIUS_M     = 400
 SLEEP_S      = 4.0  # polite delay between stops (one request per stop now)
 
-# Stop coordinates (WGS84) — from equity.py / GTFS matching
+# Stop coordinates (WGS84) — averaged from matching data/gtfs/ladywood_stops.json
+# entries by exact stop name (multiple GTFS entries per stop = different
+# direction/platform; averaging gives a representative point for the 400m
+# POI radius). Previous values were not derived from GTFS and were off by
+# 300m-2.2km for 14/15 stops.
 STOPS: dict[str, dict] = {
-    "S01": {"name": "New Street Station",        "lat": 52.4778, "lon": -1.8990},
-    "S02": {"name": "Spring St",                 "lat": 52.4868, "lon": -1.9101},
-    "S03": {"name": "Jewellery Quarter Station", "lat": 52.4868, "lon": -1.9101},
-    "S04": {"name": "Soho Hill",                 "lat": 52.5012, "lon": -1.9178},
-    "S05": {"name": "Five Ways (Metro)",         "lat": 52.4737, "lon": -1.9102},
-    "S06": {"name": "Dudley Rd",                 "lat": 52.4887, "lon": -1.9302},
-    "S07": {"name": "Five Ways Station",         "lat": 52.4737, "lon": -1.9102},
-    "S08": {"name": "Icknield Port Rd",          "lat": 52.4914, "lon": -1.9267},
-    "S09": {"name": "Belgrave Interchange",      "lat": 52.4820, "lon": -1.8960},
-    "S10": {"name": "Ladywood Fire Station",     "lat": 52.4820, "lon": -1.9200},
-    "S11": {"name": "Edgbaston Village Metro",   "lat": 52.4680, "lon": -1.9170},
-    "S12": {"name": "Summerfield Park",          "lat": 52.4940, "lon": -1.9200},
-    "S13": {"name": "City Rd Medical Centre",    "lat": 52.4880, "lon": -1.9350},
-    "S14": {"name": "Mencap Centre",             "lat": 52.5020, "lon": -1.9430},
-    "S15": {"name": "Summerfield Crescent",      "lat": 52.4930, "lon": -1.9230},
+    "S01": {"name": "New Street Station",        "lat": 52.4776, "lon": -1.8962},
+    "S02": {"name": "Spring St",                 "lat": 52.4677, "lon": -1.9034},
+    "S03": {"name": "Jewellery Quarter Station", "lat": 52.4897, "lon": -1.9126},
+    "S04": {"name": "Soho Hill",                 "lat": 52.4963, "lon": -1.9151},
+    "S05": {"name": "Five Ways (Metro)",         "lat": 52.4756, "lon": -1.9138},
+    "S06": {"name": "Dudley Rd",                 "lat": 52.4859, "lon": -1.9368},
+    "S07": {"name": "Five Ways Station",         "lat": 52.4715, "lon": -1.9120},
+    "S08": {"name": "Icknield Port Rd",          "lat": 52.4787, "lon": -1.9267},
+    "S09": {"name": "Belgrave Interchange",      "lat": 52.4668, "lon": -1.8991},
+    "S10": {"name": "Ladywood Fire Station",     "lat": 52.4780, "lon": -1.9276},
+    "S11": {"name": "Edgbaston Village Metro",   "lat": 52.4722, "lon": -1.9236},
+    "S12": {"name": "Summerfield Park",          "lat": 52.4865, "lon": -1.9385},
+    "S13": {"name": "City Rd Medical Centre",    "lat": 52.4861, "lon": -1.9409},
+    "S14": {"name": "Mencap Centre",             "lat": 52.4930, "lon": -1.9591},
+    "S15": {"name": "Summerfield Crescent",      "lat": 52.4829, "lon": -1.9341},
 }
 
 HEADERS = {
@@ -157,9 +161,9 @@ def _count_elements(elements: list) -> dict[str, int]:
     return counts
 
 
-def stop_tier(counts: dict[str, int]) -> str:
-    """Derive demand tier from real POI counts (replaces hand-labelling)."""
-    score = (
+def _poi_score(counts: dict[str, int]) -> int:
+    """Weighted POI density score (foot-traffic / demand proxy)."""
+    return (
         counts.get("hospitals", 0) * 5 +
         counts.get("gp_clinics", 0) * 3 +
         counts.get("schools", 0) * 2 +
@@ -169,11 +173,27 @@ def stop_tier(counts: dict[str, int]) -> str:
         counts.get("pharmacies", 0) * 1 +
         counts.get("convenience", 0) * 1
     )
-    if score >= 10:
-        return "major"
-    if score >= 4:
-        return "medium"
-    return "minor"
+
+
+def assign_tiers(scores: dict[str, int]) -> dict[str, str]:
+    """Rank stops by POI score and split into major/medium/minor thirds.
+
+    Absolute score thresholds don't transfer between corridors — a score of
+    40 is "major" on a quiet suburban route and "minor" in a city centre.
+    Tiers are therefore relative to this corridor's own stops, split into
+    equal thirds (ties broken by stop_id for a stable, reproducible split).
+    """
+    ordered = sorted(scores, key=lambda sid: (scores[sid], sid))
+    third = len(ordered) // 3
+    tiers: dict[str, str] = {}
+    for rank, sid in enumerate(ordered):
+        if rank < third:
+            tiers[sid] = "minor"
+        elif rank < 2 * third:
+            tiers[sid] = "medium"
+        else:
+            tiers[sid] = "major"
+    return tiers
 
 
 def run() -> dict:
@@ -197,22 +217,23 @@ def run() -> dict:
             print(f"  {category:<15} {status}")
         time.sleep(SLEEP_S)
 
-        tier = stop_tier(counts)
-
         result[sid] = {
             "stop_name": stop["name"],
             "lat":       lat,
             "lon":       lon,
             "radius_m":  RADIUS_M,
             "poi_counts": counts,
-            "derived_tier": tier,
+            "poi_score": _poi_score(counts),
             "data_source": "OpenStreetMap via Overpass API",
         }
 
-        print(f"  -> derived tier: {tier}")
+    tiers = assign_tiers({sid: v["poi_score"] for sid, v in result.items()})
+    for sid in result:
+        result[sid]["derived_tier"] = tiers[sid]
+        print(f"  {sid} score={result[sid]['poi_score']:<4} -> {tiers[sid]}")
 
     print(f"\n{sep}")
-    print("Stop tier summary (real POI-derived):")
+    print("Stop tier summary (relative tertile, real POI-derived):")
     for tier in ["major", "medium", "minor"]:
         stops_in_tier = [sid for sid, v in result.items() if v["derived_tier"] == tier]
         print(f"  {tier:<8}: {', '.join(stops_in_tier)}")

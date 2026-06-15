@@ -1,206 +1,255 @@
 {
   "S01": {
     "stop_name": "New Street Station",
-    "lat": 52.4778,
-    "lon": -1.899,
+    "lat": 52.4776,
+    "lon": -1.8962,
     "radius_m": 400,
     "poi_counts": {
       "hospitals": 0,
       "gp_clinics": 4,
       "pharmacies": 2,
-      "schools": 0,
-      "supermarkets": 6,
-      "convenience": 17,
-      "bus_stops": 24,
-      "workplaces": 64
+      "schools": 4,
+      "supermarkets": 7,
+      "convenience": 15,
+      "bus_stops": 46,
+      "workplaces": 39
     },
+    "poi_score": 136,
     "derived_tier": "major",
     "data_source": "OpenStreetMap via Overpass API"
   },
   "S02": {
     "stop_name": "Spring St",
-    "lat": 52.4868,
-    "lon": -1.9101,
-    "radius_m": 400,
-    "poi_counts": {
-      "hospitals": 0,
-      "gp_clinics": 0,
-      "pharmacies": 0,
-      "schools": 6,
-      "supermarkets": 0,
-      "convenience": 5,
-      "bus_stops": 13,
-      "workplaces": 158
-    },
-    "derived_tier": "major",
-    "data_source": "OpenStreetMap via Overpass API"
-  },
-  "S03": {
-    "stop_name": "Jewellery Quarter Station",
-    "lat": 52.4868,
-    "lon": -1.9101,
-    "radius_m": 400,
-    "poi_counts": {
-      "hospitals": 0,
-      "gp_clinics": 0,
-      "pharmacies": 0,
-      "schools": 6,
-      "supermarkets": 0,
-      "convenience": 5,
-      "bus_stops": 13,
-      "workplaces": 158
-    },
-    "derived_tier": "minor",
-    "data_source": "OpenStreetMap via Overpass API (re-fetched 2026-06-13; original query failed)"
-  },
-  "S04": {
-    "stop_name": "Soho Hill",
-    "lat": 52.5012,
-    "lon": -1.9178,
-    "radius_m": 400,
-    "poi_counts": {
-      "hospitals": 1,
-      "gp_clinics": 0,
-      "pharmacies": 1,
-      "schools": 5,
-      "supermarkets": 1,
-      "convenience": 1,
-      "bus_stops": 16,
-      "workplaces": 0
-    },
-    "derived_tier": "major",
-    "data_source": "OpenStreetMap via Overpass API"
-  },
-  "S05": {
-    "stop_name": "Five Ways (Metro)",
-    "lat": 52.4737,
-    "lon": -1.9102,
+    "lat": 52.4677,
+    "lon": -1.9034,
     "radius_m": 400,
     "poi_counts": {
       "hospitals": 0,
       "gp_clinics": 0,
       "pharmacies": 1,
       "schools": 3,
+      "supermarkets": 1,
+      "convenience": 3,
+      "bus_stops": 13,
+      "workplaces": 0
+    },
+    "poi_score": 25,
+    "derived_tier": "minor",
+    "data_source": "OpenStreetMap via Overpass API"
+  },
+  "S03": {
+    "stop_name": "Jewellery Quarter Station",
+    "lat": 52.4897,
+    "lon": -1.9126,
+    "radius_m": 400,
+    "poi_counts": {
+      "hospitals": 0,
+      "gp_clinics": 0,
+      "pharmacies": 0,
+      "schools": 5,
       "supermarkets": 0,
       "convenience": 4,
-      "bus_stops": 11,
-      "workplaces": 23
+      "bus_stops": 12,
+      "workplaces": 99
     },
+    "poi_score": 125,
+    "derived_tier": "major",
+    "data_source": "OpenStreetMap via Overpass API"
+  },
+  "S04": {
+    "stop_name": "Soho Hill",
+    "lat": 52.4963,
+    "lon": -1.9151,
+    "radius_m": 400,
+    "poi_counts": {
+      "hospitals": 1,
+      "gp_clinics": 0,
+      "pharmacies": 0,
+      "schools": 5,
+      "supermarkets": 0,
+      "convenience": 0,
+      "bus_stops": 15,
+      "workplaces": 11
+    },
+    "poi_score": 41,
+    "derived_tier": "medium",
+    "data_source": "OpenStreetMap via Overpass API"
+  },
+  "S05": {
+    "stop_name": "Five Ways (Metro)",
+    "lat": 52.4756,
+    "lon": -1.9138,
+    "radius_m": 400,
+    "poi_counts": {
+      "hospitals": 0,
+      "gp_clinics": 1,
+      "pharmacies": 1,
+      "schools": 1,
+      "supermarkets": 2,
+      "convenience": 5,
+      "bus_stops": 19,
+      "workplaces": 33
+    },
+    "poi_score": 67,
     "derived_tier": "major",
     "data_source": "OpenStreetMap via Overpass API"
   },
   "S06": {
     "stop_name": "Dudley Rd",
-    "lat": 52.4887,
-    "lon": -1.9302,
+    "lat": 52.4859,
+    "lon": -1.9368,
     "radius_m": 400,
     "poi_counts": {
-      "hospitals": 0,
-      "gp_clinics": 3,
+      "hospitals": 1,
+      "gp_clinics": 0,
       "pharmacies": 0,
-      "schools": 1,
-      "supermarkets": 0,
-      "convenience": 0,
-      "bus_stops": 6,
-      "workplaces": 2
+      "schools": 3,
+      "supermarkets": 1,
+      "convenience": 2,
+      "bus_stops": 21,
+      "workplaces": 1
     },
-    "derived_tier": "major",
+    "poi_score": 37,
+    "derived_tier": "medium",
     "data_source": "OpenStreetMap via Overpass API"
   },
   "S07": {
     "stop_name": "Five Ways Station",
-    "lat": 52.4737,
-    "lon": -1.9102,
+    "lat": 52.4715,
+    "lon": -1.912,
     "radius_m": 400,
     "poi_counts": {
       "hospitals": 0,
-      "gp_clinics": 0,
+      "gp_clinics": 3,
       "pharmacies": 1,
-      "schools": 3,
-      "supermarkets": 0,
-      "convenience": 4,
-      "bus_stops": 11,
-      "workplaces": 23
+      "schools": 4,
+      "supermarkets": 1,
+      "convenience": 2,
+      "bus_stops": 12,
+      "workplaces": 12
     },
-    "derived_tier": "major",
+    "poi_score": 46,
+    "derived_tier": "medium",
     "data_source": "OpenStreetMap via Overpass API"
   },
   "S08": {
     "stop_name": "Icknield Port Rd",
-    "lat": 52.4914,
+    "lat": 52.4787,
     "lon": -1.9267,
     "radius_m": 400,
     "poi_counts": {
       "hospitals": 0,
-      "gp_clinics": 2,
-      "pharmacies": 0,
-      "schools": 0,
+      "gp_clinics": 0,
+      "pharmacies": 1,
+      "schools": 2,
       "supermarkets": 0,
-      "convenience": 1,
-      "bus_stops": 7,
-      "workplaces": 0
+      "convenience": 2,
+      "bus_stops": 11,
+      "workplaces": 28
     },
-    "derived_tier": "major",
+    "poi_score": 46,
+    "derived_tier": "medium",
     "data_source": "OpenStreetMap via Overpass API"
   },
   "S09": {
     "stop_name": "Belgrave Interchange",
-    "lat": 52.482,
-    "lon": -1.896,
-    "radius_m": 400,
-    "poi_counts": {
-      "hospitals": 2,
-      "gp_clinics": 4,
-      "pharmacies": 1,
-      "schools": 2,
-      "supermarkets": 3,
-      "convenience": 14,
-      "bus_stops": 56,
-      "workplaces": 112
-    },
-    "derived_tier": "major",
-    "data_source": "OpenStreetMap via Overpass API"
-  },
-  "S10": {
-    "stop_name": "Ladywood Fire Station",
-    "lat": 52.482,
-    "lon": -1.92,
+    "lat": 52.4668,
+    "lon": -1.8991,
     "radius_m": 400,
     "poi_counts": {
       "hospitals": 0,
       "gp_clinics": 0,
-      "pharmacies": 3,
-      "schools": 2,
+      "pharmacies": 1,
+      "schools": 1,
       "supermarkets": 1,
       "convenience": 3,
-      "bus_stops": 14,
-      "workplaces": 17
+      "bus_stops": 18,
+      "workplaces": 6
     },
+    "poi_score": 32,
+    "derived_tier": "minor",
+    "data_source": "OpenStreetMap via Overpass API"
+  },
+  "S10": {
+    "stop_name": "Ladywood Fire Station",
+    "lat": 52.478,
+    "lon": -1.9276,
+    "radius_m": 400,
+    "poi_counts": {
+      "hospitals": 0,
+      "gp_clinics": 0,
+      "pharmacies": 1,
+      "schools": 2,
+      "supermarkets": 0,
+      "convenience": 2,
+      "bus_stops": 11,
+      "workplaces": 28
+    },
+    "poi_score": 46,
     "derived_tier": "major",
     "data_source": "OpenStreetMap via Overpass API"
   },
   "S11": {
     "stop_name": "Edgbaston Village Metro",
-    "lat": 52.468,
-    "lon": -1.917,
+    "lat": 52.4722,
+    "lon": -1.9236,
     "radius_m": 400,
     "poi_counts": {
       "hospitals": 0,
-      "gp_clinics": 6,
+      "gp_clinics": 1,
       "pharmacies": 0,
       "schools": 3,
       "supermarkets": 1,
-      "convenience": 0,
-      "bus_stops": 9,
-      "workplaces": 25
+      "convenience": 1,
+      "bus_stops": 21,
+      "workplaces": 32
     },
+    "poi_score": 65,
     "derived_tier": "major",
     "data_source": "OpenStreetMap via Overpass API"
   },
   "S12": {
     "stop_name": "Summerfield Park",
-    "lat": 52.494,
-    "lon": -1.92,
+    "lat": 52.4865,
+    "lon": -1.9385,
+    "radius_m": 400,
+    "poi_counts": {
+      "hospitals": 1,
+      "gp_clinics": 0,
+      "pharmacies": 1,
+      "schools": 2,
+      "supermarkets": 1,
+      "convenience": 3,
+      "bus_stops": 19,
+      "workplaces": 1
+    },
+    "poi_score": 35,
+    "derived_tier": "minor",
+    "data_source": "OpenStreetMap via Overpass API"
+  },
+  "S13": {
+    "stop_name": "City Rd Medical Centre",
+    "lat": 52.4861,
+    "lon": -1.9409,
+    "radius_m": 400,
+    "poi_counts": {
+      "hospitals": 1,
+      "gp_clinics": 0,
+      "pharmacies": 2,
+      "schools": 3,
+      "supermarkets": 1,
+      "convenience": 3,
+      "bus_stops": 19,
+      "workplaces": 0
+    },
+    "poi_score": 37,
+    "derived_tier": "medium",
+    "data_source": "OpenStreetMap via Overpass API"
+  },
+  "S14": {
+    "stop_name": "Mencap Centre",
+    "lat": 52.493,
+    "lon": -1.9591,
     "radius_m": 400,
     "poi_counts": {
       "hospitals": 0,
@@ -209,64 +258,30 @@
       "schools": 4,
       "supermarkets": 0,
       "convenience": 0,
-      "bus_stops": 14,
-      "workplaces": 5
+      "bus_stops": 12,
+      "workplaces": 10
     },
-    "derived_tier": "major",
-    "data_source": "OpenStreetMap via Overpass API"
-  },
-  "S13": {
-    "stop_name": "City Rd Medical Centre",
-    "lat": 52.488,
-    "lon": -1.935,
-    "radius_m": 400,
-    "poi_counts": {
-      "hospitals": 1,
-      "gp_clinics": 3,
-      "pharmacies": 0,
-      "schools": 3,
-      "supermarkets": 1,
-      "convenience": 3,
-      "bus_stops": 18,
-      "workplaces": 0
-    },
-    "derived_tier": "major",
-    "data_source": "OpenStreetMap via Overpass API"
-  },
-  "S14": {
-    "stop_name": "Mencap Centre",
-    "lat": 52.502,
-    "lon": -1.943,
-    "radius_m": 400,
-    "poi_counts": {
-      "hospitals": 0,
-      "gp_clinics": 0,
-      "pharmacies": 2,
-      "schools": 3,
-      "supermarkets": 1,
-      "convenience": 7,
-      "bus_stops": 10,
-      "workplaces": 9
-    },
-    "derived_tier": "major",
+    "poi_score": 30,
+    "derived_tier": "minor",
     "data_source": "OpenStreetMap via Overpass API"
   },
   "S15": {
     "stop_name": "Summerfield Crescent",
-    "lat": 52.493,
-    "lon": -1.923,
+    "lat": 52.4829,
+    "lon": -1.9341,
     "radius_m": 400,
     "poi_counts": {
       "hospitals": 0,
       "gp_clinics": 0,
       "pharmacies": 0,
-      "schools": 1,
+      "schools": 2,
       "supermarkets": 0,
-      "convenience": 1,
-      "bus_stops": 10,
-      "workplaces": 9
+      "convenience": 0,
+      "bus_stops": 9,
+      "workplaces": 5
     },
-    "derived_tier": "major",
+    "poi_score": 18,
+    "derived_tier": "minor",
     "data_source": "OpenStreetMap via Overpass API"
   }
 }
