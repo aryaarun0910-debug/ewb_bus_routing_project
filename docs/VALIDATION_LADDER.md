@@ -25,17 +25,17 @@ data nobody publishes for Ladywood itself.
 > our own corridors, measured through the government's open data feed. And the top rung
 > is filed with TfWM."
 
-## What changes in the repo (team decision, Sunday)
+## What changed in the repo (completed)
 
-1. **Adopt the empirical weekend curve** (`empirical_weekend_curve.json` factors →
-   `PROFILE_FN`), regenerate, retrain — alongside the crime-feature removal in one
-   retrain. Both changes improve honesty *and* metrics.
-2. **Add Wellington as shape-validation evidence #2** (script + outputs mirror the
-   BUSTO validation; period caveat: Jan–Feb 2020, NZ summer, pre-COVID).
-3. **Update A12 to RESOLVED** (empirical curve) and note the minor-curve question as
-   the single remaining open shape item, now bounded by two countries' evidence.
-4. **Start the BODS collector** the day someone registers (free) — every week it runs
-   before finals is a week of "we measured our own corridors" on stage.
+1. **Empirical weekend curve adopted** — `EMP_SAT_SHAPE` / `EMP_SUN_SHAPE` in
+   `generate_map_dataset.py` are now the 3-year BUSTO mean (`analysis/weekend_curve/`).
+   Dataset regenerated and model retrained (R²=0.9421). Note: the weekend shape is
+   *derived* from BUSTO data, so r ≈ 1.0 is by construction — the independent check
+   is shape stability (r ≥ 0.998 across all three years, rung 2).
+2. **Wellington added as shape-validation evidence #2** (rung 5 above; caveat: Jan–Feb
+   2020, NZ summer, pre-COVID).
+3. **A12 updated to RESOLVED** in `docs/ASSUMPTION_LOG.md`.
+4. **BODS collector started** — rung 7 live since 2026-06-12.
 
 *Sources: TfL Open Data; HSL (CC BY 4.0); Greater Wellington Regional Council FOI
 release (fyi.org.nz request 14028); DfT BODS (OGL). No registrations, no personal data,

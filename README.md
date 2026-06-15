@@ -319,7 +319,7 @@ The remaining path to fully-observed accuracy: a direct TfWM Automatic Passenger
 - [Architecture](docs/ARCHITECTURE.md)
 - [Model Card](docs/MODEL_CARD.md)
 - [Assumption Log](docs/ASSUMPTION_LOG.md) — every load-bearing assumption: where it enters the code, its status (VERIFIED / BOUNDED / OPEN), impact if wrong, revisit trigger
-- [Demand-shape validation vs TfL BUSTO](analysis/shape_validation/SHAPE_VALIDATION.md) — modelled curves tested against 2.3M observed boardings (weekday r = 0.94–0.95; weekend honestly weaker and logged as open)
+- [Demand-shape validation vs TfL BUSTO](analysis/shape_validation/SHAPE_VALIDATION.md) — modelled curves tested against 2.3M observed boardings (weekday r = 0.94–0.95; weekend shape now derived from BUSTO, A12 RESOLVED)
 - [Crime-feature ablation](analysis/crime_ablation/CRIME_ABLATION.md) — tested, carried no signal, recommended for removal
 - [Why XGBoost — model technique comparison](docs/design/MODEL_COMPARISON.md)
 - [Driver interface & lawful rollout pathway](docs/DRIVER_INTERFACE.md) — how a driver actually receives a route, and the three-phase route through bus-registration law
