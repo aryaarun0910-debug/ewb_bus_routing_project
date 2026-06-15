@@ -186,8 +186,8 @@
     "n_high_deprivation_stops": 5,
     "n_high_dep_unserved_by_fixed": 0,
     "high_dep_unserved_names": [],
-    "allocation_mismatch_fixed": 0.363,
-    "allocation_mismatch_dynamic": 0.363,
+    "allocation_mismatch_fixed": 0.348,
+    "allocation_mismatch_dynamic": 0.344,
     "mismatch_snapshots_compared": 32
   },
   "national_context": {
