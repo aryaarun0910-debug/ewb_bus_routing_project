@@ -106,31 +106,48 @@ stated margin, not just a confident decimal.
 
 ## Chris Legge — Hardware, FPGA, Verilog
 
-I learned the difference between "it compiles" and "it works" the hard way, at about 1am,
-chasing a timing violation on the WS2812B driver that Quartus kept failing on. The LEDs
-*looked* right on the bench but the static-timing analysis said the pulse widths weren't
-guaranteed — and I'd been telling the team it was done. It wasn't done; it happened to
-work. Closing that timing properly, and learning to say "verified" only when I could prove
-it, is the thing I'll take into every hardware job after this.
+At about 1am I was looking at the WS2812B driver in Quartus and I'd been telling the team
+for two days that the LED board was done. The LEDs looked right on the bench. The
+static-timing analysis said the pulse widths weren't guaranteed. It wasn't done — it
+happened to work, which is a different thing entirely, and if it had failed during Jack's
+serial-bridge tests the screen and the board would have disagreed and nobody would have
+known which one to believe. The only reason that didn't happen is that I went looking for
+a problem I wasn't expecting to find. I'm still not entirely comfortable with how close
+that was.
 
-The decision I'm most quietly proud of is an unglamorous one: baking the route plan into
-ROM and accepting that the board shows an honest *snapshot*, instead of wiring up something
-that faked live updates for the demo. It would have looked more impressive. It would also
-have been a lie to anyone watching, and the people this display is *for* — someone at a
-stop with no phone, no app, and maybe no English — are exactly the people who can't
-double-check a screen that's quietly wrong. That constraint, designing for a viewer who has
-to trust the thing completely, drove every choice: colour instead of words, brightness over
-detail, a fail-safe that goes dark rather than show stale data.
+After that I stopped saying "done" and started saying "verified" — and the distinction
+changed how I thought about every hardware decision that followed. The most unglamorous one:
+baking the route plan into ROM and accepting that the board shows an honest *snapshot*, not
+live data. I had a version that pretended to update continuously. It was more impressive.
+It would also have shown stale information to someone who had no way to check whether what
+they were reading was current — and the person standing in front of this display, the one
+it's actually for, may not speak English, may not have a phone, and is probably standing
+there because they have no other option. That person can't tell a confident-looking screen
+from a correct one. So the fail-safe doesn't show an error state. It goes dark. A blank
+screen is honest. A screen showing last Tuesday's route plan looks authoritative and is
+lying.
 
-It also changed how I pick components. Cheap, common, repairable parts aren't a compromise
-here — if this is going into a community, it has to be fixable by that community, not
-locked to a vendor. That's a different design goal than "best spec," and exploring the
-options through *that* lens is what makes the hardware globally responsible rather than
-just clever.
+That constraint — designing for someone who has to trust the thing completely — is what
+settled every other choice. Colour instead of words, because the 28.6% of the ward whose
+first language isn't English shouldn't need to read a label to understand what the light
+means. Brightness over fine detail, because the display lives in a public space with
+variable light. And common, replaceable components throughout: if this goes into a
+community it has to be fixable by that community, without a specialist or a proprietary
+part from a single supplier. "Best spec" was never the constraint. "Repairable without us"
+was.
 
-What I'd do differently: run the LoRa link-budget survey at the start instead of leaving
-the live-radio question to the end, and write the testbench *first* — I'd have caught the
-timing issue weeks earlier if I'd verified before I trusted.
+There's a version of this project where I'd hidden the timing issue and shipped something
+that passed visual inspection and called it a success. I don't think I'd have been
+comfortable presenting it. The people who depend on the route plan can't run a
+static-timing analysis on the board at the bus stop — so the standard I'm holding the
+hardware to isn't what it looks like, it's what it actually guarantees.
+
+What I'd do differently: the LoRa link-budget survey should have happened in week one,
+not near the end. I left the live-radio question open too long, and that's the kind of
+decision that looks like a detail until the range numbers come back and suddenly it's the
+whole architecture. And I'd have written the testbench before the driver, not after — the
+timing violation would have surfaced in hours rather than after I'd already told the team
+it was finished.
 
 ---
 
