@@ -1,4 +1,5 @@
 {
+  "__note__": "derived_tier is a RELATIVE POI-DENSITY TERTILE computed by fetch_osm_pois.py: the 15 stops are ranked by poi_score and split into equal thirds (bottom 5 = minor, middle 5 = medium, top 5 = major). It measures commercial/service density within 400 m, NOT operational route importance. The model uses stop_importance (from generate_map_dataset.py / ladywood_display.py) which is the OPERATIONAL tier — route-convergence and interchange role (e.g. S07 Five Ways Station is operationally major because 3 routes converge there, even though its poi_score is moderate; S05 Five Ways Metro is operationally minor because only one route serves it, even though Five Ways commercial density puts its poi_score in the top third). The two measures are deliberately distinct and expected to diverge for transport-node stops. stop_importance_enc is the #1 XGBoost feature (permutation importance 0.735).",
   "S01": {
     "stop_name": "New Street Station",
     "lat": 52.4776,
