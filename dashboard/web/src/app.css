@@ -827,8 +827,8 @@
 }
 
 /* IMD overlay legend */
-.legend-dot.imd-low { background: #8e8e93; }
-.legend-dot.imd-high { background: #ff375f; }
+.legend-dot.imd-low  { background: #2c4a7c; }   /* steel blue — low deprivation */
+.legend-dot.imd-high { background: #f5c842; }   /* amber-gold — high deprivation */
 
 .overlay-toggle {
   font-size: 11px;

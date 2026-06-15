@@ -66,12 +66,13 @@ export default function StopPanel({
             <Stat label="Elevation" value={stop.elevation_m == null ? "—" : `${fmt(stop.elevation_m)} m`} />
           </div>
 
-          <button className="glossary-toggle" onClick={() => setShowGlossary((v) => !v)}>
+          <button className="glossary-toggle" onClick={() => setShowGlossary((v) => !v)} aria-expanded={showGlossary} aria-controls="stop-glossary">
             {showGlossary ? "Hide metric definitions ▴" : "What do these metrics mean? ▾"}
           </button>
           <AnimatePresence>
             {showGlossary && (
               <motion.dl
+                id="stop-glossary"
                 className="glossary"
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}

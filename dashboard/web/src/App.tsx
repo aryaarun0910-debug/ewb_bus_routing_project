@@ -190,6 +190,7 @@ function App() {
             className="scenario-select"
             value={scenario}
             onChange={(e) => setScenario(e.target.value)}
+            aria-label="Select route scenario"
           >
             {scenarios.map((s) => (
               <option key={s} value={s}>{s}</option>
@@ -228,6 +229,7 @@ function App() {
             value={windowIdx}
             onChange={(e) => { setWindowIdx(Number(e.target.value)); setPlaying(false); }}
             className="time-slider"
+            aria-label={`Time of day: ${win.label} (${win.hours})`}
           />
         </div>
         {currentPlan?.unserved_stops && currentPlan.unserved_stops.length > 0 && (
@@ -258,20 +260,24 @@ function App() {
             </>
           )}
           <span className="legend-spacer" />
-          <button className="overlay-toggle story-launch" onClick={startStory} title="Play the guided story">
+          <button className="overlay-toggle story-launch" onClick={startStory} title="Play the guided story" aria-label="Play the guided story">
             ▶ Story
           </button>
           <button
             className={`overlay-toggle${comparing ? " active" : ""}`}
             onClick={() => setComparing((v) => !v)}
             title="Compare two scenarios side by side"
+            aria-label="Compare two scenarios side by side"
+            aria-pressed={comparing}
           >
             {comparing ? "Comparing" : "Compare"}
           </button>
           <button
             className={`overlay-toggle${imdOverlay ? " active" : ""}`}
             onClick={() => setImdOverlay((v) => !v)}
-            title="Toggle the IMD deprivation heat-field"
+            title="Toggle the IMD deprivation equity overlay"
+            aria-label="Toggle the IMD deprivation equity overlay"
+            aria-pressed={imdOverlay}
           >
             Equity overlay
           </button>

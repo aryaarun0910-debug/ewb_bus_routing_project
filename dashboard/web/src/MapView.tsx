@@ -170,6 +170,8 @@ export default function MapView({
         wrap.className = "stop-anchor";
         const el = document.createElement("div");
         el.className = `stop-dot tier-${stop.importance}${isHero ? " hero" : ""}`;
+        el.setAttribute("role", "button");
+        el.setAttribute("tabIndex", "0");
         el.innerHTML =
           `<span class="pulse-ring"></span>` +
           `<span class="stop-label">${stop.name}` +
@@ -187,6 +189,12 @@ export default function MapView({
           e.stopPropagation();
           onSelectStop(stop);
         });
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onSelectStop(stop);
+          }
+        });
         entry = { marker, el };
         markersRef.current[stop.stop_id] = entry;
       }
@@ -194,6 +202,7 @@ export default function MapView({
       entry.el.style.width = `${r * 2}px`;
       entry.el.style.height = `${r * 2}px`;
       entry.el.title = `${stop.name} — ${boardings.toFixed(0)} boardings`;
+      entry.el.setAttribute("aria-label", `${stop.name}, ${stop.importance} stop, ${boardings.toFixed(0)} predicted boardings`);
 
       // Demand heat drives the fill, the pulse, everything. t = 0 cool/quiet,
       // t = 1 red/busy.
@@ -218,16 +227,16 @@ export default function MapView({
       entry.el.style.setProperty("--glow-scale", (0.4 + t * 1.8).toFixed(3));
 
       if (imdOverlay && stop.imd_score != null) {
-        // Equity view: fill = deprivation, plus a soft red FIELD whose radius
-        // scales with deprivation — overlapping fields read as a heat map.
+        // Equity view: fill = deprivation, viridis-inspired blue→amber-gold ramp
+        // (colorblind-safe and distinct from the red demand view).
         const d = Math.max(0, Math.min(1, stop.imd_score / 60));
-        const r0 = 90, g0 = 100, b0 = 110;  // muted slate baseline
-        const r1 = 255, g1 = 55, b1 = 95;    // alert red (#ff375f)
+        const r0 = 44,  g0 = 74,  b0 = 124;  // steel blue (low deprivation)
+        const r1 = 245, g1 = 200, b1 = 66;   // amber-gold (high deprivation)
         const mix = (a: number, b: number) => Math.round(a + (b - a) * d);
         entry.el.style.background = `rgb(${mix(r0, r1)}, ${mix(g0, g1)}, ${mix(b0, b1)})`;
         if (!isUnderserved)
           entry.el.style.boxShadow =
-            `0 0 0 ${ring}px ${tierRing}, 0 0 ${18 + d * 46}px ${6 + d * 18}px rgba(255,55,95,${(0.22 + d * 0.5).toFixed(2)})`;
+            `0 0 0 ${ring}px ${tierRing}, 0 0 ${18 + d * 46}px ${6 + d * 18}px rgba(245,200,66,${(0.22 + d * 0.5).toFixed(2)})`;
       } else {
         // Default view: FILL = demand heat (loud), RING = tier (quiet).
         entry.el.style.background = heat;
