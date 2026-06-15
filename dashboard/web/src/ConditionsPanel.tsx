@@ -5,7 +5,6 @@ export interface Conditions {
   weather: "sunny" | "cloudy" | "light_rain" | "heavy_rain";
   specialEvent: "none" | "concert" | "festival" | "market" | "road_closure" | "sports_match";
   isSchoolTerm: boolean;
-  isUniTerm: boolean;
 }
 
 const DAY_TYPES: Conditions["dayType"][] = ["weekday", "saturday", "sunday"];
@@ -91,15 +90,7 @@ export default function ConditionsPanel({
             checked={conditions.isSchoolTerm}
             onChange={(e) => set("isSchoolTerm", e.target.checked)}
           />
-          School term
-        </label>
-        <label className="cond-check">
-          <input
-            type="checkbox"
-            checked={conditions.isUniTerm}
-            onChange={(e) => set("isUniTerm", e.target.checked)}
-          />
-          University term
+          School / university term
         </label>
       </div>
     </motion.div>

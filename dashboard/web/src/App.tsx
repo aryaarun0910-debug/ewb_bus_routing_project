@@ -48,7 +48,6 @@ function App() {
     weather: "sunny",
     specialEvent: "none",
     isSchoolTerm: true,
-    isUniTerm: true,
   });
   const [storyActive, setStoryActive] = useState(false);
   const [storyStep, setStoryStep] = useState(0);
@@ -113,7 +112,7 @@ function App() {
       weather: conditions.weather,
       special_event: conditions.specialEvent,
       is_school_term: conditions.isSchoolTerm ? 1 : 0,
-      is_uni_term: conditions.isUniTerm ? 1 : 0,
+      is_uni_term: conditions.isSchoolTerm ? 1 : 0,
     }).then((d) => setDemand(d.predictions));
   }, [win.hour, conditions]);
 

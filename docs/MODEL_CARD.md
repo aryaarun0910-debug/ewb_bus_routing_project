@@ -35,7 +35,7 @@ Counting (APC) data feed (see [Caveats](#known-limitations--the-honest-gap)).
 |---|---|---|
 | Stop coordinates, road geometry | **Real** | TfWM GTFS (open licence) |
 | Weather (2023–24, hourly) | **Real** | Open-Meteo historical archive |
-| School/university term dates | **Real** | Birmingham LA term + bank-holiday calendars |
+| School/university term dates | **Real (school only)** | Birmingham LA term + bank-holiday calendars. Note: `is_uni_term` is set equal to `is_school_term` in the training data — no independent university calendar was sourced. The two features are perfectly collinear at training time; the model cannot distinguish between them. The dashboard exposes a single "School / university term" toggle and mirrors it to both model inputs |
 | Per-stop demand anchor | **Real** | UCL/GEoDS ENCTS concessionary smartcard journey volumes, TfWM-linked, 2010–2016 |
 | Per-stop static **model** features (`imd_score`, `poi_total`, `population`, `elevation_m`) | **Real** | IMD 2019, OSM, ONS Census 2021, elevation API |
 | `crime_total_2024` — **displayed as context, NOT a model feature** | **Real** | police.uk. Deliberately excluded from the model: an ablation (`analysis/crime_ablation/`) showed it carried no signal (R² 0.9418 → 0.9421 *without* it) and it risks inheriting policing bias. Surfaced in the dashboard as caveated area context only |
@@ -69,10 +69,13 @@ model to reality is a chain of independent anchors, weakest link disclosed last:
 hour-of-day **shape** is validated against 2.3 million observed TfL boardings at
 r = 0.94–0.95 for major/medium stops ([shape validation](../analysis/shape_validation/SHAPE_VALIDATION.md));
 demand **levels** are anchored to real smartcard data (representativeness caveat
-logged as A13); **weather** is real (Open-Meteo archive); **weekend** shapes
-correlate at only r = 0.55–0.68 — a divergence we found ourselves, published, and
-logged as open assumption A12. The final link — observed Ladywood boardings — is the
-filed TfWM APC data request.
+logged as A13); **weather** is real (Open-Meteo archive); **weekend** shapes are
+now *derived* directly from three years of TfL BUSTO Saturday/Sunday boardings
+(A12 RESOLVED — `analysis/weekend_curve/`), replacing the old flattened-weekday
+curves that correlated at only r = 0.55–0.68. Because the current shapes are derived
+from the same data they'd be tested against, r ≈ 1.0 holds by construction; the
+independent check is shape stability (r ≥ 0.998 across all three years). The final
+link — observed Ladywood boardings — is the filed TfWM APC data request.
 
 ## Robustness — six independent checks (full data: [`robustness.json`](../analysis/outputs/robustness.json))
 
