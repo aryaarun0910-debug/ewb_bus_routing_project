@@ -4,11 +4,18 @@ fetch_lsoa_population.py
 Downloads ONS Census 2021 usual resident population for Birmingham LSOAs
 from the Nomis bulk download API and extracts counts for the 15 model stops.
 
-Census table: TS001 — Number of usual residents
-  Total usual residents per LSOA — the denominator for demand scaling.
+Census tables
+-------------
+  TS001  (NM_2021_1) — Number of usual residents
+    Total usual residents per LSOA — the denominator for demand scaling.
+    Requires c2021_restype_3=0 to select "Total: All usual residents"
+    (without it, Nomis returns 3 rows per LSOA: total/household/communal).
 
-Also fetches TS007A (age groups) to get elderly (65+) and young (0-15)
-proportions — key indicators of bus dependency.
+  TS007A (NM_2020_1) — Age by 5-year bands
+    Used to derive elderly (65+, exact from the 65-69...85+ bands) and
+    young (0-14, sum of the 0-4/5-9/10-14 bands — the nearest TS007A
+    equivalent to the standard 0-15 "children" cut, one year narrower)
+    proportions — key indicators of bus dependency.
 
 Output
 ------
@@ -34,47 +41,58 @@ OUT     = OUT_DIR / "ladywood_population_2021.json"
 
 HEADERS = {"User-Agent": "ewb-bus-routing/1.0 (EWB design challenge; educational use)"}
 
-# Query exactly the 15 stop LSOAs by code — avoids LA filter syntax issues
+# Query exactly the 15 stop LSOAs by code — avoids LA filter syntax issues.
+# These are LSOA21 codes (2021 Census boundaries). 14/15 match the LSOA11
+# code used in fetch_imd_scores.py; S05's LSOA11 (E01033639, Birmingham 136D)
+# was itself split for 2021, so S05 uses its LSOA21 successor E01034948
+# (Birmingham 136E) here.
 _LSOA_CODES = ",".join([
-    "E01013761", "E01009099", "E01009158", "E01009146", "E01009057",
-    "E01009129", "E01009111", "E01009127", "E01009097", "E01009133",
-    "E01009063", "E01009119", "E01009121", "E01013524", "E01009117",
+    "E01033615", "E01033624", "E01033559", "E01033638", "E01034948",
+    "E01009153", "E01033626", "E01009143", "E01033640", "E01009140",
+    "E01009143", "E01009152", "E01009346", "E01010062", "E01009153",
 ])
 
 TS001_URL = (
-    f"https://www.nomisweb.co.uk/api/v01/dataset/NM_2002_1.data.csv"
+    f"https://www.nomisweb.co.uk/api/v01/dataset/NM_2021_1.data.csv"
     f"?geography={_LSOA_CODES}"
     f"&date=latest"
-    f"&variable=1"
+    f"&c2021_restype_3=0"
     f"&measures=20100"
     f"&select=geography_code,geography_name,obs_value"
 )
 
-TS007_URL = (
-    f"https://www.nomisweb.co.uk/api/v01/dataset/NM_2041_1.data.csv"
+TS007A_URL = (
+    f"https://www.nomisweb.co.uk/api/v01/dataset/NM_2020_1.data.csv"
     f"?geography={_LSOA_CODES}"
     f"&date=latest"
-    f"&c2021_age_92=1001,1002,1003,1018,1019,1020,1021"
     f"&measures=20100"
-    f"&select=geography_code,c2021_age_92_name,obs_value"
+    f"&select=geography_code,c2021_age_19_name,obs_value"
 )
 
+# TS007A 5-year age bands used to derive the young/elderly proportions
+_YOUNG_BANDS = {"Aged 4 years and under", "Aged 5 to 9 years", "Aged 10 to 14 years"}
+_ELDERLY_BANDS = {
+    "Aged 65 to 69 years", "Aged 70 to 74 years", "Aged 75 to 79 years",
+    "Aged 80 to 84 years", "Aged 85 years and over",
+}
+
+# LSOA21 codes — see _LSOA_CODES comment above for the S05 LSOA11/LSOA21 split.
 STOP_LSOA: dict[str, dict] = {
-    "S01": {"lsoa": "E01013761", "name": "New Street Station"},
-    "S02": {"lsoa": "E01009099", "name": "Spring St"},
-    "S03": {"lsoa": "E01009158", "name": "Jewellery Quarter Station"},
-    "S04": {"lsoa": "E01009146", "name": "Soho Hill"},
-    "S05": {"lsoa": "E01009057", "name": "Five Ways (Metro)"},
-    "S06": {"lsoa": "E01009129", "name": "Dudley Rd"},
-    "S07": {"lsoa": "E01009111", "name": "Five Ways Station"},
-    "S08": {"lsoa": "E01009127", "name": "Icknield Port Rd"},
-    "S09": {"lsoa": "E01009097", "name": "Belgrave Interchange"},
-    "S10": {"lsoa": "E01009133", "name": "Ladywood Fire Station"},
-    "S11": {"lsoa": "E01009063", "name": "Edgbaston Village Metro"},
-    "S12": {"lsoa": "E01009119", "name": "Summerfield Park"},
-    "S13": {"lsoa": "E01009121", "name": "City Rd Medical Centre"},
-    "S14": {"lsoa": "E01013524", "name": "Mencap Centre"},
-    "S15": {"lsoa": "E01009117", "name": "Summerfield Crescent"},
+    "S01": {"lsoa": "E01033615", "name": "New Street Station"},
+    "S02": {"lsoa": "E01033624", "name": "Spring St"},
+    "S03": {"lsoa": "E01033559", "name": "Jewellery Quarter Station"},
+    "S04": {"lsoa": "E01033638", "name": "Soho Hill"},
+    "S05": {"lsoa": "E01034948", "name": "Five Ways (Metro)"},
+    "S06": {"lsoa": "E01009153", "name": "Dudley Rd"},
+    "S07": {"lsoa": "E01033626", "name": "Five Ways Station"},
+    "S08": {"lsoa": "E01009143", "name": "Icknield Port Rd"},
+    "S09": {"lsoa": "E01033640", "name": "Belgrave Interchange"},
+    "S10": {"lsoa": "E01009140", "name": "Ladywood Fire Station"},
+    "S11": {"lsoa": "E01009143", "name": "Edgbaston Village Metro"},
+    "S12": {"lsoa": "E01009152", "name": "Summerfield Park"},
+    "S13": {"lsoa": "E01009346", "name": "City Rd Medical Centre"},
+    "S14": {"lsoa": "E01010062", "name": "Mencap Centre"},
+    "S15": {"lsoa": "E01009153", "name": "Summerfield Crescent"},
 }
 
 
@@ -97,24 +115,22 @@ def fetch_ts001() -> dict[str, int]:
     return pop
 
 
-def fetch_ts007() -> dict[str, dict]:
-    """Age group counts per LSOA — returns dict of lsoa -> {age_group: count}."""
-    print("Fetching TS007 (age groups) from Nomis...")
-    r = requests.get(TS007_URL, headers=HEADERS, timeout=60)
+def fetch_ts007a() -> dict[str, dict]:
+    """5-year age band counts per LSOA — returns dict of lsoa -> {band: count}."""
+    print("Fetching TS007A (age bands) from Nomis...")
+    r = requests.get(TS007A_URL, headers=HEADERS, timeout=60)
     r.raise_for_status()
     reader = csv.DictReader(io.StringIO(r.text))
 
     ages: dict[str, dict] = {}
     for row in reader:
         code  = row.get("GEOGRAPHY_CODE", "").strip()
-        label = row.get("C2021_AGE_92_NAME", "").strip().lower()
+        label = row.get("C2021_AGE_19_NAME", "").strip()
         val   = row.get("OBS_VALUE", "").strip()
-        if not code.startswith("E01") or not val:
+        if not code.startswith("E01") or not val or label == "Total":
             continue
-        if code not in ages:
-            ages[code] = {}
         try:
-            ages[code][label] = int(float(val))
+            ages.setdefault(code, {})[label] = int(float(val))
         except ValueError:
             pass
 
@@ -124,14 +140,14 @@ def fetch_ts007() -> dict[str, dict]:
 
 def run() -> dict:
     pop   = fetch_ts001()
-    ages  = fetch_ts007()
+    ages  = fetch_ts007a()
 
     result = {}
     sep = "-" * 65
 
     print(f"\n{'Population & Age Structure by Stop':^65}")
     print(sep)
-    print(f"  {'Stop':<5} {'Name':<30} {'Pop':>5} {'<16':>5} {'65+':>5}")
+    print(f"  {'Stop':<5} {'Name':<30} {'Pop':>5} {'<15':>5} {'65+':>5}")
     print(f"  {'-'*5} {'-'*30} {'-'*5} {'-'*5} {'-'*5}")
 
     for sid, info in STOP_LSOA.items():
@@ -147,18 +163,8 @@ def run() -> dict:
             print(f"  {sid}  {info['name']:<30}  no data")
             continue
 
-        # Sum elderly (65+) and young (0-15) from available age groups
-        elderly = sum(v for k, v in age_data.items() if any(
-            x in k for x in ["65", "66", "67", "68", "69", "70", "71", "72", "73",
-                              "74", "75", "76", "77", "78", "79", "80", "81", "82",
-                              "83", "84", "85", "86", "87", "88", "89", "90", "91",
-                              "92", "93", "94", "95", "96", "97", "98", "99", "100"]
-        ))
-        young = sum(v for k, v in age_data.items() if any(
-            x in k for x in ["aged 4", "aged 5", "aged 6", "aged 7", "aged 8",
-                              "aged 9", "aged 10", "aged 11", "aged 12", "aged 13",
-                              "aged 14", "aged 15", "aged 0", "aged 1", "aged 2", "aged 3"]
-        ))
+        elderly = sum(v for k, v in age_data.items() if k in _ELDERLY_BANDS)
+        young   = sum(v for k, v in age_data.items() if k in _YOUNG_BANDS)
 
         elderly_pct = round(100 * elderly / total, 1) if total else 0
         young_pct   = round(100 * young   / total, 1) if total else 0
@@ -169,10 +175,10 @@ def run() -> dict:
             "total_population": total,
             "elderly_65plus":  elderly,
             "elderly_pct":     elderly_pct,
-            "young_0to15":     young,
+            "young_0to14":     young,
             "young_pct":       young_pct,
-            "age_raw":         age_data,
-            "data_source":     "Census 2021 TS001 + TS007 (Nomis)",
+            "age_bands_raw":   age_data,
+            "data_source":     "Census 2021 TS001 (NM_2021_1) + TS007A (NM_2020_1), Nomis",
         }
         print(f"  {sid}  {info['name']:<30}  {total:>5}  {young_pct:>4.1f}%  {elderly_pct:>4.1f}%")
 

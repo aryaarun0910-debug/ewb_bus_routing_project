@@ -138,7 +138,7 @@ def load_static_features() -> dict[str, dict]:
         out[sid] = {
             "imd_score":         (imd.get(sid) or {}).get("imd_score"),
             "poi_total":         sum((pois.get(sid) or {}).get("poi_counts", {}).values()) or None,
-            "population":        (pop.get(sid) or {}).get("population_2015"),
+            "population":        (pop.get(sid) or {}).get("total_population"),
             "crime_total_2024":  sum((crime.get(sid) or {}).get("crime_counts", {}).values()) or None,
             "elevation_m":       (elev.get(sid) or {}).get("elevation_m"),
         }

@@ -9,32 +9,56 @@ the dynamic routing system serves the most deprived areas.
 Deprivation scores
 ------------------
 Scores are derived from the English Indices of Multiple Deprivation 2019 (IMD
-2019), published by MHCLG. Each stop is mapped to its nearest Lower Super Output
-Area (LSOA). Scores are normalised to [0, 1] where 1 = most deprived.
+2019), published by MHCLG and fetched live into data/imd/ladywood_imd_2019.json
+by scripts/fetch_imd_scores.py. Each stop is mapped to its LSOA.
 
   Source: MHCLG, "English Indices of Deprivation 2019: LSOA data"
   https://www.gov.uk/government/statistics/english-indices-of-deprivation-2019
 
-LSOA → score mapping
---------------------
-  S06  Dudley Rd        E01009129  (Ladywood 009A)  IMD rank  312 / 32,844 → 0.88
-  S10  Ladywood FS      E01009133  (Ladywood 011A)  IMD rank  418           → 0.86
-  S12  Summerfield Pk   E01009119  (Winson Green 002B) rank   520           → 0.82
-  S14  Mencap Centre    E01013524  (Smethwick West)  rank     650           → 0.80
-  S13  City Rd Med Ctr  E01009121  (Ladywood 002B)   rank     740           → 0.78
-  S15  Summerfield Cres E01009117  (Winson Green 001A) rank   820           → 0.76
-  S08  Icknield Port Rd E01009127  (Ladywood 008A)   rank     910           → 0.74
-  S02  Spring St        E01009099  (Balsall Heath 007) rank  1100           → 0.70
-  S04  Soho Hill        E01009146  (Handsworth 010B)  rank   1300           → 0.66
-  S09  Belgrave Intchg  E01009097  (Balsall Heath 005) rank  1500           → 0.62
-  S07  Five Ways Stn    E01009111  (Ladywood 001B)    rank   3200           → 0.54
-  S03  Jewellery Qtr    E01009158  (Jewellery Qtr 002) rank  5800           → 0.40
-  S11  Edgbaston Vill   E01009063  (Edgbaston 006A)   rank   8200           → 0.32
-  S05  Five Ways Metro  E01009057  (Edgbaston 001A)   rank   9600           → 0.28
-  S01  New Street Stn   E01013761  (City Centre 003)  rank  14000           → 0.18
+Two deprivation measures are reported per stop:
 
-IMD rank → normalised score: score = 1 − (rank / 32844) × 0.85 + offset so that
-the rank-1 LSOA maps to ≈ 0.95 and rank-32844 maps to ≈ 0.10.
+  imd_decile       — England-wide IMD 2019 decile (1 = most deprived 10% of
+                      England's 32,844 LSOAs, 10 = least deprived). Taken
+                      directly from MHCLG, externally verifiable.
+
+  deprivation_band — "high" / "medium" / "low", a *corridor-relative* ranking.
+                      Stops are ranked by national IMD rank and split into
+                      equal thirds (ties broken by stop_id), via
+                      assign_deprivation_bands() below — the same
+                      relative-tertile approach used for POI tiers in
+                      fetch_osm_pois.py, so that the variable is informative
+                      regardless of where this corridor sits nationally.
+
+LSOA → IMD 2019 mapping (from data/imd/ladywood_imd_2019.json)
+----------------------------------------------------------------
+  Stop  Name                       LSOA        IMD rank  Decile  Band
+  S08   Icknield Port Rd           E01009143     765       1     high
+  S11   Edgbaston Village Metro    E01009143     765       1     high
+  S09   Belgrave Interchange       E01033640     830       1     high
+  S04   Soho Hill                  E01033638     871       1     high
+  S14   Mencap Centre              E01010062    1394       1     high
+  S05   Five Ways (Metro)          E01033639    2197       1     medium
+  S12   Summerfield Park           E01009152    2203       1     medium
+  S06   Dudley Rd                  E01009153    2431       1     medium
+  S15   Summerfield Crescent       E01009153    2431       1     medium
+  S13   City Rd Medical Centre     E01009346    3798       2     medium
+  S10   Ladywood Fire Station      E01009140    6930       3     low
+  S02   Spring St                  E01033624    7607       3     low
+  S07   Five Ways Station          E01033626    9262       3     low
+  S01   New Street Station         E01033615   10295       4     low
+  S03   Jewellery Quarter Station  E01033559   14019       5     low
+
+National context: 9/15 Ladywood stops are in IMD decile 1 (England's most
+deprived 10% of LSOAs); 13/15 are in deciles 1-3 (most-deprived 30%). S01
+(decile 4) and S03 (decile 5) are the only stops outside the most-deprived
+40% of England.
+
+Note: S08/S11 and S06/S15 each share an LSOA (their GTFS coordinates fall
+in the same ~1,500-resident census area), so they have identical IMD figures
+— a real feature of the geography, not a data error.
+
+deprivation_score [0,1] = 1 - (imd_rank - 1) / 32843, i.e. rank 1 -> 1.0 and
+rank 32844 -> 0.0. Used only for display ordering, not for banding.
 
 Equity metric
 -------------
@@ -63,41 +87,72 @@ from pathlib import Path
 _REPO_ROOT = Path(__file__).parent.parent
 _ROUTE_PLAN = _REPO_ROOT / "prediction model" / "route_plan.json"
 
-# ── IMD 2019-derived deprivation scores for each mapped Ladywood stop ─────────
-# Normalised to [0,1]: 1 = most deprived. Source: MHCLG IMD 2019.
+# ── IMD 2019 data for each mapped Ladywood stop ───────────────────────────────
+# imd_rank / imd_decile are taken directly from data/imd/ladywood_imd_2019.json
+# (live MHCLG fetch). deprivation_score and deprivation_band are derived below
+# by _normalised_score() and assign_deprivation_bands() — not hand-set.
 
 STOP_DEPRIVATION: dict[str, dict] = {
-    "S06": {"name": "Dudley Rd",              "lsoa": "E01009129", "imd_rank":   312, "score": 0.88,
-            "postcode_area": "B18 7QF", "notes": "Route 80; City Hospital corridor; flagged 'high deprivation' in GTFS display data"},
-    "S10": {"name": "Ladywood Fire Station",  "lsoa": "E01009133", "imd_rank":   418, "score": 0.86,
-            "postcode_area": "B16 8SP", "notes": "57.9% of Ladywood Ward have no car (Census 2021); high transit dependency"},
-    "S12": {"name": "Summerfield Park",       "lsoa": "E01009119", "imd_rank":   520, "score": 0.82,
-            "postcode_area": "B18 5JS", "notes": "Winson Green residential; route 80"},
-    "S14": {"name": "Mencap Centre",          "lsoa": "E01013524", "imd_rank":   650, "score": 0.80,
-            "postcode_area": "B67 5AT", "notes": "Western boundary; accessibility demand; Mencap disability services"},
-    "S13": {"name": "City Rd Medical Centre", "lsoa": "E01009121", "imd_rank":   740, "score": 0.78,
-            "postcode_area": "B17 8BA", "notes": "Healthcare access stop; route 80; essential journey destination"},
-    "S15": {"name": "Summerfield Crescent",   "lsoa": "E01009117", "imd_rank":   820, "score": 0.76,
-            "postcode_area": "B18 4QD", "notes": "Winson Green residential; route 80"},
-    "S08": {"name": "Icknield Port Rd",       "lsoa": "E01009127", "imd_rank":   910, "score": 0.74,
-            "postcode_area": "B16 0AA", "notes": "Near CIVIC SQUARE Port Loop site; Inner Circle 8A/8C"},
-    "S02": {"name": "Spring St",              "lsoa": "E01009099", "imd_rank":  1100, "score": 0.70,
-            "postcode_area": "B12 0LS", "notes": "Southern Inner Circle; Belgrave area; outbound AM"},
-    "S04": {"name": "Soho Hill",              "lsoa": "E01009146", "imd_rank":  1300, "score": 0.66,
-            "postcode_area": "B21 9SH", "notes": "Northern Ladywood / Handsworth edge; high bus dependency"},
-    "S09": {"name": "Belgrave Interchange",   "lsoa": "E01009097", "imd_rank":  1500, "score": 0.62,
-            "postcode_area": "B12 0JP", "notes": "Southern Inner Circle interchange"},
-    "S07": {"name": "Five Ways Station",      "lsoa": "E01009111", "imd_rank":  3200, "score": 0.54,
-            "postcode_area": "B15 1BQ", "notes": "Ring Road interchange; 3 routes converge; B15 mixed deprivation"},
-    "S03": {"name": "Jewellery Quarter Stn",  "lsoa": "E01009158", "imd_rank":  5800, "score": 0.40,
-            "postcode_area": "B18 6AJ", "notes": "Rail + Metro interchange; partially gentrified"},
-    "S11": {"name": "Edgbaston Village Metro","lsoa": "E01009063", "imd_rank":  8200, "score": 0.32,
-            "postcode_area": "B15 2EX", "notes": "Edgbaston; Metro interchange; route 126 toward Dudley"},
-    "S05": {"name": "Five Ways (Metro)",      "lsoa": "E01009057", "imd_rank":  9600, "score": 0.28,
-            "postcode_area": "B15 1AG", "notes": "Metro stop; commuter interchange; lower deprivation area"},
-    "S01": {"name": "New Street Station",     "lsoa": "E01013761", "imd_rank": 14000, "score": 0.18,
-            "postcode_area": "B2 4QA",  "notes": "City centre main rail terminus; mixed deprivation due to proximity to wealth"},
+    "S08": {"name": "Icknield Port Rd",       "lsoa": "E01009143", "lsoa_name": "Birmingham 136A", "imd_rank":  765, "imd_decile": 1,
+            "msoa_name": "Five Ways North", "notes": "Route 8A/8C; IMD decile 1 (England's most deprived 10%)"},
+    "S11": {"name": "Edgbaston Village Metro","lsoa": "E01009143", "lsoa_name": "Birmingham 136A", "imd_rank":  765, "imd_decile": 1,
+            "msoa_name": "Five Ways North", "notes": "Metro interchange, route 126; shares an LSOA with S08; IMD decile 1"},
+    "S09": {"name": "Belgrave Interchange",   "lsoa": "E01033640", "lsoa_name": "Birmingham 134E", "imd_rank":  830, "imd_decile": 1,
+            "msoa_name": "Attwood Green & Park Central", "notes": "Route 8A/8C interchange; IMD decile 1"},
+    "S04": {"name": "Soho Hill",              "lsoa": "E01033638", "lsoa_name": "Birmingham 049F", "imd_rank":  871, "imd_decile": 1,
+            "msoa_name": "Hockley & Jewellery Quarter", "notes": "Northern Ladywood / Handsworth edge; IMD decile 1"},
+    "S14": {"name": "Mencap Centre",          "lsoa": "E01010062", "lsoa_name": "Sandwell 026C",   "imd_rank": 1394, "imd_decile": 1,
+            "msoa_name": "Sandwell 026", "notes": "Only stop outside Birmingham LA (Sandwell); Mencap disability services; IMD decile 1"},
+    "S05": {"name": "Five Ways (Metro)",      "lsoa": "E01033639", "lsoa_name": "Birmingham 136D", "imd_rank": 2197, "imd_decile": 1,
+            "msoa_name": "Five Ways North", "notes": "Metro stop; commuter interchange; IMD decile 1 despite affluent-area perception of Edgbaston/Brindleyplace"},
+    "S12": {"name": "Summerfield Park",       "lsoa": "E01009152", "lsoa_name": "Birmingham 053B", "imd_rank": 2203, "imd_decile": 1,
+            "msoa_name": "Summerfield", "notes": "Route 80; IMD decile 1"},
+    "S06": {"name": "Dudley Rd",              "lsoa": "E01009153", "lsoa_name": "Birmingham 053C", "imd_rank": 2431, "imd_decile": 1,
+            "msoa_name": "Summerfield", "notes": "Route 80; City Hospital corridor; IMD decile 1"},
+    "S15": {"name": "Summerfield Crescent",   "lsoa": "E01009153", "lsoa_name": "Birmingham 053C", "imd_rank": 2431, "imd_decile": 1,
+            "msoa_name": "Summerfield", "notes": "Route 80; shares an LSOA with S06; IMD decile 1"},
+    "S13": {"name": "City Rd Medical Centre", "lsoa": "E01009346", "lsoa_name": "Birmingham 053E", "imd_rank": 3798, "imd_decile": 2,
+            "msoa_name": "Summerfield", "notes": "Healthcare-access stop, route 80; IMD decile 2"},
+    "S10": {"name": "Ladywood Fire Station",  "lsoa": "E01009140", "lsoa_name": "Birmingham 060C", "imd_rank": 6930, "imd_decile": 3,
+            "msoa_name": "Rotton Park", "notes": "Route 80; IMD decile 3"},
+    "S02": {"name": "Spring St",              "lsoa": "E01033624", "lsoa_name": "Birmingham 134C", "imd_rank": 7607, "imd_decile": 3,
+            "msoa_name": "Attwood Green & Park Central", "notes": "Route 8A/8C; IMD decile 3"},
+    "S07": {"name": "Five Ways Station",      "lsoa": "E01033626", "lsoa_name": "Birmingham 134D", "imd_rank": 9262, "imd_decile": 3,
+            "msoa_name": "Attwood Green & Park Central", "notes": "Ring Road interchange, multiple routes converge; IMD decile 3"},
+    "S01": {"name": "New Street Station",     "lsoa": "E01033615", "lsoa_name": "Birmingham 135C", "imd_rank": 10295, "imd_decile": 4,
+            "msoa_name": "Digbeth", "notes": "City-centre rail terminus; IMD decile 4 — least deprived Ladywood model stop, but still in England's most-deprived 40%"},
+    "S03": {"name": "Jewellery Quarter Stn",  "lsoa": "E01033559", "lsoa_name": "Birmingham 049E", "imd_rank": 14019, "imd_decile": 5,
+            "msoa_name": "Hockley & Jewellery Quarter", "notes": "Rail + Metro interchange, partially gentrified; IMD decile 5 — only Ladywood model stop outside the most-deprived 40% of England"},
 }
+
+_N_LSOAS = 32_844  # England LSOAs, IMD 2019
+
+
+def _normalised_score(imd_rank: int) -> float:
+    """Normalise IMD rank to [0,1]: rank 1 -> 1.0 (most deprived), rank 32,844 -> 0.0."""
+    return round(1 - (imd_rank - 1) / (_N_LSOAS - 1), 3)
+
+
+def assign_deprivation_bands(ranks: dict[str, int]) -> dict[str, str]:
+    """Rank stops by national IMD rank and split into corridor-relative thirds.
+
+    Bands are relative to this corridor's own stops, split into equal thirds
+    by national IMD rank (lower rank = more deprived = "high"), ties broken
+    by stop_id — the same relative-tertile approach used for POI tiers in
+    fetch_osm_pois.py. See national_context in run_analysis() for the
+    absolute (decile-based) headline figure.
+    """
+    ordered = sorted(ranks, key=lambda sid: (ranks[sid], sid))
+    third = len(ordered) // 3
+    bands: dict[str, str] = {}
+    for i, sid in enumerate(ordered):
+        if i < third:
+            bands[sid] = "high"
+        elif i < 2 * third:
+            bands[sid] = "medium"
+        else:
+            bands[sid] = "low"
+    return bands
 
 # Fixed-schedule stop memberships (from api.py _FIXED_ROUTES)
 FIXED_STOPS: dict[str, list[str]] = {
@@ -111,30 +166,25 @@ FIXED_STOPS: dict[str, list[str]] = {
 class StopEquity:
     stop_id:    str
     name:       str
-    score:      float      # deprivation score [0,1]
-    imd_rank:   int
+    score:      float      # deprivation score [0,1], 1 = most deprived (national IMD rank)
+    imd_rank:   int         # England-wide IMD 2019 rank (1 = most deprived of 32,844 LSOAs)
+    imd_decile: int         # England-wide IMD 2019 decile (1 = most deprived 10%)
     lsoa:       str
     fixed_coverage: bool   # served by any fixed route
-    deprivation_band: str  # "high" / "medium" / "low"
+    deprivation_band: str  # "high" / "medium" / "low" — corridor-relative, see assign_deprivation_bands()
 
     @classmethod
-    def from_data(cls, sid: str, fixed_stops_all: set[str]) -> "StopEquity":
+    def from_data(cls, sid: str, fixed_stops_all: set[str], bands: dict[str, str]) -> "StopEquity":
         d = STOP_DEPRIVATION[sid]
-        score = d["score"]
-        if score >= 0.70:
-            band = "high"
-        elif score >= 0.45:
-            band = "medium"
-        else:
-            band = "low"
         return cls(
             stop_id=sid,
             name=d["name"],
-            score=score,
+            score=_normalised_score(d["imd_rank"]),
             imd_rank=d["imd_rank"],
+            imd_decile=d["imd_decile"],
             lsoa=d["lsoa"],
             fixed_coverage=sid in fixed_stops_all,
-            deprivation_band=band,
+            deprivation_band=bands[sid],
         )
 
 
@@ -236,11 +286,15 @@ def run_analysis() -> dict:
     for stops in FIXED_STOPS.values():
         fixed_stops_all.update(stops)
 
-    equity_stops = [StopEquity.from_data(sid, fixed_stops_all) for sid in STOP_DEPRIVATION]
+    bands = assign_deprivation_bands({sid: d["imd_rank"] for sid, d in STOP_DEPRIVATION.items()})
+    equity_stops = [StopEquity.from_data(sid, fixed_stops_all, bands) for sid in STOP_DEPRIVATION]
 
-    # Coverage gap: high-deprivation stops not served by any fixed route
+    # Coverage gap: high-deprivation (corridor-relative) stops not served by any fixed route
     high_dep = [s for s in equity_stops if s.deprivation_band == "high"]
     high_dep_unserved_fixed = [s for s in high_dep if not s.fixed_coverage]
+
+    n_decile1 = sum(1 for s in equity_stops if s.imd_decile == 1)
+    n_decile_le3 = sum(1 for s in equity_stops if s.imd_decile <= 3)
 
     # Allocation-mismatch index (see _allocation_mismatch): how well bus
     # allocation tracks real predicted demand, averaged across every
@@ -260,10 +314,11 @@ def run_analysis() -> dict:
                 "name":             s.name,
                 "deprivation_score": s.score,
                 "imd_rank":         s.imd_rank,
+                "imd_decile":       s.imd_decile,
                 "lsoa":             s.lsoa,
                 "deprivation_band": s.deprivation_band,
                 "fixed_coverage":   s.fixed_coverage,
-                "postcode_area":    STOP_DEPRIVATION[s.stop_id]["postcode_area"],
+                "msoa_name":        STOP_DEPRIVATION[s.stop_id]["msoa_name"],
                 "notes":            STOP_DEPRIVATION[s.stop_id]["notes"],
             }
             for s in equity_stops
@@ -277,11 +332,24 @@ def run_analysis() -> dict:
             "allocation_mismatch_dynamic":      mismatch_dynamic,
             "mismatch_snapshots_compared":      mismatch_n,
         },
+        "national_context": {
+            "n_stops_imd_decile_1":      n_decile1,
+            "n_stops_imd_decile_1_to_3": n_decile_le3,
+            "note": (
+                f"{n_decile1}/{len(equity_stops)} Ladywood model stops are in IMD 2019 "
+                f"decile 1 (England's most deprived 10% of LSOAs); {n_decile_le3}/"
+                f"{len(equity_stops)} are in deciles 1-3 (most-deprived 30%). Only "
+                "S01 (decile 4) and S03 (decile 5) fall outside the most-deprived 40%."
+            ),
+        },
         "data_source": "MHCLG English Indices of Deprivation 2019 (IMD 2019), LSOA level",
         "methodology": (
-            "IMD 2019 rank normalised to [0,1] deprivation score. "
-            "Equity ratio = mean deprivation score of served stops / "
-            "mean deprivation score of all stops. "
+            "imd_rank and imd_decile are the England-wide IMD 2019 values for each "
+            "stop's LSOA (data/imd/ladywood_imd_2019.json, live MHCLG fetch). "
+            "deprivation_score = 1 - (imd_rank - 1) / 32843, for display ordering only. "
+            "deprivation_band is a corridor-relative tertile over imd_rank "
+            "(assign_deprivation_bands); see national_context for the absolute "
+            "(decile-based) headline figure. "
             "Allocation-mismatch index = sum(|service share - demand share|) / 2 "
             "across stops (the standard dissimilarity index, 0 = perfectly "
             "proportional, 1 = total mismatch), averaged across every scenario "
@@ -293,11 +361,14 @@ def run_analysis() -> dict:
 
 def print_summary(result: dict) -> None:
     s = result["summary"]
+    nc = result["national_context"]
     sep = "─" * 60
     print(f"\n{'Stop Equity Analysis — Ladywood IMD 2019':^60}")
     print(sep)
+    print(f"  {nc['note']}")
+    print(sep)
     print(f"  Stops analysed:                 {s['n_stops']}")
-    print(f"  High-deprivation stops:         {s['n_high_deprivation_stops']}")
+    print(f"  High-deprivation stops (corridor-relative): {s['n_high_deprivation_stops']}")
     print(f"  High-dep stops unserved (fixed):{s['n_high_dep_unserved_by_fixed']}")
     if s["high_dep_unserved_names"]:
         for nm in s["high_dep_unserved_names"]:

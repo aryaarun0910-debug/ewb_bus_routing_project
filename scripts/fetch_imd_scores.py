@@ -50,23 +50,26 @@ HEADERS = {
     "Accept": "text/csv,*/*",
 }
 
-# Stop -> LSOA mapping
+# Stop -> LSOA (2011 boundaries, matching IMD 2019 File 7) mapping.
+# Derived by reverse-geocoding each stop's GTFS coordinates (see
+# scripts/fetch_osm_pois.py STOPS) against ONS LSOA11 boundaries via
+# findthatpostcode.uk/points/{lat},{lon}.json -> "lsoa11".
 STOP_LSOA: dict[str, dict] = {
-    "S01": {"lsoa": "E01013761", "name": "New Street Station"},
-    "S02": {"lsoa": "E01009099", "name": "Spring St"},
-    "S03": {"lsoa": "E01009158", "name": "Jewellery Quarter Station"},
-    "S04": {"lsoa": "E01009146", "name": "Soho Hill"},
-    "S05": {"lsoa": "E01009057", "name": "Five Ways (Metro)"},
-    "S06": {"lsoa": "E01009129", "name": "Dudley Rd"},
-    "S07": {"lsoa": "E01009111", "name": "Five Ways Station"},
-    "S08": {"lsoa": "E01009127", "name": "Icknield Port Rd"},
-    "S09": {"lsoa": "E01009097", "name": "Belgrave Interchange"},
-    "S10": {"lsoa": "E01009133", "name": "Ladywood Fire Station"},
-    "S11": {"lsoa": "E01009063", "name": "Edgbaston Village Metro"},
-    "S12": {"lsoa": "E01009119", "name": "Summerfield Park"},
-    "S13": {"lsoa": "E01009121", "name": "City Rd Medical Centre"},
-    "S14": {"lsoa": "E01013524", "name": "Mencap Centre"},
-    "S15": {"lsoa": "E01009117", "name": "Summerfield Crescent"},
+    "S01": {"lsoa": "E01033615", "name": "New Street Station"},
+    "S02": {"lsoa": "E01033624", "name": "Spring St"},
+    "S03": {"lsoa": "E01033559", "name": "Jewellery Quarter Station"},
+    "S04": {"lsoa": "E01033638", "name": "Soho Hill"},
+    "S05": {"lsoa": "E01033639", "name": "Five Ways (Metro)"},
+    "S06": {"lsoa": "E01009153", "name": "Dudley Rd"},
+    "S07": {"lsoa": "E01033626", "name": "Five Ways Station"},
+    "S08": {"lsoa": "E01009143", "name": "Icknield Port Rd"},
+    "S09": {"lsoa": "E01033640", "name": "Belgrave Interchange"},
+    "S10": {"lsoa": "E01009140", "name": "Ladywood Fire Station"},
+    "S11": {"lsoa": "E01009143", "name": "Edgbaston Village Metro"},
+    "S12": {"lsoa": "E01009152", "name": "Summerfield Park"},
+    "S13": {"lsoa": "E01009346", "name": "City Rd Medical Centre"},
+    "S14": {"lsoa": "E01010062", "name": "Mencap Centre"},
+    "S15": {"lsoa": "E01009153", "name": "Summerfield Crescent"},
 }
 
 # Map CSV column name fragments to clean keys
