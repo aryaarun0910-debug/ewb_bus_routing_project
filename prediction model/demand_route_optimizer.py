@@ -40,26 +40,34 @@ OUT_MODEL = BASE / "demand_model.pkl"
 OUT_PLAN  = BASE / "route_plan.json"
 OUT_TXT   = BASE / "route_plan_summary.txt"
 
+_REPO = BASE.parent
+_SVC_RAW = json.loads((_REPO / "data" / "gtfs" / "service_profile.json").read_text())
+_SVC_PROFILE: dict[str, dict[str, dict[int, int]]] = {
+    sid: {dt: {int(h): v for h, v in hrs.items()}
+          for dt, hrs in info.items() if dt in ("weekday", "saturday", "sunday")}
+    for sid, info in _SVC_RAW.items()
+}
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 1.  MAP TOPOLOGY  (must match generate_map_dataset.py)
 # ─────────────────────────────────────────────────────────────────────────────
 
 STOPS = [
-    {"id": "S01", "name": "North Hub",       "x": 5.8, "y": 0.5,  "importance": "major"},
-    {"id": "S03", "name": "Upper Junction",  "x": 3.5, "y": 3.8,  "importance": "major"},
-    {"id": "S07", "name": "West Hub",        "x": 3.5, "y": 4.9,  "importance": "major"},
-    {"id": "S09", "name": "East Hub",        "x": 7.7, "y": 5.8,  "importance": "major"},
-    {"id": "S04", "name": "Northeast Pass",  "x": 5.0, "y": 2.7,  "importance": "medium"},
-    {"id": "S08", "name": "City Centre",     "x": 4.5, "y": 5.8,  "importance": "medium"},
-    {"id": "S11", "name": "South Junction",  "x": 2.5, "y": 7.5,  "importance": "medium"},
-    {"id": "S12", "name": "Southeast Cross", "x": 5.7, "y": 7.7,  "importance": "medium"},
-    {"id": "S02", "name": "Northwest End",   "x": 1.4, "y": 1.5,  "importance": "minor"},
-    {"id": "S05", "name": "Far East End",    "x": 8.8, "y": 2.8,  "importance": "minor"},
-    {"id": "S06", "name": "West End",        "x": 0.4, "y": 4.9,  "importance": "minor"},
-    {"id": "S10", "name": "Lower West End",  "x": 0.4, "y": 6.6,  "importance": "minor"},
-    {"id": "S13", "name": "South End",       "x": 1.4, "y": 10.3, "importance": "minor"},
-    {"id": "S14", "name": "Far South West",  "x": 0.4, "y": 11.5, "importance": "minor"},
-    {"id": "S15", "name": "Far South East",  "x": 5.8, "y": 11.5, "importance": "minor"},
+    {"id": "S01", "name": "North Hub",       "x": 5.8, "y": 0.5,  "lat": 52.477558, "lng": -1.896240, "importance": "major"},
+    {"id": "S03", "name": "Upper Junction",  "x": 3.5, "y": 3.8,  "lat": 52.489780, "lng": -1.912559, "importance": "major"},
+    {"id": "S07", "name": "West Hub",        "x": 3.5, "y": 4.9,  "lat": 52.472332, "lng": -1.912667, "importance": "major"},
+    {"id": "S09", "name": "East Hub",        "x": 7.7, "y": 5.8,  "lat": 52.466953, "lng": -1.898929, "importance": "major"},
+    {"id": "S04", "name": "Northeast Pass",  "x": 5.0, "y": 2.7,  "lat": 52.496273, "lng": -1.915020, "importance": "medium"},
+    {"id": "S08", "name": "City Centre",     "x": 4.5, "y": 5.8,  "lat": 52.478622, "lng": -1.926436, "importance": "medium"},
+    {"id": "S11", "name": "South Junction",  "x": 2.5, "y": 7.5,  "lat": 52.472256, "lng": -1.923237, "importance": "medium"},
+    {"id": "S12", "name": "Southeast Cross", "x": 5.7, "y": 7.7,  "lat": 52.486561, "lng": -1.938601, "importance": "medium"},
+    {"id": "S02", "name": "Northwest End",   "x": 1.4, "y": 1.5,  "lat": 52.467575, "lng": -1.904080, "importance": "minor"},
+    {"id": "S05", "name": "Far East End",    "x": 8.8, "y": 2.8,  "lat": 52.475674, "lng": -1.913573, "importance": "minor"},
+    {"id": "S06", "name": "West End",        "x": 0.4, "y": 4.9,  "lat": 52.485722, "lng": -1.936805, "importance": "minor"},
+    {"id": "S10", "name": "Lower West End",  "x": 0.4, "y": 6.6,  "lat": 52.477840, "lng": -1.927453, "importance": "minor"},
+    {"id": "S13", "name": "South End",       "x": 1.4, "y": 10.3, "lat": 52.486130, "lng": -1.940943, "importance": "minor"},
+    {"id": "S14", "name": "Far South West",  "x": 0.4, "y": 11.5, "lat": 52.493015, "lng": -1.959108, "importance": "minor"},
+    {"id": "S15", "name": "Far South East",  "x": 5.8, "y": 11.5, "lat": 52.482845, "lng": -1.934218, "importance": "minor"},
 ]
 
 EDGES = [
@@ -109,19 +117,21 @@ for col in CAT_COLS:
     df[col + "_enc"] = le.fit_transform(df[col])
     encoders[col] = le
 
-# NOTE: crime_total_2024 was deliberately REMOVED as a model feature. An ablation
-# (analysis/crime_ablation/) showed it carried no signal — with 15 stops a static
-# per-stop count is redundant with stop identity — and removing it slightly
-# *improved* out-of-year generalisation (R² 0.9418 → 0.9421). Excluding it also
-# removes any policing-derived input and the redlining/bias risk that comes with
-# it. Crime is still surfaced in the dashboard as caveated area context, but it
-# never influences routing.
-_REAL_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m"]
+# crime_total_2024 excluded — ablation rank 16/20, importance 0.000279 (see
+# analysis/crime_ablation/). car_free_pct added: Census 2021 TS045 per-stop
+# car-free household rate, a direct transit-dependency measure.
+# trips_per_hour added: GTFS scheduled departures per stop per hour — the
+# supply side was previously absent entirely from the feature set.
+# stop_lat/stop_lng replaces abstract stop_x/stop_y grid coordinates with
+# real WGS84 coordinates from TfWM GTFS (via ladywood_display.py).
+# is_uni_term now uses a separate University of Birmingham + Aston University
+# term calendar (previously collinear with is_school_term — now independent).
+_REAL_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m", "car_free_pct"]
 
 FEATURE_COLS = (
     [c + "_enc" for c in CAT_COLS]
     + ["hour", "month", "temperature_c", "wind_kmh", "precipitation_mm",
-       "is_school_term", "is_uni_term", "stop_x", "stop_y"]
+       "is_school_term", "is_uni_term", "trips_per_hour", "stop_lat", "stop_lng"]
     + [c for c in _REAL_STATIC_COLS if c in df.columns]
 )
 
@@ -225,6 +235,7 @@ def predict_stop_demand(
 ) -> float:
     """Return predicted boardings for one stop-hour combination."""
     s = STOP_MAP[stop_id]
+    trips = _SVC_PROFILE.get(stop_id, {}).get(day_type, {}).get(hour, 0)
     row = [
         _safe_encode(encoders["stop_id"],         stop_id),
         _safe_encode(encoders["stop_importance"],  s["importance"]),
@@ -235,7 +246,8 @@ def predict_stop_demand(
         hour, month,
         temperature_c, wind_kmh, precipitation_mm,
         is_school_term, is_uni_term,
-        s["x"], s["y"],
+        trips,
+        s["lat"], s["lng"],
     ]
     if _STATIC_COLS:
         static = _STATIC_LOOKUP.get(stop_id, {})

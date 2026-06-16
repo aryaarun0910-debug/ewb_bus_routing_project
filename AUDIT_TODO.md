@@ -1,119 +1,144 @@
-# Grand Finals Audit — Fix Tracker
+# UK2026-82 Grand Finals — Master Audit & Task List
 
-Audited: 2026-06-16 (5 agents, full repo scan).  
-Deck freeze: **Wed 17 Jun**. Grand Finals: **Fri 19 Jun**.  
-Claude updates this file each session — check off items as they land.
-
----
-
-## STAGE-KILLERS (block the presentation if not fixed)
-
-- [x] **SK1** — `crime_total_2024` removed from `docs/ARCHITECTURE.md` Layer 2, `README.md` From-Synthetic table and Data Sources table, and `README.md` Caveats paragraph. Parenthetical ablation note added in each place.
-
-- [x] **SK2** — `docs/MODEL_CARD.md` line 79 changed to "pathway identified — foi@tfwm.org.uk." `docs/ASSUMPTION_LOG.md` A13 changed to "pathway identified — not yet filed."
-
-- [x] **SK3** — `docs/MODEL_CARD.md` updated to "median Pearson 0.38 across 15 weekday stops (range −0.04 to 0.66; outliers S05/S14 at r≈0.06 explained)." `docs/ASSUMPTION_LOG.md` A1 updated to match and now includes BUSTO positive evidence (r=0.945/0.942). `docs/REFLECTIONS.md` Arya's narrative clarified: 0.06 is the S05 outlier she noticed, not the overall median.
-
-- [x] **SK4** — `docs/REFLECTIONS.md` draft-caveat blockquote (lines 1–9 of old header block) deleted. File now opens directly with the first section header.
-
-- [ ] **SK5** — BODS dwell claim not verified from committed data. `VALIDATION_LADDER.md` stage script says "Ladywood Fire Station and Summerfield Park showing higher observed dwell than Five Ways Station." `beast/beyond/bods_avl/stop_ranking_observed.json` is keyed by raw ATCO codes, not S01–S15. Nobody has confirmed the mapping. Fix: run ATCO→stop lookup, verify S10/S12 actually outrank S07, add verified stop names to VALIDATION_LADDER.md rung 7. Arya owns this — Wed 17 morning.
-
-- [x] **SK6** — `VALIDATION_LADDER.md` on-stage script changed from "124,000 clean observations" to "Around 82,000 observations a day."
+**Finals: Friday 19 June 2026**
+**Deck freeze: Wednesday 17 June (morning)**
+**Dry-run target: Tuesday 17 June**
+**Last updated: Monday 16 June — full repo re-scan after Chris's hardware commit (23d1ce9)**
 
 ---
 
-## CODE BLOCKERS (analysis scripts, not in live demo path — still fix)
+## WHAT CHRIS SHIPPED (hardware commit 23d1ce9, Mon 16 Jun)
 
-- [x] **CB1** — `analysis/explainability.py`: `_DATA_DIR` and `_MODEL_PKL` paths fixed to `"prediction model" / "demand_model.pkl"` and `"prediction model" / "map_demand_dataset.csv"`.
+All of the following are now live in the repo under `hardware/`:
 
-- [x] **CB2** — `analysis/gtfs_validate.py` line 99: path fixed to `"prediction model" / "map_demand_dataset.csv"`. Error message updated to match.
-
----
-
-## HIGH PRIORITY (before Wed 17 freeze)
-
-- [ ] **HP1** — `radio_signalling_report.md` has no §6 Security section. `tools/living_twin/FPGA_HARDENING.md` §1 flags this as "CURRENTLY UNADDRESSED — highest priority." Content exists in FPGA_HARDENING.md (AES-128-CMAC + monotonic counter + fail-safe blank on bad packet). Chris owns this (~30 min). Must be in the public repo before deck freeze.
-
-- [x] **HP2** — `docs/EFFECT_SIZE_TRANSLATION.md`: `visits_per_day` computed from `route_plan.json` (116 route-stop assignments/weekday). N = 0.004 × 116 = 0.46 ≈ 0.5. Spoken answer updated: "roughly one additional route allocation every other day." Table and spoken-answer template filled in.
-
-- [x] **HP3** — `docs/FAILURE_MODES_AND_SERVICE_FLOOR.md` §4: broken `ASSUMPTION_LOG_ADDITIONS.md` reference replaced with "(see A15, A16 in `docs/ASSUMPTION_LOG.md`)".
-
-- [x] **HP4** — `docs/ASSUMPTION_LOG.md` A1 Evidence column: BUSTO positive evidence (r=0.945/0.942 for major/medium) added alongside the GTFS median (now corrected to 0.38).
-
-- [x] **HP5** — `docs/MODEL_CARD.md`: `stop_importance_enc` reworded to "highest-importance design variable (0.735) — behind only the temporal index `hour` (0.946)". `data/osm/ladywood_stop_pois.json` `__note__` updated to match.
+| File | Status |
+|------|--------|
+| `hardware/fpga/uart_rx.sv` | Done — correct 2-FF synchroniser + 9600-baud FSM |
+| `hardware/fpga/frame_rx.sv` | Done — 0xAA sync, 15-byte double-buffer, XOR checksum |
+| `hardware/fpga/uart_tx.sv` | Done — bonus addition |
+| `hardware/fpga/latencyZeroFPGA.sv` | Done — top-level with SW9 mux |
+| `hardware/raspberry_pi/hub.py` | Done — Pi bridge (see critical note below) |
+| `hardware/raspberry_pi/README.md` | Done |
+| `hardware/raspberry_pi/SETUP_GUIDE.txt` | Done |
+| `hardware/arduino/stop_unit/stop_unit.ino` | Done |
+| `docs/radio_signalling_report.md §6 Security` | Done — AES-128-CMAC, replay counter, fail-dark |
+| `fpga/README.md` WS2812B outdoors paragraph | Done |
+| `docs/design/RUNNING_COSTS.md` maintenance line | Done — £30-50/unit/yr |
 
 ---
 
-## QUICK WINS (~30 min total)
+## WHAT IS CONFIRMED DONE (across both team members)
 
-- [x] **QW1** — `tools/living_twin/EVERYONE_TASKS.md` was deleted (`git rm`'d) and consolidated into `AUDIT_TODO.md`. The broken `CIRCULARITY_REBUTTAL.md` reference is gone with it. No further action.
-
-- [x] **QW2** — `analysis/cost_model.py` line 64: comment changed to "passengers per vehicle (single-decker capacity)" — removed false claim of matching the optimizer's 320 window budget.
-
-- [ ] **QW3** — File the TfWM APC data request (foi@tfwm.org.uk, Wellington FOI 14028 as template). Once filed, update SK2/ASSUMPTION_LOG.md A13/MODEL_CARD.md to say "filed." 10 minutes. Target: Wed 17 before deck freeze so "filed" is literally true on Fri 19.
-
----
-
-## LIVING TWIN — Chris owns these (Mon 16 → Tue 17)
-
-- [ ] **LT1** — `fpga/uart_rx.sv` + `fpga/frame_rx.sv` + SW9 mux do not exist in the repo. Must be written. Spec: 9600-8-N-1 at 50 MHz (divider 5208); byte FSM wait `0xAA` → 15 bytes → XOR verify → double-buffer latch; SW9 mux live_regs vs rom_row. Resolve SW9 semantic conflict with existing demo-cycle logic in `fpga/bus_route.v` line 51. Staleness watchdog: no valid frame for 60 s → amber "no data" pulse.
-
-- [ ] **LT2** — `hub.py` (Pi side) does not exist in the repo. Must be written and committed. Reads `prediction model/route_plan.json` (demand nibble) + snaps BODS positions to `data/gtfs/ladywood_stops.json` (haversine). Sends 17-byte UART frame every 5 s (byte 0: 0xAA; bytes 1–15: [high nibble = vehicles at stop 0–9, low nibble = demand tier 0–3]; byte 16: XOR checksum).
-
-- [ ] **LT3** — Implement replay mode in `hub.py` (`--replay <file>` at 60× speed, same UART output). Not optional — this is the on-stage fallback if BODS/hotspot drops.
-
-- [ ] **LT4** — Register BODS key in `.bods_key` (gitignored) on the Pi before running `hub.py`.
-
-- [ ] **LT5** — Bench acceptance test (Mon 16 tonight): real bus move S06→S07 lights correctly; pull wire → amber pulse after 60 s; SW9 down → ROM snapshot demo. Chris + Jack integration test.
-
-- [ ] **LT6** — Record a replay file from live Tuesday data; commit it (or note path). On-stage label: "recorded Tuesday 17 Jun — replay mode, honest label."
-
-- [ ] **LT7** — WS2812B outdoors suitability paragraph → `fpga/README.md`; maintenance cost line → `docs/design/RUNNING_COSTS.md`. (Chris §5 in EVERYONE_TASKS, not yet in tracker.)
-
-> **ROM snapshot**: does NOT need regeneration. Stop importance tiers (major/medium/minor in `dashboard/ladywood_display.py`) did not change during the retrain — the ROM encodes colour tiers, not raw demand numbers. Raw demand numbers changed (weekend retrain) but those are read dynamically by `hub.py` from `route_plan.json`, not baked into the FPGA ROM.
-> **demand_model.pkl**: Pi does NOT load the pkl at runtime for the Living Twin — it reads the pre-computed `route_plan.json`. The pkl change is irrelevant to Chris's hardware.
-> **ladywood_stop_pois.json `__note__`**: hub.py does not read this file. No action.
+| Item | Notes |
+|------|-------|
+| `docs/REFLECTIONS.md` | Fully personalised, all three sections, no DRAFT banner |
+| `docs/ASSUMPTION_LOG.md` | 16 assumptions (expanded from 11), all with status/evidence |
+| `docs/UNINTENDED_CONSEQUENCES.md` | Complete — covers community, environment, economy |
+| `docs/DRIVER_INTERFACE.md` | Complete — incl. Transport Act 1985 compliance pathway |
+| `docs/DEMOGRAPHIC_DESIGN_MAP.md` | Complete — 8-row table with real population sources |
+| `docs/EMISSIONS_QUANTIFICATION.md` | Complete — 1.95-2.54 t CO2e/yr quantified |
+| `docs/EFFECT_SIZE_TRANSLATION.md` | N filled in — 116 route-stop assignments/weekday, ~0.5 extra allocations/day |
+| `docs/radio_signalling_report.md §6` | Security section present and complete |
+| `docs/design/RUNNING_COSTS.md` | WS2812B maintenance line present |
+| XGBoost retrain | Crime feature removed, R² = 0.9421, 263K real-anchored rows |
+| `analysis/weekend_curve/` | Empirical weekend curve committed (3 files) |
+| Dashboard: scrollable stop panel | Done |
+| Dashboard: compact controls | Done |
+| Dashboard: POI dash + metric glossary | Done |
+| `dashboard/demand.py` pkl guard | Done — existence pre-check before load |
+| UART/frame RX hardware | Done — uart_rx.sv, frame_rx.sv correct and clean |
 
 ---
 
-## MISSING FROM TRACKER (surfaced in second audit pass)
+## OPEN — ARYA (all small, finals this week)
 
-- [x] **MT1** — `README.md` docs index: "Team reflection" section added with link to `docs/REFLECTIONS.md`.
-
-- [ ] **MT2** — Dashboard commits push: day-lit map, compact controls, scrollable stop panel, metric-scale definitions, POI dash. (Arya §2 in EVERYONE_TASKS — not tracked here.)
-
-- [ ] **MT3** — Deck slide 18 CO₂ number: change "2.4–3.1 tCO₂e" to "~2–2.5 t" (model output is 1.95–2.54 tCO₂e/yr). `docs/EMISSIONS_QUANTIFICATION.md` is already correct; deck sync needed. (Arya §5 in EVERYONE_TASKS.)
-
-- [ ] **MT4** — Jack: sanity-check `prediction model/route_plan.json` after retrain: every stop served or in unserved list, capacities respected, no broken geometry. (Jack §2 in EVERYONE_TASKS.)
-
-- [ ] **MT5** — Jack + full team: end-to-end dry-run (dashboard + Living Twin + deck + replay-mode fallback). Target Tue 17. (Jack §4 in EVERYONE_TASKS.)
-
-- [x] **MT6** — Crime removed entirely from dashboard (`demand.py` `_STATIC_COLS`, `api.ts` `Stop` interface, `StopPanel.tsx` `METRIC_DEFS` and stat-grid). No attack vector remains.
+| ID | Priority | Item |
+|----|----------|------|
+| SK5 | STAGE-KILLER | **BODS dwell ATCO mapping — Wed 17 morning.** Run `tools/bods_avl/derive_dwell_times.py` on the pilot-week data. Confirm the ATCO codes in `stop_ranking_observed.json` map correctly to S10 (Ladywood Fire Station) and S12 (Summerfield Park) outranking S07 (Five Ways). If the mapping cannot be confirmed, remove the on-stage dwell claim before the deck freezes. |
+| QW3 | High | **File TfWM APC FOI — today.** Email foi@tfwm.org.uk. Use Wellington FOI 14028 as template. Once sent, update `docs/MODEL_CARD.md`: change "pathway identified; foi@tfwm.org.uk" to "FOI filed [date]". This turns a Q&A weakness into a strength on stage. |
+| BUG-A1 | Medium | **`dashboard/web/index.html` title is still "web".** Change `<title>web</title>` to `<title>Ladywood Predictive Bus Routing</title>`. One line. |
+| MT3 | Low | **Deck slide 18 CO2 number** — verify it reads "~2–2.5 t" not "2.4–3.1 tCO2e". The cost model computes 1.95–2.54 t on the 300-day basis. |
+| MT5 | All team | **End-to-end dry-run — Tue 17 (Jack owns logistics).** Dashboard at :8000 + Living Twin UART path or replay fallback + deck in order + spoken answers timed. Nothing first-attempted on stage. |
 
 ---
 
-## REHEARSAL (no code change needed — spoken answers)
+## OPEN — CHRIS (two critical checks, one build gap)
 
-- [ ] **RH1** — README honestly reports 30.2% worst-case optimality gap. Prepare 10-second answer: "1.16% mean gap is the deployment metric; 30.2% is the worst-case upper bound on any single route in the largest scenario — the system average is what drives fuel savings."
+### Critical 1 — verify SW9 actually routes live_regs to the display
 
-- [ ] **RH2** — FPGA timing not closed (−11.24 ns setup slack in fpga/README.md). Chris answer: "It works on the bench — the WS2812B timing is observed correct. Retiming the `cur_color` chain is the documented next step. Bench test is the proof."
+**`hardware/fpga/latencyZeroFPGA.sv` SW9 semantic needs verification.**
 
-- [ ] **RH3** — Jack must answer the *current* Pi→FPGA UART single-point-of-failure question, not the legacy Unity serial bridge. Answer: "SW9 down is always the fallback — the ROM snapshot we already trust. If BODS drops on stage, we have a replay file of real Tuesday data, honestly labelled. We designed for this failure on purpose."
+The scrape found SW9 controls auto-cycling of scenario/timeslot (`eff_sc = SW[9] ? auto_sc : SW[1:0]`). Build spec says SW9 should mux between ROM snapshot and live `stop_regs` from `frame_rx`. These are different behaviours. Before the bench test, confirm that `stop_regs` from `frame_rx` actually feed the display colour logic — not just echo back out via `uart_tx`. If `stop_regs` bypass the colour ROM entirely, the live-data path is unconnected on screen even though the UART plumbing is correct.
 
-- [ ] **RH4** — Latent demand attack ("if night buses are unreliable, your model can't see the suppressed demand"). Point to ASSUMPTION_LOG.md A5 (no induced-demand feedback loop — named, bounded, out of scope for Phase 1).
+### Critical 2 — hub.py is a simulation hub, not a BODS poller
 
-- [x] **RH5** — Crime removed entirely from dashboard. No tooltip to defend; no live-demo attack vector on SK1.
+**`hardware/raspberry_pi/hub.py` does not poll BODS.**
 
-- [ ] **RH6** — CIRCULARITY_REBUTTAL script: if it still cites r=0.945 anywhere, update to R²=0.9421 (the post-retrain figure) so what you say on stage matches the deck exactly.
+The committed hub.py is a bidirectional ROM-matching loop: it reads 0xBB demand frames back from the FPGA, matches them to identify the active scenario/timeslot, and repositions bus objects locally. It does not call the BODS SIRI-VM feed, does not haversine-snap real vehicle positions, and does not send real-bus-position 0xAA frames. The "Living Twin" as committed shows the ROM animation with UART echo, not real buses from the live feed.
+
+**Decision for Chris before Tue dry-run:**
+- If the demo plan is "UART-bridged ROM animation with UDP broadcast to Arduino" — the committed hub.py is correct and the demo is coherent. Relabel it honestly on stage: "live UART bridge between Pi and FPGA — real BODS integration is the next phase."
+- If the demo plan requires showing a real bus on Dudley Road move the LED — hub.py needs the BODS poll + haversine snap added before Mon night.
+
+Either way, the UART architecture is sound. This is a scoping question, not a bug.
+
+### Remaining build items
+
+| ID | Status | Item |
+|----|--------|------|
+| LT3 | Open | **Replay mode** (`hub.py --replay <file>`) not present. If the demo relies on a pre-recorded fallback, add `--replay` argument to hub.py before dry-run. |
+| LT5 | Open | **Bench acceptance test** — hardware test, not a repo artefact. Run the full sequence: Pi → UART → FPGA → LEDs update; pull wire → amber pulse after staleness timeout; SW9 down → ROM. All three must work before Fri. |
+| LT6 | Open | **Replay file not committed.** Record a BODS (or simulated) snapshot file and commit to `tools/bods_avl/replay/ladywood_<date>.jsonl` for on-stage fallback. |
+| HW3 | Open | **HDL testbench `fpga/tb_bus_route.v` still missing.** If you verified on-hardware by inspection, add one paragraph to `fpga/README.md` explicitly stating this: "Verified on DE1-SoC by visual inspection of WS2812B output — no simulation testbench committed; this is a known gap for Phase 2." This pre-empts the judge question without claiming something that isn't there. |
 
 ---
 
-## COMPLETED
+## OPEN — JACK
 
-- [x] Fix #1–#15 (LSOA rederivation, service floor, model retrain, equity, BODS pipeline, accessibility, crime ablation, weekend curve, ASSUMPTION_LOG, CRIME_ABLATION, SHAPE_VALIDATION, MODEL_COMPARISON, SCALABILITY, EFFECT_SIZE_TRANSLATION scaffolding)
-- [x] Fix #16 — `tools/living_twin/EVERYONE_TASKS.md` + `BUILD_SPEC.md`: stale metric corrected (R² 0.9418→0.9421); FPGA = "display/edge device" not "solver"
-- [x] Fix #17 — `data/osm/ladywood_stop_pois.json`: `__note__` key added; `docs/MODEL_CARD.md`: stop_importance row added distinguishing operational tier from derived_tier
-- [x] BODS field-name bug — `tools/bods_avl/derive_dwell_times.py`: `s["id"]`→`s.get("id") or s["stop_id"]`, `s["lon"]`→`s.get("lon") or s["lng"]` (both repo copy and live beast copy)
-- [x] `docs/VALIDATION_LADDER.md` rung 7 updated to real numbers (~82k/day, ~330k/4 days); rung 8 changed to "pathway identified, not yet filed"
-- [x] `docs/FAILURE_MODES_AND_SERVICE_FLOOR.md`: BODS reference updated to 4-day archive path
-- [x] `docs/REFLECTIONS.md`: Arya, Jack, and Chris sections all finalised (pending personal sign-off)
+| ID | Item |
+|----|------|
+| MT4 | **route_plan.json sanity check** — verify every stop is served or in the unserved list, capacities respected, no broken geometry. Sign off before Tue dry-run. |
+| J3 | **Living Twin integration test (today Mon 16)** — help Chris confirm Pi → FPGA path works: LEDs update, pull-wire amber, SW9 ROM fallback. This is the on-stage moment; rehearse it. |
+| J4 | **Demo dry-run owner (Tue/Wed)** — run the full flow end-to-end with timing. Nothing first-attempted on stage. |
+
+---
+
+## SPOKEN Q&A — DRILL BEFORE FRI (all team)
+
+| ID | Status | Answer brief |
+|----|--------|--------------|
+| RH1 | [ ] | **"R² is circular — you trained on synthetic data."** Concede; reframe R² as pipeline capability, not forecast accuracy. Anchor chain: BUSTO shape r=0.945 → smartcard absolute levels → real Open-Meteo weather → weekend divergence we caught and corrected → FOI filed [date]. Script in `beast/hardening/CIRCULARITY_REBUTTAL.md`. |
+| RH2 | [ ] | **"Worst-case optimality gap?"** 30.2% on one route. Mean 1.16% — but deflated because brute-force optimal only computed for routes ≤8 stops; harder routes compare to themselves. Honest framing: greedy+2-opt is a practical heuristic, not an exact solver. |
+| RH3 | [ ] | **"Why not APC data?"** Not publicly available in UK. TfWM APC is proprietary ETM. FOI filed [date]. Wellington NZ Metlink used for hour-of-day shape validation: r=0.945 on comparable tier stops. |
+| RH4 | [ ] | **"Your display can be spoofed."** AES-128-CMAC on every LoRa packet. Monotonic frame counter drops replays. Fail-dark on bad MAC or stale counter — blank display is honest, a lying one is not. People who most depend on it are least able to catch a lie. |
+| RH5 | [ ] | **"BODS is down on the day?"** Replay fallback: pre-recorded snapshot at 60x. FPGA staleness watchdog fires after 60 s → amber pulse. Dashboard always shows route_plan.json predictions regardless. |
+| RH6 | [ ] | **"Driver hours fall but drivers are stakeholders — you're cutting jobs."** Saving is fuel and dead-mileage on same duties, not headcount. Driver count unchanged; optimisation eliminates unnecessary dead kilometres. Full reconciliation in `docs/DRIVER_INTERFACE.md §3`. |
+| RH7 | [ ] | **"This is illegal — Transport Act 1985 s.6."** Correct. Three-phase lawful pathway: within-registration flexibility → s.22 flexible registration → WMCA franchising. Full answer in `docs/DRIVER_INTERFACE.md`. |
+| RH8 | [ ] | **"Latent demand — people who stopped using the bus?"** Named in ASSUMPTION_LOG as A5. Model predicts observed demand, not potential. Suppressed demand is invisible. Phase 2 requires survey data. Bounded as out of scope, not ignored. |
+| RH9 | [ ] | **"Crime feature — redlining?"** Tested: permutation importance 0.000279, rank 16/20. R² improved after removal. Deleted on principle. See `analysis/crime_ablation/`. |
+
+---
+
+## TRACKER HOUSEKEEPING (update AUDIT_TODO.md in repo)
+
+These items are done in the repo but still marked open in AUDIT_TODO.md — check them off:
+
+- HP1: `radio_signalling_report.md §6` — DONE
+- LT1: `uart_rx.sv`, `frame_rx.sv`, SW9 mux — DONE (`hardware/fpga/`)
+- LT2: `hub.py` — DONE (`hardware/raspberry_pi/`) with the caveat above
+- LT7: WS2812B outdoors paragraph + RUNNING_COSTS.md line — DONE
+- MT2: Dashboard commits (scrollable panel, compact controls, POI, glossary) — DONE (code confirmed)
+- SK4: REFLECTIONS.md DRAFT banner — DONE
+
+---
+
+## POST-FINALS BACKLOG (do not touch before Fri)
+
+- Add BODS live polling to `hub.py` (haversine snap, real 0xAA frames)
+- Fix FPGA timing closure: latch `cur_color` once per LED (−11.24 ns setup slack)
+- Write `gen_rom.py` to auto-generate Verilog ROM tables from route_plan.json
+- Wire pytest into CI (ci.yml currently runs compileall only)
+- Hyperparameter search for XGBoost (all params currently manual)
+- SHAP values in `analysis/explainability.py`
+- Fix `is_uni_term = is_term` with a real university calendar
+- Fix `is_uni_term` toggle missing in ConditionsPanel

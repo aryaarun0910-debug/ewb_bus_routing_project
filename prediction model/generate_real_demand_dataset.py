@@ -63,12 +63,28 @@ _REPO = Path(__file__).parent.parent
 HOURLY_WEATHER = _REPO / "data" / "weather" / "birmingham_hourly_2023_2024.csv"
 DAILY_WEATHER  = _REPO / "data" / "weather" / "birmingham_daily_summary_2023_2024.csv"
 TERM_CALENDAR  = _REPO / "data" / "school_terms" / "birmingham_term_calendar.json"
+UNI_TERM       = _REPO / "data" / "school_terms" / "university_term_calendar.json"
 SMARTCARD      = _REPO / "data" / "geods" / "ladywood_smartcard_summary.json"
 IMD            = _REPO / "data" / "imd" / "ladywood_imd_2019.json"
 POIS           = _REPO / "data" / "osm" / "ladywood_stop_pois.json"
 CRIME          = _REPO / "data" / "crime" / "ladywood_stop_crime_2024.json"
 ELEVATION      = _REPO / "data" / "elevation" / "ladywood_stop_elevation.json"
 POPULATION     = _REPO / "data" / "census" / "ladywood_population_2021.json"
+CAR_FREE       = _REPO / "data" / "census" / "ladywood_car_availability.json"
+SERVICE_PROFILE= _REPO / "data" / "gtfs" / "service_profile.json"
+
+# Real WGS84 coordinates for the 15 model stops, from ladywood_display.py.
+# Replaces the abstract 0-10 grid used for synthetic map topology.
+REAL_STOP_COORDS: dict[str, tuple[float, float]] = {
+    "S01": (52.477558, -1.896240), "S02": (52.467575, -1.904080),
+    "S03": (52.489780, -1.912559), "S04": (52.496273, -1.915020),
+    "S05": (52.475674, -1.913573), "S06": (52.485722, -1.936805),
+    "S07": (52.472332, -1.912667), "S08": (52.478622, -1.926436),
+    "S09": (52.466953, -1.898929), "S10": (52.477840, -1.927453),
+    "S11": (52.472256, -1.923237), "S12": (52.486561, -1.938601),
+    "S13": (52.486130, -1.940943), "S14": (52.493015, -1.959108),
+    "S15": (52.482845, -1.934218),
+}
 
 OUT = Path(__file__).parent / "map_demand_dataset.csv"
 
@@ -109,6 +125,33 @@ def load_term_calendar() -> dict[str, dict]:
     return json.loads(TERM_CALENDAR.read_text(encoding="utf-8"))
 
 
+def load_uni_term_calendar() -> dict[str, bool]:
+    """Date -> is_uni_term (University of Birmingham + Aston composite)."""
+    raw = json.loads(UNI_TERM.read_text(encoding="utf-8"))
+    return {d: v["is_uni_term"] for d, v in raw.items()}
+
+
+def load_car_free() -> dict[str, float | None]:
+    """stop_id -> car-free household percentage (Census 2021 TS045).
+    S14 (Mencap Centre) is in Sandwell LA — no Birmingham Census coverage; returns None."""
+    data = json.loads(CAR_FREE.read_text(encoding="utf-8"))
+    return {sid: v.get("no_car_pct") for sid, v in data.items()}
+
+
+def load_service_profile() -> dict[str, dict[str, dict[int, int]]]:
+    """stop_id -> day_type -> hour -> scheduled departures.
+    Source: TfWM GTFS static feed, mined by scripts/build_gtfs_profile.py."""
+    raw = json.loads(SERVICE_PROFILE.read_text(encoding="utf-8"))
+    out = {}
+    for sid, info in raw.items():
+        out[sid] = {
+            "weekday":  {int(h): v for h, v in info.get("weekday",  {}).items()},
+            "saturday": {int(h): v for h, v in info.get("saturday", {}).items()},
+            "sunday":   {int(h): v for h, v in info.get("sunday",   {}).items()},
+        }
+    return out
+
+
 def load_smartcard_anchor() -> dict[str, float]:
     """Per-stop relative demand anchor from real concessionary journey volumes."""
     data = json.loads(SMARTCARD.read_text(encoding="utf-8"))
@@ -127,11 +170,12 @@ def load_smartcard_anchor() -> dict[str, float]:
 
 def load_static_features() -> dict[str, dict]:
     """Per-stop static real-world features merged from multiple sources."""
-    imd  = json.loads(IMD.read_text(encoding="utf-8"))
-    pois = json.loads(POIS.read_text(encoding="utf-8"))
-    crime = json.loads(CRIME.read_text(encoding="utf-8"))
-    elev = json.loads(ELEVATION.read_text(encoding="utf-8"))
-    pop  = json.loads(POPULATION.read_text(encoding="utf-8"))
+    imd      = json.loads(IMD.read_text(encoding="utf-8"))
+    pois     = json.loads(POIS.read_text(encoding="utf-8"))
+    crime    = json.loads(CRIME.read_text(encoding="utf-8"))
+    elev     = json.loads(ELEVATION.read_text(encoding="utf-8"))
+    pop      = json.loads(POPULATION.read_text(encoding="utf-8"))
+    car_free = load_car_free()
 
     out = {}
     for sid in [s["id"] for s in STOPS]:
@@ -141,6 +185,7 @@ def load_static_features() -> dict[str, dict]:
             "population":        (pop.get(sid) or {}).get("total_population"),
             "crime_total_2024":  sum((crime.get(sid) or {}).get("crime_counts", {}).values()) or None,
             "elevation_m":       (elev.get(sid) or {}).get("elevation_m"),
+            "car_free_pct":      car_free.get(sid),
         }
     return out
 
@@ -207,15 +252,18 @@ def get_demand(stop, anchor, hour, day_type, month, weather, special_event, clim
 
 def run() -> None:
     print("Loading real datasets...")
-    hourly   = load_hourly_weather()
-    storms   = load_daily_storms()
-    calendar = load_term_calendar()
-    anchors  = build_anchors()
-    static   = load_static_features()
+    hourly          = load_hourly_weather()
+    storms          = load_daily_storms()
+    calendar        = load_term_calendar()
+    uni_calendar    = load_uni_term_calendar()
+    anchors         = build_anchors()
+    static          = load_static_features()
+    svc_profile     = load_service_profile()
 
     print(f"  Hourly weather records : {len(hourly):,}")
     print(f"  Storm days             : {len(storms)}")
     print(f"  Calendar days          : {len(calendar):,}")
+    print(f"  Uni term dates loaded  : {sum(v for v in uni_calendar.values())} in-term days")
     print(f"  Demand anchors         : {anchors}")
 
     dates = sorted({d for (d, _h) in hourly})
@@ -227,7 +275,8 @@ def run() -> None:
     for d_str in dates:
         y, m, day = (int(x) for x in d_str.split("-"))
         cal = calendar.get(d_str, {})
-        is_term = 1 if cal.get("is_school_term") else 0
+        is_term     = 1 if cal.get("is_school_term") else 0
+        is_uni_term = 1 if uni_calendar.get(d_str, False) else 0
 
         wd = date(y, m, day).weekday()
         day_type = "weekday" if wd < 5 else ("saturday" if wd == 5 else "sunday")
@@ -259,11 +308,14 @@ def run() -> None:
                 occ = max(5, occ + random.randint(-10, 10))
 
                 feat = static[sid]
+                lat, lng = REAL_STOP_COORDS[sid]
+                # trips_per_hour: scheduled GTFS departures at this stop this hour
+                trips = svc_profile.get(sid, {}).get(day_type, {}).get(hour, 0)
                 rows.append({
                     "stop_id":          sid,
                     "stop_name":        stop["name"],
-                    "stop_x":           stop["x"],
-                    "stop_y":           stop["y"],
+                    "stop_lat":         lat,
+                    "stop_lng":         lng,
                     "stop_importance":  stop["importance"],
                     "date":             d_str,
                     "month":            m,
@@ -278,12 +330,14 @@ def run() -> None:
                     "climate_event":    climate_event,
                     "special_event":    special,
                     "is_school_term":   is_term,
-                    "is_uni_term":      is_term,   # no separate real uni-term calendar
+                    "is_uni_term":      is_uni_term,
+                    "trips_per_hour":   trips,
                     "imd_score":        feat["imd_score"],
                     "poi_total":        feat["poi_total"],
                     "population":       feat["population"],
                     "crime_total_2024": feat["crime_total_2024"],
                     "elevation_m":      feat["elevation_m"],
+                    "car_free_pct":     feat["car_free_pct"],
                     "boardings":        boardings,
                     "alightings":       alightings,
                     "net_flow":         boardings - alightings,
@@ -291,13 +345,14 @@ def run() -> None:
                 })
 
     fieldnames = [
-        "stop_id", "stop_name", "stop_x", "stop_y", "stop_importance",
+        "stop_id", "stop_name", "stop_lat", "stop_lng", "stop_importance",
         "date", "month", "month_name", "day_type",
         "hour", "time_label",
         "weather_type", "temperature_c", "wind_kmh", "precipitation_mm",
         "climate_event", "special_event",
-        "is_school_term", "is_uni_term",
-        "imd_score", "poi_total", "population", "crime_total_2024", "elevation_m",
+        "is_school_term", "is_uni_term", "trips_per_hour",
+        "imd_score", "poi_total", "population", "crime_total_2024",
+        "elevation_m", "car_free_pct",
         "boardings", "alightings", "net_flow", "occupancy_pct",
     ]
 

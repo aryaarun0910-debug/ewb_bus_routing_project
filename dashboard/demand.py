@@ -11,6 +11,7 @@ Exposes `predict_stop_demand(...)` for the FastAPI layer.
 
 from __future__ import annotations
 
+import json
 import pickle
 from pathlib import Path
 
@@ -22,14 +23,17 @@ _MODEL_DIR = _REPO_ROOT / "prediction model"
 _MODEL_PKL = _MODEL_DIR / "demand_model.pkl"
 _DATASET_CSV = _MODEL_DIR / "map_demand_dataset.csv"
 
-# Synthetic plan-space coordinates for the 15 model stops — these are the
-# `stop_x` / `stop_y` features the model was trained on (distinct from the
-# real lat/lng in ladywood_display.STOPS_DISPLAY, which are for the map).
-_STOP_XY = {
-    "S01": (5.8, 0.5),  "S03": (3.5, 3.8),  "S07": (3.5, 4.9),  "S09": (7.7, 5.8),
-    "S04": (5.0, 2.7),  "S08": (4.5, 5.8),  "S11": (2.5, 7.5),  "S12": (5.7, 7.7),
-    "S02": (1.4, 1.5),  "S05": (8.8, 2.8),  "S06": (0.4, 4.9),  "S10": (0.4, 6.6),
-    "S13": (1.4, 10.3), "S14": (0.4, 11.5), "S15": (5.8, 11.5),
+# Real WGS84 stop coordinates — used as stop_lat/stop_lng model features.
+# Matches REAL_STOP_COORDS in generate_real_demand_dataset.py exactly.
+_STOP_LATLONG = {
+    "S01": (52.477558, -1.896240), "S02": (52.467575, -1.904080),
+    "S03": (52.489780, -1.912559), "S04": (52.496273, -1.915020),
+    "S05": (52.475674, -1.913573), "S06": (52.485722, -1.936805),
+    "S07": (52.472332, -1.912667), "S08": (52.478622, -1.926436),
+    "S09": (52.466953, -1.898929), "S10": (52.477840, -1.927453),
+    "S11": (52.472256, -1.923237), "S12": (52.486561, -1.938601),
+    "S13": (52.486130, -1.940943), "S14": (52.493015, -1.959108),
+    "S15": (52.482845, -1.934218),
 }
 _STOP_IMPORTANCE = {
     "S01": "major", "S03": "major", "S07": "major", "S09": "major",
@@ -38,10 +42,24 @@ _STOP_IMPORTANCE = {
     "S13": "minor", "S14": "minor", "S15": "minor",
 }
 
-# Static per-stop columns served to the dashboard. crime_total_2024 was removed
-# (ablated — rank 16/20, importance 0.000279 — see analysis/crime_ablation/).
-_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m"]
-_MODEL_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m"]
+# Static per-stop columns. crime_total_2024 excluded (ablation rank 16/20).
+# car_free_pct added: Census 2021 TS045 transit-dependency measure.
+_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m", "car_free_pct"]
+_MODEL_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m", "car_free_pct"]
+
+# GTFS service frequency: stop_id -> day_type -> hour -> scheduled departures.
+def _load_svc_profile() -> dict[str, dict[str, dict[int, int]]]:
+    path = _REPO_ROOT / "data" / "gtfs" / "service_profile.json"
+    if not path.exists():
+        return {}
+    raw = json.loads(path.read_text())
+    return {
+        sid: {dt: {int(h): v for h, v in hrs.items()}
+              for dt, hrs in info.items() if dt in ("weekday", "saturday", "sunday")}
+        for sid, info in raw.items()
+    }
+
+_svc_profile = _load_svc_profile()
 
 
 def _load_bundle():
@@ -73,7 +91,6 @@ _model_static_cols = [c for c in _MODEL_STATIC_COLS
                       if c in next(iter(_static_lookup.values()), {})]
 
 
-
 def _safe_encode(enc: LabelEncoder, value: str) -> int:
     if value in enc.classes_:
         return int(enc.transform([value])[0])
@@ -88,7 +105,8 @@ def _build_row(
     is_school_term: int, is_uni_term: int,
 ) -> list:
     """Assemble one model feature row for a stop-hour (order matches FEATURE_COLS)."""
-    x, y = _STOP_XY[stop_id]
+    lat, lng = _STOP_LATLONG[stop_id]
+    trips = _svc_profile.get(stop_id, {}).get(day_type, {}).get(hour, 0)
     row = [
         _safe_encode(_encoders["stop_id"], stop_id),
         _safe_encode(_encoders["stop_importance"], _STOP_IMPORTANCE[stop_id]),
@@ -99,7 +117,8 @@ def _build_row(
         hour, month,
         temperature_c, wind_kmh, precipitation_mm,
         is_school_term, is_uni_term,
-        x, y,
+        trips,
+        lat, lng,
     ]
     if _model_static_cols:
         static = _static_lookup.get(stop_id, {})
