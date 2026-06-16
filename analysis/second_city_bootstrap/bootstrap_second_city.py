@@ -76,8 +76,7 @@ stops["tier"] = np.where(ranks > 2/3, "major",
                 np.where(ranks > 1/3, "medium", "minor"))
 
 # ── 3. Deprivation context: IMD 2019, Manchester LSOAs ───────────────────────
-imd = pd.read_csv(PACK / "imd" / next((PACK / "imd").glob("File_7*.csv")).name
-                  if False else next((PACK / "imd").glob("File_7*.csv")))
+imd = pd.read_csv(next((PACK / "imd").glob("File_7*.csv")))
 la_col = [c for c in imd.columns if "Local Authority District name" in c][0]
 dec_col = [c for c in imd.columns if "Index of Multiple Deprivation (IMD) Decile" in c][0]
 manc = imd[imd[la_col] == "Manchester"]

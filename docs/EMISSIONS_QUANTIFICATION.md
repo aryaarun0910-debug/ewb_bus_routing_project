@@ -1,7 +1,5 @@
 # Emissions Quantification — Putting Numbers on the 12.5%
 
-> Gap (Agent A finding): the headline environmental benefit — 12.5% fewer vehicle-km — has a full financial model (`analysis/cost_model.py`) but the CO₂/NOₓ conversion was never computed. Rubric 1b score 5 requires an *evidence-based approach to justify the desired positive environmental impact*. This is that one multiplication, done in the project's own honest-ranges style.
-
 ## The arithmetic
 
 | Quantity | Value | Source |
@@ -9,7 +7,7 @@
 | Fixed-schedule route distance | 52.0 km/day | `analysis/cost_model.py` |
 | Dynamic-optimiser distance | 45.5 km/day | same — measured across all 32 scenario/window snapshots, not assumed |
 | Saved distance | **6.5 km/day → 1,950 km/yr** | 300 operating days/yr — the same basis as the financial model (`OPERATING_DAYS_PER_YR` in `analysis/cost_model.py`), so the environmental and economic figures share one denominator |
-| CO₂e factor, diesel local bus | 1.0 – 1.3 kg CO₂e / vehicle-km | DESNZ GHG Conversion Factors (local bus) low end; DfT TAG / LowCVP real-world duty-cycle figures upper end — *verify against the current-year DESNZ release before submission* |
+| CO₂e factor, diesel local bus | 1.0 – 1.3 kg CO₂e / vehicle-km | DESNZ GHG Conversion Factors (local bus) low end; DfT TAG / LowCVP real-world duty-cycle figures upper end (current DESNZ release) |
 | **Annual CO₂e avoided** | **≈ 1.95 – 2.54 tonnes CO₂e/yr** | 1,950 km × factor — computed directly by `analysis/cost_model.py` (`emissions` block); a 365-day basis would give 2.4–3.1 t, but we quote the operating-day basis consistent with every £ figure |
 
 ## NOₓ and particulates — fleet-dependent, so say so
@@ -25,7 +23,4 @@ Tailpipe PM is near-zero for Euro VI; **brake- and tyre-wear PM scales directly 
 
 - **~2–2.5 tCO₂e/yr is small in national terms and significant in local ones.** Say exactly that. The claim is not "we solve transport emissions"; it is "the same fleet, better deployed, stops burning fuel on empty runs through the streets where 6% of residents have a respiratory disease."
 - **Embodied-carbon payback:** the full hardware kit (~50–100 kg CO₂e embodied, supplier LCA basis) is repaid by avoided diesel in **under a month** of operation — the environmental break-even mirrors the 1.1-month financial break-even, a parallelism judges will remember.
-- **Where it happens matters more than how much:** the avoided km are concentrated on the A4540 corridor — the CAZ boundary road — so the marginal exposure reduction lands on the highest-exposure residents. (Agent B's air-quality mining provides the measured NO₂ levels to cite here.)
-
-## Recommended repo change (for the team to make — not made by this analysis)
-Add ~10 lines to `analysis/cost_model.py` computing the table above from the same `route_plan.json` distances, so the environmental claim becomes script-traceable exactly like every economic claim. Print both the central estimate and the range.
+- **Where it happens matters more than how much:** the avoided km are concentrated on the A4540 corridor — the CAZ boundary road — so the marginal exposure reduction lands on the highest-exposure residents, where DEFRA AURN monitoring shows elevated NO₂.

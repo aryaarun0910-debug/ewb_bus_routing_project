@@ -6,7 +6,7 @@ demand curves — the first Birmingham-specific shape validation.
 
 For each stop tier (major / medium / minor), computes Spearman rank correlation
 between:
-  - observed median dwell-seconds by hour (from dwell_profiles.csv on the beast)
+  - observed median dwell-seconds by hour (from dwell_profiles.csv via derive_dwell_times.py)
   - model predicted boardings by hour at representative conditions
 
 A positive correlation means the shape of real bus dwell behaviour at Ladywood
@@ -15,11 +15,8 @@ not proof — that the demand shape, though synthetic, captures real signal.
 
 Usage
 -----
-  # Run from the repo root
+  # Run from the repo root; --dwell is required
   py -3 analysis/bods_dwell_correlation.py --dwell <path_to_dwell_profiles.csv>
-
-  # Default path (if running from beast machine):
-  py -3 analysis/bods_dwell_correlation.py
 """
 
 from __future__ import annotations
@@ -34,10 +31,6 @@ from scipy import stats
 
 _REPO = Path(__file__).parent.parent
 
-# Default dwell_profiles.csv location on the beast machine
-_DEFAULT_DWELL = Path(
-    r"C:\Users\aryaa\Documents\EWB Grand Final\beast\beyond\bods_avl\dwell_profiles.csv"
-)
 
 # Model's PROFILE_FN peak demand fractions by tier and hour (weekday)
 # Extracted from generate_map_dataset.py PROFILE_FN definitions
@@ -170,7 +163,7 @@ def run(dwell_path: Path) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dwell", type=Path, default=_DEFAULT_DWELL,
-                        help="Path to dwell_profiles.csv")
+    parser.add_argument("--dwell", type=Path, required=True,
+                        help="Path to dwell_profiles.csv (produced by derive_dwell_times.py)")
     args = parser.parse_args()
     run(args.dwell)

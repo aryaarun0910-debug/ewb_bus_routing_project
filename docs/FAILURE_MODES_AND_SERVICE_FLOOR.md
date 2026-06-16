@@ -1,15 +1,9 @@
 # Failure Modes, Safe Defaults & the Service Floor
 
-**Where this goes:** a new section in `docs/ARCHITECTURE.md` ("Failure modes and safe
-defaults") plus a short constraint note in the optimiser docs. This closes three of the
-four Tier-1 stage-killers from the Achilles audit: the stranded-passenger attack, the
-no-degradation-story gap, and the point-prediction-without-uncertainty worry.
-
-The governing principle, stated once and then everywhere: **the system can only ever
-degrade to the status quo. Its worst failure mode is "today."** That sentence is your
-shield. Today, Ladywood has a static timetable and a dark bus stop. If our model server
-dies, the LoRa hub loses power, or `route_plan.json` corrupts, the passenger sees exactly
-that — a static timetable and a dark stop. Never *worse* than the baseline we're improving.
+The governing principle: **the system can only ever degrade to the status quo. Its worst
+failure mode is "today."** Ladywood currently has a static timetable and a dark bus stop.
+If the model server fails, the LoRa hub loses power, or `route_plan.json` corrupts, the
+passenger sees exactly that — never worse than the baseline being improved.
 
 ---
 
@@ -95,7 +89,7 @@ ironic for a Birmingham-traffic project. The honest answer:
   congestion *is* captured at the coarse band level even though it isn't modelled
   continuously.
 - Live within-window congestion is a **named Phase-2 input**: BODS live vehicle feeds
-  (collector live since 2026-06-12; 4-day AVL archive in `beast/beyond/bods_avl/avl_raw/`)
+  (collector running since 2026-06-12, four-day AVL archive)
   are the data source for dynamic edge costs.
 - State it as a bounded limitation in the assumption log, not an undisclosed gap.
 
@@ -111,12 +105,3 @@ encode them. The defence is genuinely strong but currently lives nobody-knows-wh
   So existing, already-legal duty cards still envelope the optimised routes.
 - Encoding drivers'-hours explicitly is a named next step for the franchised/at-scale phase.
 - One sentence in the assumption log closes it.
-
----
-
-## Repo action summary (each = one commit)
-
-1. New "Failure modes and safe defaults" section + the table → `ARCHITECTURE.md`.
-2. Service-floor constraint stated in optimiser docs (and ideally a feasibility check in `demand_route_optimizer.py`).
-3. CQR interim-safety paragraph → `MODEL_CARD.md`.
-4. Static-travel-time + driver-hours limitations → assumption log (see A15, A16 in `docs/ASSUMPTION_LOG.md`).

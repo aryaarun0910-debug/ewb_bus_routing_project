@@ -53,3 +53,18 @@ simulation/UserSettings/
 # BODS live-data collection (key is personal; raw AVL regenerable)
 .bods_key
 tools/bods_avl/avl_raw/
+data/bods/snapshots/
+
+# Raw census, weather, GEoDS downloads (re-downloadable; large binary/CSV)
+data/census/*.xlsx
+data/weather/*.csv
+data/geods/*.csv
+
+# FPGA compiled output (Quartus generated artefacts)
+legacy/fpga/output_files/
+*.sof
+*.jdi
+*.jditmp
+
+# Internal planning documents
+AUDIT_TODO.md
