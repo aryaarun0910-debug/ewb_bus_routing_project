@@ -47,6 +47,9 @@ All of the following are now live in the repo under `hardware/`:
 | Dashboard: POI dash + metric glossary | Done |
 | `dashboard/demand.py` pkl guard | Done — existence pre-check before load |
 | UART/frame RX hardware | Done — uart_rx.sv, frame_rx.sv correct and clean |
+| `data/school_terms/university_term_calendar.json` | Done — real university calendar committed, fixes is_uni_term dead feature |
+| `analysis/bods_dwell_correlation.py` | Done — BODS dwell analysis script committed (feeds SK5 verification) |
+| MIDAS Winterbourne weather 2023-2024 | Done — real Met Office data committed |
 
 ---
 
@@ -55,32 +58,18 @@ All of the following are now live in the repo under `hardware/`:
 | ID | Priority | Item |
 |----|----------|------|
 | SK5 | STAGE-KILLER | **BODS dwell ATCO mapping — Wed 17 morning.** Run `tools/bods_avl/derive_dwell_times.py` on the pilot-week data. Confirm the ATCO codes in `stop_ranking_observed.json` map correctly to S10 (Ladywood Fire Station) and S12 (Summerfield Park) outranking S07 (Five Ways). If the mapping cannot be confirmed, remove the on-stage dwell claim before the deck freezes. |
-| QW3 | High | **File TfWM APC FOI — today.** Email foi@tfwm.org.uk. Use Wellington FOI 14028 as template. Once sent, update `docs/MODEL_CARD.md`: change "pathway identified; foi@tfwm.org.uk" to "FOI filed [date]". This turns a Q&A weakness into a strength on stage. |
+| QW3 | Dropped | APC data acquisition is a multi-stakeholder next-phase effort, not a single FOI email. Speak to it figuratively on stage as a defined next step. No action required before Finals. |
 | BUG-A1 | Medium | **`dashboard/web/index.html` title is still "web".** Change `<title>web</title>` to `<title>Ladywood Predictive Bus Routing</title>`. One line. |
 | MT3 | Low | **Deck slide 18 CO2 number** — verify it reads "~2–2.5 t" not "2.4–3.1 tCO2e". The cost model computes 1.95–2.54 t on the 300-day basis. |
 | MT5 | All team | **End-to-end dry-run — Tue 17 (Jack owns logistics).** Dashboard at :8000 + Living Twin UART path or replay fallback + deck in order + spoken answers timed. Nothing first-attempted on stage. |
 
 ---
 
-## OPEN — CHRIS (two critical checks, one build gap)
+## OPEN — CHRIS
 
-### Critical 1 — verify SW9 actually routes live_regs to the display
+### Architecture note (confirmed Mon 16 Jun)
 
-**`hardware/fpga/latencyZeroFPGA.sv` SW9 semantic needs verification.**
-
-The scrape found SW9 controls auto-cycling of scenario/timeslot (`eff_sc = SW[9] ? auto_sc : SW[1:0]`). Build spec says SW9 should mux between ROM snapshot and live `stop_regs` from `frame_rx`. These are different behaviours. Before the bench test, confirm that `stop_regs` from `frame_rx` actually feed the display colour logic — not just echo back out via `uart_tx`. If `stop_regs` bypass the colour ROM entirely, the live-data path is unconnected on screen even though the UART plumbing is correct.
-
-### Critical 2 — hub.py is a simulation hub, not a BODS poller
-
-**`hardware/raspberry_pi/hub.py` does not poll BODS.**
-
-The committed hub.py is a bidirectional ROM-matching loop: it reads 0xBB demand frames back from the FPGA, matches them to identify the active scenario/timeslot, and repositions bus objects locally. It does not call the BODS SIRI-VM feed, does not haversine-snap real vehicle positions, and does not send real-bus-position 0xAA frames. The "Living Twin" as committed shows the ROM animation with UART echo, not real buses from the live feed.
-
-**Decision for Chris before Tue dry-run:**
-- If the demo plan is "UART-bridged ROM animation with UDP broadcast to Arduino" — the committed hub.py is correct and the demo is coherent. Relabel it honestly on stage: "live UART bridge between Pi and FPGA — real BODS integration is the next phase."
-- If the demo plan requires showing a real bus on Dudley Road move the LED — hub.py needs the BODS poll + haversine snap added before Mon night.
-
-Either way, the UART architecture is sound. This is a scoping question, not a bug.
+The FPGA is a demand ROM + UART bridge, not a display controller. Display colour is the Arduino's job. hub.py is a closed simulation by design — it reads 0xBB demand frames from the FPGA via UART, then UDP-broadcasts to the Arduino (10.42.0.255:4210) which drives the LED colours. This is correct and coherent. The two "critical" flags raised in the earlier audit were based on a misread of the architecture — both are cleared.
 
 ### Remaining build items
 
@@ -107,9 +96,9 @@ Either way, the UART architecture is sound. This is a scoping question, not a bu
 
 | ID | Status | Answer brief |
 |----|--------|--------------|
-| RH1 | [ ] | **"R² is circular — you trained on synthetic data."** Concede; reframe R² as pipeline capability, not forecast accuracy. Anchor chain: BUSTO shape r=0.945 → smartcard absolute levels → real Open-Meteo weather → weekend divergence we caught and corrected → FOI filed [date]. Script in `beast/hardening/CIRCULARITY_REBUTTAL.md`. |
+| RH1 | [ ] | **"R² is circular — you trained on synthetic data."** Concede; reframe R² as pipeline capability, not forecast accuracy. Anchor chain: BUSTO shape r=0.945 → smartcard absolute levels → real Open-Meteo weather → weekend divergence we caught and corrected → real APC is the defined next phase. Script in `beast/hardening/CIRCULARITY_REBUTTAL.md`. |
 | RH2 | [ ] | **"Worst-case optimality gap?"** 30.2% on one route. Mean 1.16% — but deflated because brute-force optimal only computed for routes ≤8 stops; harder routes compare to themselves. Honest framing: greedy+2-opt is a practical heuristic, not an exact solver. |
-| RH3 | [ ] | **"Why not APC data?"** Not publicly available in UK. TfWM APC is proprietary ETM. FOI filed [date]. Wellington NZ Metlink used for hour-of-day shape validation: r=0.945 on comparable tier stops. |
+| RH3 | [ ] | **"Why not APC data?"** Not publicly available in UK — TfWM APC is proprietary ETM data, not released under open data obligations. Wellington NZ Metlink used for hour-of-day shape validation: r=0.945 on comparable tier stops. Real APC integration is the defined next phase, requiring a data-sharing agreement with TfWM, not just a request. |
 | RH4 | [ ] | **"Your display can be spoofed."** AES-128-CMAC on every LoRa packet. Monotonic frame counter drops replays. Fail-dark on bad MAC or stale counter — blank display is honest, a lying one is not. People who most depend on it are least able to catch a lie. |
 | RH5 | [ ] | **"BODS is down on the day?"** Replay fallback: pre-recorded snapshot at 60x. FPGA staleness watchdog fires after 60 s → amber pulse. Dashboard always shows route_plan.json predictions regardless. |
 | RH6 | [ ] | **"Driver hours fall but drivers are stakeholders — you're cutting jobs."** Saving is fuel and dead-mileage on same duties, not headcount. Driver count unchanged; optimisation eliminates unnecessary dead kilometres. Full reconciliation in `docs/DRIVER_INTERFACE.md §3`. |
@@ -140,5 +129,4 @@ These items are done in the repo but still marked open in AUDIT_TODO.md — chec
 - Wire pytest into CI (ci.yml currently runs compileall only)
 - Hyperparameter search for XGBoost (all params currently manual)
 - SHAP values in `analysis/explainability.py`
-- Fix `is_uni_term = is_term` with a real university calendar
-- Fix `is_uni_term` toggle missing in ConditionsPanel
+- Fix `is_uni_term` toggle missing in ConditionsPanel (calendar is now committed, just needs wiring into UI)
