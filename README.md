@@ -107,7 +107,7 @@ We then mined as much **real, openly-licensed data** as exists for Ladywood (see
 | Weather | Sampled from a hand-built monthly probability table | Real Open-Meteo hourly archive — actual recorded conditions per hour |
 | School terms | Fixed flag per calendar month | Real Birmingham term + bank-holiday calendar, per real date |
 | Per-stop demand level | Hand-picked `base` value per importance tier | Anchored to real ENCTS concessionary smartcard journey volumes (UCL/GEoDS, TfWM-linked) |
-| Static features | `stop_x`, `stop_y`, `stop_importance` only | + `imd_score`, `poi_total`, `population`, `crime_total_2024`, `elevation_m` — all real, all per-stop |
+| Static features | `stop_x`, `stop_y`, `stop_importance` only | + `imd_score`, `poi_total`, `population`, `elevation_m` — all real, all per-stop (`crime_total_2024` tested and excluded — see `analysis/crime_ablation/`) |
 | Demand model R² | 0.940 (RMSE 4.3), random 80/20 split | 0.9421 (RMSE 4.13), **temporal split** — train on 2023, test on unseen 2024 |
 | What still isn't real | Everything (no observed boardings exist for these stops) | Hour-of-day demand *shape* and one-off special events — no public per-hour boarding curves or event logs exist; this is the honest residual gap (see [Caveats](#caveats)) |
 
@@ -266,7 +266,7 @@ Every number quoted in this README traces back to a script you can run yourself 
 | **Birmingham school term & bank holiday calendar** | **Birmingham City Council term dates + GOV.UK bank holidays API** | **Real `is_school_term` flag for every training row (was a fixed monthly synthetic flag)** |
 | IMD 2019 | MHCLG | Stop-level deprivation scoring + ML feature (`imd_score`) |
 | OSM Overpass API | OpenStreetMap | POI density per stop (hospitals, schools, workplaces, shops) — ML feature (`poi_total`) |
-| data.police.uk | UK Police open data | Street crime counts per stop, 2024 — ML feature (`crime_total_2024`) |
+| data.police.uk | UK Police open data | Street crime counts per stop, 2024 — displayed as area context only, not a model feature (ablation: rank 16/20, importance 0.000279 — see `analysis/crime_ablation/`) |
 | Open-Meteo Elevation API | Open-Meteo (SRTM 90m) | Stop elevation — ML feature (`elevation_m`) |
 | Census 2021 (TS007/TS045/TS058/TS061/TS062) | ONS | Age structure, car-free household rate, working-age population, commuting patterns |
 | DfT BUS0101/BUS0102/BUS09 | Department for Transport | Regional bus statistics — punctuality, patronage trends, vehicle-km |
@@ -282,7 +282,7 @@ Every number quoted in this README traces back to a script you can run yourself 
 True commercial stop-route boarding counts are **not publicly released** by TfWM (we asked the question directly — see [Data Sources](#data-sources)). `generate_real_demand_dataset.py` therefore builds the training set from real, openly-licensed inputs wherever they exist:
 
 - **Real exogenous variables** — every row uses observed Birmingham weather (Open-Meteo hourly archive, 2023–2024), the real school-term/bank-holiday calendar, and storm flags derived from observed conditions, in place of the original sampled distributions.
-- **Real demand anchor** — each stop's relative demand level is now set from its real ENCTS concessionary smartcard journey volume (UCL/GEoDS, TfWM-linked, 2010–2016) rather than a hand-picked synthetic `base` value, with IMD/POI/crime/elevation added as genuine per-stop ML features.
+- **Real demand anchor** — each stop's relative demand level is now set from its real ENCTS concessionary smartcard journey volume (UCL/GEoDS, TfWM-linked, 2010–2016) rather than a hand-picked synthetic `base` value, with IMD/POI/elevation added as genuine per-stop ML features (crime excluded after ablation — rank 16/20, importance 0.000279).
 - **Still synthetic** — the *hour-of-day demand shape* (commuter-peak curves) and one-off *special events* (festivals, road closures) remain modelled, since no public per-hour boarding curves or event logs exist for these stops. This is the honest residual gap, and the reason R² = 0.9421 should still be read as *self-consistency with a realistically-anchored generator*, not validated real-world accuracy.
 
 GTFS validation (`analysis/gtfs_validate.py`) compares the model's temporal pattern against real service frequency — see [`docs/MODEL_CARD.md`](docs/MODEL_CARD.md) and [`analysis/outputs/gtfs_validation.json`](analysis/outputs/gtfs_validation.json) for the full discussion.

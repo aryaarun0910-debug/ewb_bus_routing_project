@@ -61,7 +61,7 @@ FUEL_POVERTY_PCT            = 26.6      # CIVIC SQUARE Doughnut Portrait 2022
 
 # Fleet & operations
 N_BUSES                = 3
-BUS_CAPACITY           = 40            # passengers (matches demand_route_optimizer.py)
+BUS_CAPACITY           = 40            # passengers per vehicle (single-decker capacity)
 OPERATING_DAYS_PER_YR  = 300           # excluding bank holidays + reduced Sunday service
 
 # Fixed-schedule route lengths (km), estimated from real TfWM GTFS stop sequences

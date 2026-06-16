@@ -23,9 +23,9 @@ data nobody publishes for Ladywood itself.
 > assume — so our service floor matters more, not less. Wellington — true passenger
 > counts, the other side of the planet — says r = 0.96. And then we measured the actual
 > buses on our own corridors for four days through the government's open data feed.
-> 124,000 clean observations. Ladywood Fire Station and Summerfield Park — both minor-tier
-> in the model — are showing higher observed dwell than Five Ways Station. That's exactly
-> what the service floor is there to catch."
+> Around 82,000 observations a day. Ladywood Fire Station and Summerfield Park — both
+> minor-tier in the model — are showing higher observed dwell than Five Ways Station.
+> That's exactly what the service floor is there to catch."
 
 ## What changed in the repo (completed)
 

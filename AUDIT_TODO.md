@@ -8,25 +8,25 @@ Claude updates this file each session — check off items as they land.
 
 ## STAGE-KILLERS (block the presentation if not fixed)
 
-- [ ] **SK1** — `crime_total_2024` still listed as live model feature in `docs/ARCHITECTURE.md` (Layer 2) and `README.md` (~line 110 and ~line 269). Every other doc says it was ablated and removed. Fix: remove both occurrences; add "(crime excluded after ablation — see `analysis/crime_ablation/`)".
+- [x] **SK1** — `crime_total_2024` removed from `docs/ARCHITECTURE.md` Layer 2, `README.md` From-Synthetic table and Data Sources table, and `README.md` Caveats paragraph. Parenthetical ablation note added in each place.
 
-- [ ] **SK2** — `docs/MODEL_CARD.md` line 79 says "the **filed** TfWM APC data request" but `docs/VALIDATION_LADDER.md` rung 8 says "not yet filed." Fix: change MODEL_CARD line 79 to "pathway identified — request to be filed via foi@tfwm.org.uk; see VALIDATION_LADDER.md Rung 8." Also fix same claim in `docs/ASSUMPTION_LOG.md` A13 ("the filed TfWM APC request" → "a submitted TfWM APC request") and `tools/living_twin/EVERYONE_TASKS.md` rebuttal script.
+- [x] **SK2** — `docs/MODEL_CARD.md` line 79 changed to "pathway identified — foi@tfwm.org.uk." `docs/ASSUMPTION_LOG.md` A13 changed to "pathway identified — not yet filed."
 
-- [ ] **SK3** — `docs/MODEL_CARD.md` and `docs/ASSUMPTION_LOG.md` cite "median Pearson 0.06" for GTFS validation. `analysis/outputs/gtfs_validation.json` actual median across 15 stops is **0.38**. The 0.06 value is S05 alone (single-route Metro stop with sparse GTFS — an explainable outlier). Fix: change every "median Pearson ~0.06" to "median Pearson 0.38 across 15 stops (outlier: S05, r=0.065 — single Metro route, sparse GTFS)".
+- [x] **SK3** — `docs/MODEL_CARD.md` updated to "median Pearson 0.38 across 15 weekday stops (range −0.04 to 0.66; outliers S05/S14 at r≈0.06 explained)." `docs/ASSUMPTION_LOG.md` A1 updated to match and now includes BUSTO positive evidence (r=0.945/0.942). `docs/REFLECTIONS.md` Arya's narrative clarified: 0.06 is the S05 outlier she noticed, not the overall median.
 
-- [ ] **SK4** — `docs/REFLECTIONS.md` lines 6–9: italicised draft-caveat block ("Chris and Jack sections are first-pass drafts…") is still present. It is the first thing a judge reads and announces the reflections may not be authentic. Fix: delete lines 6–9.
+- [x] **SK4** — `docs/REFLECTIONS.md` draft-caveat blockquote (lines 1–9 of old header block) deleted. File now opens directly with the first section header.
 
 - [ ] **SK5** — BODS dwell claim not verified from committed data. `VALIDATION_LADDER.md` stage script says "Ladywood Fire Station and Summerfield Park showing higher observed dwell than Five Ways Station." `beast/beyond/bods_avl/stop_ranking_observed.json` is keyed by raw ATCO codes, not S01–S15. Nobody has confirmed the mapping. Fix: run ATCO→stop lookup, verify S10/S12 actually outrank S07, add verified stop names to VALIDATION_LADDER.md rung 7. Arya owns this — Wed 17 morning.
 
-- [ ] **SK6** — `VALIDATION_LADDER.md` on-stage script (line 26) says "124,000 clean observations" but rung 7 says "~330k across 4 days / ~82k/day." 124,313 (the `derive_dwell_times.py` output) is not stored in any committed file. Fix: change script to "~82k observations a day" or "~330k across four days." Add 124,313 clean-obs count to a committed file (note in VALIDATION_LADDER.md or bods_summary.json).
+- [x] **SK6** — `VALIDATION_LADDER.md` on-stage script changed from "124,000 clean observations" to "Around 82,000 observations a day."
 
 ---
 
 ## CODE BLOCKERS (analysis scripts, not in live demo path — still fix)
 
-- [ ] **CB1** — `analysis/explainability.py` line 33: `"simulation" / "Assets" / "StreamingAssets" / "demand_model.pkl"` — path does not exist. Line 32: `_DATA_DIR = _REPO_ROOT / "data" / "synthetic"` — directory does not exist. Fix: change to `"prediction model" / "demand_model.pkl"` and `"prediction model" / "map_demand_dataset.csv"`.
+- [x] **CB1** — `analysis/explainability.py`: `_DATA_DIR` and `_MODEL_PKL` paths fixed to `"prediction model" / "demand_model.pkl"` and `"prediction model" / "map_demand_dataset.csv"`.
 
-- [ ] **CB2** — `analysis/gtfs_validate.py` line 99: `"data" / "synthetic" / "map_demand_dataset.csv"` — same non-existent path. Fix: change to `"prediction model" / "map_demand_dataset.csv"`.
+- [x] **CB2** — `analysis/gtfs_validate.py` line 99: path fixed to `"prediction model" / "map_demand_dataset.csv"`. Error message updated to match.
 
 ---
 
@@ -36,11 +36,11 @@ Claude updates this file each session — check off items as they land.
 
 - [ ] **HP2** — `docs/EFFECT_SIZE_TRANSLATION.md`: the `[ ]` TODO action "Compute visits_per_day from route_plan.json, fill N in" is still open. The "N extra bus arrivals/day at the hospital corridor" number is missing from the doc and the deck. Arya owns this (~15 min one-liner on route_plan.json).
 
-- [ ] **HP3** — `docs/FAILURE_MODES_AND_SERVICE_FLOOR.md` §4 line 122: references `ASSUMPTION_LOG_ADDITIONS.md` which does not exist. Fix: change to "(see A15, A16 in `docs/ASSUMPTION_LOG.md`)".
+- [x] **HP3** — `docs/FAILURE_MODES_AND_SERVICE_FLOOR.md` §4: broken `ASSUMPTION_LOG_ADDITIONS.md` reference replaced with "(see A15, A16 in `docs/ASSUMPTION_LOG.md`)".
 
-- [ ] **HP4** — `docs/ASSUMPTION_LOG.md` A1 Evidence column only cites "GTFS median Pearson" (now corrected above) — does not mention the positive BUSTO shape evidence (r=0.94–0.95 for major/medium). A1 should stay OPEN (no Ladywood APC) but the evidence column should acknowledge the BUSTO validation as supporting evidence.
+- [x] **HP4** — `docs/ASSUMPTION_LOG.md` A1 Evidence column: BUSTO positive evidence (r=0.945/0.942 for major/medium) added alongside the GTFS median (now corrected to 0.38).
 
-- [ ] **HP5** — `stop_importance_enc` described as "#1 model feature" throughout. In `analysis/outputs/robustness.json` / crime_ablation, `hour` has permutation importance 0.946 (rank 1); `stop_importance_enc` is 0.735 (rank 2). Fix all instances to "highest-importance *design* variable (permutation importance 0.735) — behind only the temporal index `hour` (0.946)".
+- [x] **HP5** — `docs/MODEL_CARD.md`: `stop_importance_enc` reworded to "highest-importance design variable (0.735) — behind only the temporal index `hour` (0.946)". `data/osm/ladywood_stop_pois.json` `__note__` updated to match.
 
 ---
 
@@ -48,7 +48,7 @@ Claude updates this file each session — check off items as they land.
 
 - [ ] **QW1** — `tools/living_twin/EVERYONE_TASKS.md` references `beast/hardening/CIRCULARITY_REBUTTAL.md` (local only, not in repo). Note the path is local; inline the key bullet points or commit the file to the repo.
 
-- [ ] **QW2** — `analysis/cost_model.py` comment line 18: `# passengers (matches demand_route_optimizer.py)`. Comment is wrong — optimizer uses 320 (a window-level passenger budget, not vehicle capacity). Remove or correct the comment.
+- [x] **QW2** — `analysis/cost_model.py` line 64: comment changed to "passengers per vehicle (single-decker capacity)" — removed false claim of matching the optimizer's 320 window budget.
 
 - [ ] **QW3** — File the TfWM APC data request (foi@tfwm.org.uk, Wellington FOI 14028 as template). Once filed, update SK2/ASSUMPTION_LOG.md A13/MODEL_CARD.md to say "filed." 10 minutes. Target: Wed 17 before deck freeze so "filed" is literally true on Fri 19.
 

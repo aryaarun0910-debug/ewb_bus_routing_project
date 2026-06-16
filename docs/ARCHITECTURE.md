@@ -27,7 +27,9 @@ Builds a 263k-row training table (every real day in the 2023–24 weather
 archive × every Ladywood stop × every hour) by joining the ingested sources,
 then trains an XGBoost regressor to predict `boardings` per stop per hour.
 Static per-stop features (`imd_score`, `poi_total`, `population`,
-`crime_total_2024`, `elevation_m`) are real; the demand-shape curve and
+`elevation_m`) are real (`crime_total_2024` was tested and excluded — see
+`analysis/crime_ablation/CRIME_ABLATION.md`, rank 16/20, importance 0.000279);
+the demand-shape curve and
 special-event modelling remain synthetic (see [Caveats](../README.md#caveats) —
 this is the project's most important honesty disclosure and the reason R² is
 reported as *self-consistency with a realistically-anchored generator* rather

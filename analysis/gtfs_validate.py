@@ -96,10 +96,10 @@ def load_synthetic_demand() -> dict[str, dict[str, dict[str, float]]]:
     Averaged over all rows in the synthetic dataset (ignoring weather/event variation
     to get the underlying temporal signal).
     """
-    path = _REPO / "data" / "synthetic" / "map_demand_dataset.csv"
+    path = _REPO / "prediction model" / "map_demand_dataset.csv"
     if not path.exists():
         raise FileNotFoundError(
-            f"{path} not found — run 'python prediction model/generate_map_dataset.py' first."
+            f"{path} not found — run 'python \"prediction model/generate_map_dataset.py\"' first."
         )
 
     time_window_for_hour: dict[int, str] = {}

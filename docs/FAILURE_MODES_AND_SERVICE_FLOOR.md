@@ -119,4 +119,4 @@ encode them. The defence is genuinely strong but currently lives nobody-knows-wh
 1. New "Failure modes and safe defaults" section + the table → `ARCHITECTURE.md`.
 2. Service-floor constraint stated in optimiser docs (and ideally a feasibility check in `demand_route_optimizer.py`).
 3. CQR interim-safety paragraph → `MODEL_CARD.md`.
-4. Static-travel-time + driver-hours limitations → assumption log (see `ASSUMPTION_LOG_ADDITIONS.md`).
+4. Static-travel-time + driver-hours limitations → assumption log (see A15, A16 in `docs/ASSUMPTION_LOG.md`).

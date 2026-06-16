@@ -37,7 +37,7 @@ Counting (APC) data feed (see [Caveats](#known-limitations--the-honest-gap)).
 | Weather (2023–24, hourly) | **Real** | Open-Meteo historical archive |
 | School/university term dates | **Real (school only)** | Birmingham LA term + bank-holiday calendars. Note: `is_uni_term` is set equal to `is_school_term` in the training data — no independent university calendar was sourced. The two features are perfectly collinear at training time; the model cannot distinguish between them. The dashboard exposes a single "School / university term" toggle and mirrors it to both model inputs |
 | Per-stop demand anchor | **Real** | UCL/GEoDS ENCTS concessionary smartcard journey volumes, TfWM-linked, 2010–2016 |
-| `stop_importance` (major / medium / minor) — **#1 model feature** | **Operational tier (hand-set)** | Route-convergence and interchange role, set in `ladywood_display.py`. Measures operational significance (how many routes converge, is it a named interchange). Distinct from `derived_tier` in `data/osm/ladywood_stop_pois.json`, which is a relative POI-density tertile (bottom/middle/top third by OSM poi_score). The two differ for transport-node stops where route density ≠ commercial density — e.g. S07 Five Ways Station is operationally major (3 routes converge) but poi_score is moderate; S05 Five Ways Metro is operationally minor (1 route) but poi_score is top-third. `stop_importance_enc` has permutation importance 0.735 — the highest of all 20 features |
+| `stop_importance` (major / medium / minor) — **#1 design variable** | **Operational tier (hand-set)** | Route-convergence and interchange role, set in `ladywood_display.py`. Measures operational significance (how many routes converge, is it a named interchange). Distinct from `derived_tier` in `data/osm/ladywood_stop_pois.json`, which is a relative POI-density tertile (bottom/middle/top third by OSM poi_score). The two differ for transport-node stops where route density ≠ commercial density — e.g. S07 Five Ways Station is operationally major (3 routes converge) but poi_score is moderate; S05 Five Ways Metro is operationally minor (1 route) but poi_score is top-third. `stop_importance_enc` permutation importance = 0.735 — the highest of any *design* variable; the temporal index `hour` ranks above it at 0.946 |
 | Per-stop static **model** features (`imd_score`, `poi_total`, `population`, `elevation_m`) | **Real** | IMD 2019, OSM, ONS Census 2021, elevation API |
 | `crime_total_2024` — **displayed as context, NOT a model feature** | **Real** | police.uk. Deliberately excluded from the model: an ablation (`analysis/crime_ablation/`) showed it carried no signal (R² 0.9418 → 0.9421 *without* it) and it risks inheriting policing bias. Surfaced in the dashboard as caveated area context only |
 | **Hour-of-day demand shape** (weekday commuter peaks; weekend midday peak) | **Synthetic (weekday) / observed-shape (weekend)** | Weekday curves modelled; weekend curves now follow the empirically-observed TfL BUSTO midday-peak shape (A12 resolved) |
@@ -76,7 +76,7 @@ now *derived* directly from three years of TfL BUSTO Saturday/Sunday boardings
 curves that correlated at only r = 0.55–0.68. Because the current shapes are derived
 from the same data they'd be tested against, r ≈ 1.0 holds by construction; the
 independent check is shape stability (r ≥ 0.998 across all three years). The final
-link — observed Ladywood boardings — is the filed TfWM APC data request.
+link — observed Ladywood boardings — is a TfWM APC data request (pathway identified; foi@tfwm.org.uk — see VALIDATION_LADDER.md Rung 8).
 
 ## Robustness — six independent checks (full data: [`robustness.json`](../analysis/outputs/robustness.json))
 
@@ -112,13 +112,17 @@ central honesty disclosure (also covered in the README's
 A second, related check — `analysis/gtfs_validate.py`, comparing the model's
 predicted hour-of-day demand *shape* per stop against real TfWM GTFS service
 frequency as a proxy for ridership pattern — returns a **median Pearson
-correlation of 0.06** across the 45 stop/day-type combinations evaluated (full
-data: [`gtfs_validation.json`](../analysis/outputs/gtfs_validation.json)). We
-report this number plainly rather than omit it: it confirms that *service
-frequency* is a weak proxy for *ridership shape* at this resolution (operators
-set timetables on more than just measured demand — political, contractual, and
-historical constraints all play in), and it underlines why the anchor-based,
-not shape-validated, framing above is the correct one to present. **The path
+correlation of 0.38 across 15 weekday stop combinations** (full data:
+[`gtfs_validation.json`](../analysis/outputs/gtfs_validation.json); range:
+−0.04 to 0.66). Two outlier stops — S05 Five Ways Metro (r=0.065) and S14
+Mencap Centre (r=0.059) — are single-route or low-frequency stops where GTFS
+has sparse departure data, making the correlation unstable; at all other stops
+the correlation is positive. We report this number plainly rather than omit it:
+it confirms that *service frequency* is a weak proxy for *ridership shape* at
+this resolution (operators set timetables on more than just measured demand —
+political, contractual, and historical constraints all play in), and it
+underlines why the anchor-based, not shape-validated, framing above is the
+correct one to present. **The path
 to closing this gap is a direct TfWM Automatic Passenger Counting (APC) data
 request or a manual stop-level traffic survey** — see
 [Caveats](../README.md#caveats) for the full discussion of next steps.

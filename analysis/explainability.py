@@ -29,9 +29,9 @@ from pathlib import Path
 # ── Path setup ─────────────────────────────────────────────────────────────────
 _REPO_ROOT   = Path(__file__).parent.parent
 _MODEL_DIR   = _REPO_ROOT / "prediction model"
-_DATA_DIR    = _REPO_ROOT / "data" / "synthetic"
-_MODEL_PKL   = _REPO_ROOT / "simulation" / "Assets" / "StreamingAssets" / "demand_model.pkl"
-_DATASET_CSV = _DATA_DIR / "map_demand_dataset.csv"
+_DATA_DIR    = _MODEL_DIR
+_MODEL_PKL   = _MODEL_DIR / "demand_model.pkl"
+_DATASET_CSV = _MODEL_DIR / "map_demand_dataset.csv"
 
 sys.path.insert(0, str(_MODEL_DIR))
 

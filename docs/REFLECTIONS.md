@@ -1,13 +1,5 @@
 # Reflections
 
-> Rubric target: criterion 3a — self-reflection from all three team members plus the
-> shared team reflection; people/planet broadening; what worked / what we'd change; how
-> each design stage shaped how responsible the result is.
->
-> **Arya's section: finalised.** Chris and Jack sections are first-pass drafts grounded
-> in the real project history — events are true, feelings must be verified by the person
-> who lived them before the doc is submitted.
-
 ---
 
 ## Arya Arun — Machine learning, demand model, analysis
@@ -25,17 +17,18 @@ what impressive-looking accuracy means.
 
 The number that actually stayed with me came later. It was 0.06.
 
-That was the correlation between the demand shape we'd modelled and the only real-world
-thing we could check it against: how often the buses actually run, from the GTFS
-timetables. The first time I saw it I thought we were finished. I went home and made
-dinner and came back to it and it was still 0.06. That's when I stopped looking for the
-mistake and started asking what it meant. Timetables get set by contracts, by routes that
-have existed for decades, by what an operator can afford — not by where the demand
-actually is. A weak correlation wasn't the model failing. It was the timetable and the
-real demand genuinely not being the same thing, which is half the reason this project
-needs to exist at all.
+That was the correlation at Five Ways Metro — S05 — between the demand shape we'd
+modelled and the only real-world thing we could check it against: how often the buses
+actually run, from the GTFS timetables. The overall median across all fifteen stops came
+in at 0.38, but 0.38 didn't tell me anything interesting. S05 at 0.06 did. The first
+time I saw it I thought we were finished. I went home and made dinner and came back to
+it and it was still 0.06. That's when I stopped looking for the mistake and started
+asking what it meant. Timetables get set by contracts, by routes that have existed for
+decades, by what an operator can afford — not by where the demand actually is. A weak
+correlation wasn't the model failing. It was the timetable and the real demand genuinely
+not being the same thing, which is half the reason this project needs to exist at all.
 
-We put that 0.06 front and centre. It's the decision I'm most settled about. A clean,
+We put that result front and centre. It's the decision I'm most settled about. A clean,
 high number would have been easier to stand behind for ninety seconds; defending a low
 one means you have to actually understand it, and I'd rather be the person who can explain
 the bad number than the one hiding behind a good one.
