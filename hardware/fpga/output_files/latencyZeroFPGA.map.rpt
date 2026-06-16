@@ -1,0 +1,598 @@
+Analysis & Synthesis report for latencyZeroFPGA
+Mon Jun 15 08:57:45 2026
+Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Analysis & Synthesis Summary
+  3. Analysis & Synthesis Settings
+  4. Parallel Compilation
+  5. Analysis & Synthesis Source Files Read
+  6. Analysis & Synthesis Resource Usage Summary
+  7. Analysis & Synthesis Resource Utilization by Entity
+  8. State Machine - |latencyZeroFPGA|uart_tx:u_tx|state
+  9. State Machine - |latencyZeroFPGA|frame_rx:u_frame|state
+ 10. State Machine - |latencyZeroFPGA|uart_rx:u_rx|state
+ 11. Registers Removed During Synthesis
+ 12. General Register Statistics
+ 13. Inverted Register Statistics
+ 14. Multiplexer Restructuring Statistics (Restructuring Performed)
+ 15. Port Connectivity Checks: "frame_rx:u_frame"
+ 16. Post-Synthesis Netlist Statistics for Top Partition
+ 17. Elapsed Time Per Partition
+ 18. Analysis & Synthesis Messages
+ 19. Analysis & Synthesis Suppressed Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 2025  Altera Corporation. All rights reserved.
+Your use of Altera Corporation's design tools, logic functions 
+and other software and tools, and any partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Altera Program License 
+Subscription Agreement, the Altera Quartus Prime License Agreement,
+the Altera IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Altera and sold by Altera or its authorized distributors.  Please
+refer to the Altera Software License Subscription Agreements 
+on the Quartus Prime software download page.
+
+
+
++-----------------------------------------------------------------------------------+
+; Analysis & Synthesis Summary                                                      ;
++---------------------------------+-------------------------------------------------+
+; Analysis & Synthesis Status     ; Successful - Mon Jun 15 08:57:45 2026           ;
+; Quartus Prime Version           ; 25.1std.0 Build 1129 10/21/2025 SC Lite Edition ;
+; Revision Name                   ; latencyZeroFPGA                                 ;
+; Top-level Entity Name           ; latencyZeroFPGA                                 ;
+; Family                          ; Cyclone V                                       ;
+; Logic utilization (in ALMs)     ; N/A                                             ;
+; Total registers                 ; 483                                             ;
+; Total pins                      ; 103                                             ;
+; Total virtual pins              ; 0                                               ;
+; Total block memory bits         ; 0                                               ;
+; Total DSP Blocks                ; 0                                               ;
+; Total HSSI RX PCSs              ; 0                                               ;
+; Total HSSI PMA RX Deserializers ; 0                                               ;
+; Total HSSI TX PCSs              ; 0                                               ;
+; Total HSSI PMA TX Serializers   ; 0                                               ;
+; Total PLLs                      ; 0                                               ;
+; Total DLLs                      ; 0                                               ;
++---------------------------------+-------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Settings                                                                                             ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+; Option                                                                          ; Setting            ; Default Value      ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+; Device                                                                          ; 5CSEMA5F31C6       ;                    ;
+; Top-level entity name                                                           ; latencyZeroFPGA    ; latencyZeroFPGA    ;
+; Family name                                                                     ; Cyclone V          ; Cyclone V          ;
+; Use smart compilation                                                           ; Off                ; Off                ;
+; Enable parallel Assembler and Timing Analyzer during compilation                ; On                 ; On                 ;
+; Enable compact report table                                                     ; Off                ; Off                ;
+; Restructure Multiplexers                                                        ; Auto               ; Auto               ;
+; MLAB Add Timing Constraints For Mixed-Port Feed-Through Mode Setting Don't Care ; Off                ; Off                ;
+; Create Debugging Nodes for IP Cores                                             ; Off                ; Off                ;
+; Preserve fewer node names                                                       ; On                 ; On                 ;
+; Intel FPGA IP Evaluation Mode                                                   ; Enable             ; Enable             ;
+; Verilog Version                                                                 ; Verilog_2001       ; Verilog_2001       ;
+; VHDL Version                                                                    ; VHDL_1993          ; VHDL_1993          ;
+; State Machine Processing                                                        ; Auto               ; Auto               ;
+; Safe State Machine                                                              ; Off                ; Off                ;
+; Extract Verilog State Machines                                                  ; On                 ; On                 ;
+; Extract VHDL State Machines                                                     ; On                 ; On                 ;
+; Ignore Verilog initial constructs                                               ; Off                ; Off                ;
+; Iteration limit for constant Verilog loops                                      ; 5000               ; 5000               ;
+; Iteration limit for non-constant Verilog loops                                  ; 250                ; 250                ;
+; Add Pass-Through Logic to Inferred RAMs                                         ; On                 ; On                 ;
+; Infer RAMs from Raw Logic                                                       ; On                 ; On                 ;
+; Parallel Synthesis                                                              ; On                 ; On                 ;
+; DSP Block Balancing                                                             ; Auto               ; Auto               ;
+; NOT Gate Push-Back                                                              ; On                 ; On                 ;
+; Power-Up Don't Care                                                             ; On                 ; On                 ;
+; Remove Redundant Logic Cells                                                    ; Off                ; Off                ;
+; Remove Duplicate Registers                                                      ; On                 ; On                 ;
+; Ignore CARRY Buffers                                                            ; Off                ; Off                ;
+; Ignore CASCADE Buffers                                                          ; Off                ; Off                ;
+; Ignore GLOBAL Buffers                                                           ; Off                ; Off                ;
+; Ignore ROW GLOBAL Buffers                                                       ; Off                ; Off                ;
+; Ignore LCELL Buffers                                                            ; Off                ; Off                ;
+; Ignore SOFT Buffers                                                             ; On                 ; On                 ;
+; Limit AHDL Integers to 32 Bits                                                  ; Off                ; Off                ;
+; Optimization Technique                                                          ; Balanced           ; Balanced           ;
+; Carry Chain Length                                                              ; 70                 ; 70                 ;
+; Auto Carry Chains                                                               ; On                 ; On                 ;
+; Auto Open-Drain Pins                                                            ; On                 ; On                 ;
+; Perform WYSIWYG Primitive Resynthesis                                           ; Off                ; Off                ;
+; Auto ROM Replacement                                                            ; On                 ; On                 ;
+; Auto RAM Replacement                                                            ; On                 ; On                 ;
+; Auto DSP Block Replacement                                                      ; On                 ; On                 ;
+; Auto Shift Register Replacement                                                 ; Auto               ; Auto               ;
+; Allow Shift Register Merging across Hierarchies                                 ; Auto               ; Auto               ;
+; Auto Clock Enable Replacement                                                   ; On                 ; On                 ;
+; Strict RAM Replacement                                                          ; Off                ; Off                ;
+; Allow Synchronous Control Signals                                               ; On                 ; On                 ;
+; Force Use of Synchronous Clear Signals                                          ; Off                ; Off                ;
+; Auto Resource Sharing                                                           ; Off                ; Off                ;
+; Allow Any RAM Size For Recognition                                              ; Off                ; Off                ;
+; Allow Any ROM Size For Recognition                                              ; Off                ; Off                ;
+; Allow Any Shift Register Size For Recognition                                   ; Off                ; Off                ;
+; Use LogicLock Constraints during Resource Balancing                             ; On                 ; On                 ;
+; Ignore translate_off and synthesis_off directives                               ; Off                ; Off                ;
+; Timing-Driven Synthesis                                                         ; On                 ; On                 ;
+; Report Parameter Settings                                                       ; On                 ; On                 ;
+; Report Source Assignments                                                       ; On                 ; On                 ;
+; Report Connectivity Checks                                                      ; On                 ; On                 ;
+; Ignore Maximum Fan-Out Assignments                                              ; Off                ; Off                ;
+; Synchronization Register Chain Length                                           ; 3                  ; 3                  ;
+; Power Optimization During Synthesis                                             ; Normal compilation ; Normal compilation ;
+; HDL message level                                                               ; Level2             ; Level2             ;
+; Suppress Register Optimization Related Messages                                 ; Off                ; Off                ;
+; Number of Removed Registers Reported in Synthesis Report                        ; 5000               ; 5000               ;
+; Number of Swept Nodes Reported in Synthesis Report                              ; 5000               ; 5000               ;
+; Number of Inverted Registers Reported in Synthesis Report                       ; 100                ; 100                ;
+; Clock MUX Protection                                                            ; On                 ; On                 ;
+; Auto Gated Clock Conversion                                                     ; Off                ; Off                ;
+; Block Design Naming                                                             ; Auto               ; Auto               ;
+; SDC constraint protection                                                       ; Off                ; Off                ;
+; Synthesis Effort                                                                ; Auto               ; Auto               ;
+; Shift Register Replacement - Allow Asynchronous Clear Signal                    ; On                 ; On                 ;
+; Pre-Mapping Resynthesis Optimization                                            ; Off                ; Off                ;
+; Analysis & Synthesis Message Level                                              ; Medium             ; Medium             ;
+; Disable Register Merging Across Hierarchies                                     ; Auto               ; Auto               ;
+; Resource Aware Inference For Block RAM                                          ; On                 ; On                 ;
+; Automatic Parallel Synthesis                                                    ; On                 ; On                 ;
+; Partial Reconfiguration Bitstream ID                                            ; Off                ; Off                ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+
+
++------------------------------------------+
+; Parallel Compilation                     ;
++----------------------------+-------------+
+; Processors                 ; Number      ;
++----------------------------+-------------+
+; Number detected on machine ; 22          ;
+; Maximum allowed            ; 16          ;
+;                            ;             ;
+; Average used               ; 1.00        ;
+; Maximum used               ; 16          ;
+;                            ;             ;
+; Usage by Processor         ; % Time Used ;
+;     Processor 1            ; 100.0%      ;
+;     Processor 2            ;   0.0%      ;
+;     Processor 3            ;   0.0%      ;
+;     Processors 4-16        ;   0.0%      ;
++----------------------------+-------------+
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Source Files Read                                                                                                                   ;
++----------------------------------+-----------------+------------------------------+------------------------------------------------------------+---------+
+; File Name with User-Entered Path ; Used in Netlist ; File Type                    ; File Name with Absolute Path                               ; Library ;
++----------------------------------+-----------------+------------------------------+------------------------------------------------------------+---------+
+; uart_tx.sv                       ; yes             ; User SystemVerilog HDL File  ; C:/Documents/EWBCompDay/latencyZeroFPGA/uart_tx.sv         ;         ;
+; uart_rx.sv                       ; yes             ; User SystemVerilog HDL File  ; C:/Documents/EWBCompDay/latencyZeroFPGA/uart_rx.sv         ;         ;
+; latencyZeroFPGA.sv               ; yes             ; User SystemVerilog HDL File  ; C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv ;         ;
+; frame_rx.sv                      ; yes             ; User SystemVerilog HDL File  ; C:/Documents/EWBCompDay/latencyZeroFPGA/frame_rx.sv        ;         ;
++----------------------------------+-----------------+------------------------------+------------------------------------------------------------+---------+
+
+
++--------------------------------------------------------------+
+; Analysis & Synthesis Resource Usage Summary                  ;
++---------------------------------------------+----------------+
+; Resource                                    ; Usage          ;
++---------------------------------------------+----------------+
+; Estimate of Logic utilization (ALMs needed) ; 307            ;
+;                                             ;                ;
+; Combinational ALUT usage for logic          ; 451            ;
+;     -- 7 input functions                    ; 8              ;
+;     -- 6 input functions                    ; 82             ;
+;     -- 5 input functions                    ; 77             ;
+;     -- 4 input functions                    ; 37             ;
+;     -- <=3 input functions                  ; 247            ;
+;                                             ;                ;
+; Dedicated logic registers                   ; 483            ;
+;                                             ;                ;
+; I/O pins                                    ; 103            ;
+;                                             ;                ;
+; Total DSP Blocks                            ; 0              ;
+;                                             ;                ;
+; Maximum fan-out node                        ; CLOCK_50~input ;
+; Maximum fan-out                             ; 483            ;
+; Total fan-out                               ; 3740           ;
+; Average fan-out                             ; 3.18           ;
++---------------------------------------------+----------------+
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                                      ;
++----------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+-----------------------------------+-----------------+--------------+
+; Compilation Hierarchy Node ; Combinational ALUTs ; Dedicated Logic Registers ; Block Memory Bits ; DSP Blocks ; Pins ; Virtual Pins ; Full Hierarchy Name               ; Entity Name     ; Library Name ;
++----------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+-----------------------------------+-----------------+--------------+
+; |latencyZeroFPGA           ; 451 (339)           ; 483 (278)                 ; 0                 ; 0          ; 103  ; 0            ; |latencyZeroFPGA                  ; latencyZeroFPGA ; work         ;
+;    |frame_rx:u_frame|      ; 39 (39)             ; 136 (136)                 ; 0                 ; 0          ; 0    ; 0            ; |latencyZeroFPGA|frame_rx:u_frame ; frame_rx        ; work         ;
+;    |uart_rx:u_rx|          ; 36 (36)             ; 39 (39)                   ; 0                 ; 0          ; 0    ; 0            ; |latencyZeroFPGA|uart_rx:u_rx     ; uart_rx         ; work         ;
+;    |uart_tx:u_tx|          ; 37 (37)             ; 30 (30)                   ; 0                 ; 0          ; 0    ; 0            ; |latencyZeroFPGA|uart_tx:u_tx     ; uart_tx         ; work         ;
++----------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+-----------------------------------+-----------------+--------------+
+Note: For table entries with two numbers listed, the numbers in parentheses indicate the number of resources of the given type used by the specific entity alone. The numbers listed outside of parentheses indicate the total resources of the given type used by the specific entity and all of its sub-entities in the hierarchy.
+
+
+Encoding Type:  One-Hot
++------------------------------------------------------------------+
+; State Machine - |latencyZeroFPGA|uart_tx:u_tx|state              ;
++-------------+------------+------------+-------------+------------+
+; Name        ; state.STOP ; state.DATA ; state.START ; state.IDLE ;
++-------------+------------+------------+-------------+------------+
+; state.IDLE  ; 0          ; 0          ; 0           ; 0          ;
+; state.START ; 0          ; 0          ; 1           ; 1          ;
+; state.DATA  ; 0          ; 1          ; 0           ; 1          ;
+; state.STOP  ; 1          ; 0          ; 0           ; 1          ;
++-------------+------------+------------+-------------+------------+
+
+
+Encoding Type:  One-Hot
++----------------------------------------------------------------------+
+; State Machine - |latencyZeroFPGA|frame_rx:u_frame|state              ;
++-----------------+-----------------+----------------+-----------------+
+; Name            ; state.WAIT_SYNC ; state.RECV_CHK ; state.RECV_DATA ;
++-----------------+-----------------+----------------+-----------------+
+; state.WAIT_SYNC ; 0               ; 0              ; 0               ;
+; state.RECV_DATA ; 1               ; 0              ; 1               ;
+; state.RECV_CHK  ; 1               ; 1              ; 0               ;
++-----------------+-----------------+----------------+-----------------+
+
+
+Encoding Type:  One-Hot
++------------------------------------------------------------------+
+; State Machine - |latencyZeroFPGA|uart_rx:u_rx|state              ;
++-------------+------------+------------+-------------+------------+
+; Name        ; state.STOP ; state.DATA ; state.START ; state.IDLE ;
++-------------+------------+------------+-------------+------------+
+; state.IDLE  ; 0          ; 0          ; 0           ; 0          ;
+; state.START ; 0          ; 0          ; 1           ; 1          ;
+; state.DATA  ; 0          ; 1          ; 0           ; 1          ;
+; state.STOP  ; 1          ; 0          ; 0           ; 1          ;
++-------------+------------+------------+-------------+------------+
+
+
++---------------------------------------------------------------------------------+
+; Registers Removed During Synthesis                                              ;
++----------------------------------------+----------------------------------------+
+; Register name                          ; Reason for Removal                     ;
++----------------------------------------+----------------------------------------+
+; tx_buf[0][6]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[0][2]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[0][0]                           ; Merged with tx_buf[0][1]               ;
+; tx_buf[0][1]                           ; Merged with tx_buf[0][3]               ;
+; tx_buf[0][3]                           ; Merged with tx_buf[0][4]               ;
+; tx_buf[0][4]                           ; Merged with tx_buf[0][5]               ;
+; tx_buf[0][5]                           ; Merged with tx_buf[0][7]               ;
+; tx_buf[10][0]                          ; Stuck at GND due to stuck port data_in ;
+; tx_buf[14][0]                          ; Stuck at GND due to stuck port data_in ;
+; tx_buf[2][1]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[5][1]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[6][1]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[10][1]                          ; Stuck at GND due to stuck port data_in ;
+; tx_buf[13][1]                          ; Stuck at GND due to stuck port data_in ;
+; tx_buf[14][1]                          ; Stuck at GND due to stuck port data_in ;
+; tx_buf[15][1]                          ; Stuck at GND due to stuck port data_in ;
+; tx_buf[6][2]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[10][2]                          ; Stuck at GND due to stuck port data_in ;
+; tx_buf[1][3]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[3][3]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[4][3]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[7][3]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[8][3]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[9][3]                           ; Stuck at GND due to stuck port data_in ;
+; tx_buf[11][3]                          ; Stuck at GND due to stuck port data_in ;
+; tx_buf[12][3]                          ; Stuck at GND due to stuck port data_in ;
+; uart_tx:u_tx|state~8                   ; Lost fanout                            ;
+; uart_tx:u_tx|state~9                   ; Lost fanout                            ;
+; uart_rx:u_rx|state~8                   ; Lost fanout                            ;
+; uart_rx:u_rx|state~9                   ; Lost fanout                            ;
+; tx_buf[11][2]                          ; Merged with tx_buf[0][7]               ;
+; tx_buf[12][2]                          ; Merged with tx_buf[0][7]               ;
+; tx_buf[1][2]                           ; Merged with tx_buf[0][7]               ;
+; tx_buf[3][2]                           ; Merged with tx_buf[0][7]               ;
+; tx_buf[4][2]                           ; Merged with tx_buf[0][7]               ;
+; tx_buf[7][2]                           ; Merged with tx_buf[0][7]               ;
+; tx_buf[8][2]                           ; Merged with tx_buf[0][7]               ;
+; tx_buf[9][2]                           ; Merged with tx_buf[0][7]               ;
+; tx_buf[2][0]                           ; Merged with tx_buf[13][0]              ;
+; tx_buf[5][0]                           ; Merged with tx_buf[13][0]              ;
+; tx_buf[6][0]                           ; Merged with tx_buf[15][0]              ;
+; tx_buf[15][2]                          ; Merged with tx_buf[14][2]              ;
+; Total Number of Removed Registers = 42 ;                                        ;
++----------------------------------------+----------------------------------------+
+
+
++------------------------------------------------------+
+; General Register Statistics                          ;
++----------------------------------------------+-------+
+; Statistic                                    ; Value ;
++----------------------------------------------+-------+
+; Total registers                              ; 483   ;
+; Number of registers using Synchronous Clear  ; 159   ;
+; Number of registers using Synchronous Load   ; 1     ;
+; Number of registers using Asynchronous Clear ; 478   ;
+; Number of registers using Asynchronous Load  ; 0     ;
+; Number of registers using Clock Enable       ; 349   ;
+; Number of registers using Preset             ; 0     ;
++----------------------------------------------+-------+
+
+
++--------------------------------------------------+
+; Inverted Register Statistics                     ;
++----------------------------------------+---------+
+; Inverted Register                      ; Fan out ;
++----------------------------------------+---------+
+; st3                                    ; 3       ;
+; st1                                    ; 3       ;
+; st2                                    ; 3       ;
+; uart_tx:u_tx|tx                        ; 1       ;
+; Total number of inverted registers = 4 ;         ;
++----------------------------------------+---------+
+
+
++-------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Multiplexer Restructuring Statistics (Restructuring Performed)                                                                                              ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+-----------------------------------------------+
+; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output                    ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+-----------------------------------------------+
+; 3:1                ; 32 bits   ; 64 LEs        ; 0 LEs                ; 64 LEs                 ; Yes        ; |latencyZeroFPGA|stale_cnt[20]                ;
+; 3:1                ; 20 bits   ; 40 LEs        ; 0 LEs                ; 40 LEs                 ; Yes        ; |latencyZeroFPGA|db3[0]                       ;
+; 3:1                ; 20 bits   ; 40 LEs        ; 0 LEs                ; 40 LEs                 ; Yes        ; |latencyZeroFPGA|db2[16]                      ;
+; 3:1                ; 20 bits   ; 40 LEs        ; 0 LEs                ; 40 LEs                 ; Yes        ; |latencyZeroFPGA|db1[13]                      ;
+; 3:1                ; 5 bits    ; 10 LEs        ; 5 LEs                ; 5 LEs                  ; Yes        ; |latencyZeroFPGA|tx_idx[1]                    ;
+; 4:1                ; 13 bits   ; 26 LEs        ; 0 LEs                ; 26 LEs                 ; Yes        ; |latencyZeroFPGA|uart_tx:u_tx|clk_cnt[12]     ;
+; 4:1                ; 8 bits    ; 16 LEs        ; 0 LEs                ; 16 LEs                 ; Yes        ; |latencyZeroFPGA|frame_rx:u_frame|checksum[5] ;
+; 5:1                ; 7 bits    ; 21 LEs        ; 7 LEs                ; 14 LEs                 ; Yes        ; |latencyZeroFPGA|uart_tx:u_tx|shift_reg[0]    ;
+; 5:1                ; 4 bits    ; 12 LEs        ; 4 LEs                ; 8 LEs                  ; Yes        ; |latencyZeroFPGA|frame_rx:u_frame|byte_cnt[1] ;
+; 5:1                ; 2 bits    ; 6 LEs         ; 4 LEs                ; 2 LEs                  ; Yes        ; |latencyZeroFPGA|auto_ts[1]                   ;
+; 5:1                ; 3 bits    ; 9 LEs         ; 3 LEs                ; 6 LEs                  ; Yes        ; |latencyZeroFPGA|uart_tx:u_tx|bit_cnt[2]      ;
+; 5:1                ; 3 bits    ; 9 LEs         ; 3 LEs                ; 6 LEs                  ; Yes        ; |latencyZeroFPGA|uart_rx:u_rx|bit_cnt[0]      ;
+; 6:1                ; 31 bits   ; 124 LEs       ; 0 LEs                ; 124 LEs                ; Yes        ; |latencyZeroFPGA|tick_cnt[3]                  ;
+; 5:1                ; 13 bits   ; 39 LEs        ; 0 LEs                ; 39 LEs                 ; Yes        ; |latencyZeroFPGA|uart_rx:u_rx|clk_cnt[1]      ;
+; 25:1               ; 3 bits    ; 48 LEs        ; 42 LEs               ; 6 LEs                  ; Yes        ; |latencyZeroFPGA|tx_data_sig[4]               ;
+; 6:1                ; 2 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; No         ; |latencyZeroFPGA|uart_tx:u_tx|Selector12      ;
+; 8:1                ; 2 bits    ; 10 LEs        ; 4 LEs                ; 6 LEs                  ; No         ; |latencyZeroFPGA|uart_tx:u_tx|Selector11      ;
+; 8:1                ; 2 bits    ; 10 LEs        ; 4 LEs                ; 6 LEs                  ; No         ; |latencyZeroFPGA|uart_rx:u_rx|Selector1       ;
+; 8:1                ; 2 bits    ; 10 LEs        ; 4 LEs                ; 6 LEs                  ; No         ; |latencyZeroFPGA|uart_rx:u_rx|Selector2       ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+-----------------------------------------------+
+
+
++-------------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "frame_rx:u_frame"                                                                                  ;
++---------------------+--------+----------+-------------------------------------------------------------------------------------+
+; Port                ; Type   ; Severity ; Details                                                                             ;
++---------------------+--------+----------+-------------------------------------------------------------------------------------+
+; stop_regs[0][3..0]  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[1][3..0]  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[2][3..0]  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[3][3..0]  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[4][3..0]  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[5][3..0]  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[6][3..0]  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[7][3..0]  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[8][3..0]  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[9][3..0]  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[10][3..0] ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[11][3..0] ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[12][3..0] ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[13][3..0] ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; stop_regs[14][3..0] ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++---------------------+--------+----------+-------------------------------------------------------------------------------------+
+
+
++-----------------------------------------------------+
+; Post-Synthesis Netlist Statistics for Top Partition ;
++-----------------------+-----------------------------+
+; Type                  ; Count                       ;
++-----------------------+-----------------------------+
+; arriav_ff             ; 483                         ;
+;     CLR               ; 66                          ;
+;     CLR SCLR          ; 62                          ;
+;     CLR SLD           ; 1                           ;
+;     ENA CLR           ; 252                         ;
+;     ENA CLR SCLR      ; 97                          ;
+;     plain             ; 5                           ;
+; arriav_io_obuf        ; 36                          ;
+; arriav_lcell_comb     ; 463                         ;
+;     arith             ; 174                         ;
+;         1 data inputs ; 173                         ;
+;         2 data inputs ; 1                           ;
+;     extend            ; 8                           ;
+;         7 data inputs ; 8                           ;
+;     normal            ; 281                         ;
+;         0 data inputs ; 2                           ;
+;         1 data inputs ; 12                          ;
+;         2 data inputs ; 21                          ;
+;         3 data inputs ; 50                          ;
+;         4 data inputs ; 37                          ;
+;         5 data inputs ; 77                          ;
+;         6 data inputs ; 82                          ;
+; boundary_port         ; 103                         ;
+;                       ;                             ;
+; Max LUT depth         ; 5.00                        ;
+; Average LUT depth     ; 2.38                        ;
++-----------------------+-----------------------------+
+
+
++-------------------------------+
+; Elapsed Time Per Partition    ;
++----------------+--------------+
+; Partition Name ; Elapsed Time ;
++----------------+--------------+
+; Top            ; 00:00:01     ;
++----------------+--------------+
+
+
++-------------------------------+
+; Analysis & Synthesis Messages ;
++-------------------------------+
+Info: *******************************************************************
+Info: Running Quartus Prime Analysis & Synthesis
+    Info: Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
+    Info: Processing started: Mon Jun 15 08:57:36 2026
+Info: Command: quartus_map --read_settings_files=on --write_settings_files=off latencyZeroFPGA -c latencyZeroFPGA
+Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
+Info (20030): Parallel compilation is enabled and will use 16 of the 16 processors detected
+Info (12021): Found 1 design units, including 1 entities, in source file uart_tx.sv
+    Info (12023): Found entity 1: uart_tx File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_tx.sv Line: 2
+Info (12021): Found 1 design units, including 1 entities, in source file uart_rx.sv
+    Info (12023): Found entity 1: uart_rx File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_rx.sv Line: 1
+Info (12021): Found 1 design units, including 1 entities, in source file latencyzerofpga.sv
+    Info (12023): Found entity 1: latencyZeroFPGA File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 1
+Info (12021): Found 1 design units, including 1 entities, in source file frame_rx.sv
+    Info (12023): Found entity 1: frame_rx File: C:/Documents/EWBCompDay/latencyZeroFPGA/frame_rx.sv Line: 1
+Info (12127): Elaborating entity "latencyZeroFPGA" for the top level hierarchy
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(116): truncated value with size 32 to match size of target (20) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 116
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(126): truncated value with size 32 to match size of target (20) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 126
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(136): truncated value with size 32 to match size of target (20) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 136
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(157): truncated value with size 32 to match size of target (2) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 157
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(158): truncated value with size 32 to match size of target (3) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 158
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(161): truncated value with size 32 to match size of target (2) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 161
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(162): truncated value with size 32 to match size of target (3) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 162
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(164): truncated value with size 32 to match size of target (2) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 164
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(168): truncated value with size 32 to match size of target (2) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 168
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(169): truncated value with size 32 to match size of target (3) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 169
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(171): truncated value with size 32 to match size of target (31) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 171
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(230): truncated value with size 32 to match size of target (5) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 230
+Warning (10230): Verilog HDL assignment warning at latencyZeroFPGA.sv(248): truncated value with size 32 to match size of target (26) File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 248
+Info (12128): Elaborating entity "uart_rx" for hierarchy "uart_rx:u_rx" File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 86
+Warning (10230): Verilog HDL assignment warning at uart_rx.sv(48): truncated value with size 32 to match size of target (13) File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_rx.sv Line: 48
+Warning (10230): Verilog HDL assignment warning at uart_rx.sv(59): truncated value with size 32 to match size of target (3) File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_rx.sv Line: 59
+Warning (10230): Verilog HDL assignment warning at uart_rx.sv(61): truncated value with size 32 to match size of target (13) File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_rx.sv Line: 61
+Warning (10230): Verilog HDL assignment warning at uart_rx.sv(74): truncated value with size 32 to match size of target (13) File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_rx.sv Line: 74
+Info (12128): Elaborating entity "frame_rx" for hierarchy "frame_rx:u_frame" File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 99
+Warning (10230): Verilog HDL assignment warning at frame_rx.sv(46): truncated value with size 32 to match size of target (4) File: C:/Documents/EWBCompDay/latencyZeroFPGA/frame_rx.sv Line: 46
+Info (12128): Elaborating entity "uart_tx" for hierarchy "uart_tx:u_tx" File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 205
+Warning (10230): Verilog HDL assignment warning at uart_tx.sv(48): truncated value with size 32 to match size of target (13) File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_tx.sv Line: 48
+Warning (10230): Verilog HDL assignment warning at uart_tx.sv(60): truncated value with size 32 to match size of target (3) File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_tx.sv Line: 60
+Warning (10230): Verilog HDL assignment warning at uart_tx.sv(62): truncated value with size 32 to match size of target (13) File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_tx.sv Line: 62
+Warning (10230): Verilog HDL assignment warning at uart_tx.sv(72): truncated value with size 32 to match size of target (13) File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_tx.sv Line: 72
+Info (276014): Found 24 instances of uninferred RAM logic
+    Info (276004): RAM logic "Ram0" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram1" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram2" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram3" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram4" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram5" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram6" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram7" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram8" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram9" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram10" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram11" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram12" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram13" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram14" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram15" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram16" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram17" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram18" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram19" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram20" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram21" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram22" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+    Info (276004): RAM logic "Ram23" is uninferred due to inappropriate RAM size File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 20
+Warning (13034): The following nodes have both tri-state and non-tri-state drivers
+    Warning (13035): Inserted always-enabled tri-state buffer between "GPIO_0[1]" and its non-tri-state driver. File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+Warning (13039): The following bidirectional pins have no drivers
+    Warning (13040): bidirectional pin "GPIO_0[0]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[2]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[3]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[4]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[5]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[6]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[7]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[8]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[9]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[10]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[11]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[12]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[13]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[14]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[15]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[16]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[17]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[18]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[19]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[20]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[21]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[22]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[23]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[24]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[25]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[26]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[27]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[28]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[29]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[30]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[31]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[32]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[33]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[34]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+    Warning (13040): bidirectional pin "GPIO_0[35]" has no driver File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+Warning (13009): TRI or OPNDRN buffers permanently enabled
+    Warning (13010): Node "GPIO_0[1]~synth" File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 5
+Warning (13024): Output pins are stuck at VCC or GND
+    Warning (13410): Pin "LEDR[0]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 6
+    Warning (13410): Pin "LEDR[2]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 6
+    Warning (13410): Pin "LEDR[3]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 6
+    Warning (13410): Pin "LEDR[6]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 6
+    Warning (13410): Pin "LEDR[7]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 6
+    Warning (13410): Pin "LEDR[8]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 6
+    Warning (13410): Pin "HEX1[1]" is stuck at GND File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 7
+    Warning (13410): Pin "HEX2[1]" is stuck at GND File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 7
+    Warning (13410): Pin "HEX3[3]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 7
+    Warning (13410): Pin "HEX3[6]" is stuck at GND File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 7
+    Warning (13410): Pin "HEX4[0]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 7
+    Warning (13410): Pin "HEX4[1]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 7
+    Warning (13410): Pin "HEX4[2]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 7
+    Warning (13410): Pin "HEX5[0]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 8
+    Warning (13410): Pin "HEX5[1]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 8
+    Warning (13410): Pin "HEX5[2]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 8
+    Warning (13410): Pin "HEX5[3]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 8
+    Warning (13410): Pin "HEX5[4]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 8
+    Warning (13410): Pin "HEX5[5]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 8
+    Warning (13410): Pin "HEX5[6]" is stuck at VCC File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 8
+Info (286030): Timing-Driven Synthesis is running
+Info (17049): 4 registers lost all their fanouts during netlist optimizations.
+Info (144001): Generated suppressed messages file C:/Documents/EWBCompDay/latencyZeroFPGA/output_files/latencyZeroFPGA.map.smsg
+Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
+    Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
+Warning (21074): Design contains 3 input pin(s) that do not drive logic
+    Warning (15610): No output dependent on input pin "SW[5]" File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 4
+    Warning (15610): No output dependent on input pin "SW[6]" File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 4
+    Warning (15610): No output dependent on input pin "SW[7]" File: C:/Documents/EWBCompDay/latencyZeroFPGA/latencyZeroFPGA.sv Line: 4
+Info (21057): Implemented 768 device resources after synthesis - the final resource count might be different
+    Info (21058): Implemented 15 input pins
+    Info (21059): Implemented 52 output pins
+    Info (21060): Implemented 36 bidirectional pins
+    Info (21061): Implemented 665 logic cells
+Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 88 warnings
+    Info: Peak virtual memory: 4914 megabytes
+    Info: Processing ended: Mon Jun 15 08:57:45 2026
+    Info: Elapsed time: 00:00:09
+    Info: Total CPU time (on all processors): 00:00:16
+
+
++------------------------------------------+
+; Analysis & Synthesis Suppressed Messages ;
++------------------------------------------+
+The suppressed messages can be found in C:/Documents/EWBCompDay/latencyZeroFPGA/output_files/latencyZeroFPGA.map.smsg.
+
+

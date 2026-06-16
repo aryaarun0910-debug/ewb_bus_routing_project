@@ -37,6 +37,8 @@ a costed tender.
 | Maintenance contingency (annual) | £400 |
 | **Annualised deployment cost** (hardware ÷ 5-yr amortisation + annual software) | **£903/yr** |
 
+*The maintenance contingency includes per-stop-unit inspection and occasional LED module swap (estimated £30–50/unit/yr for IP65-enclosed WS2812B modules across 15 stops). The WS2812B strip is the most likely component to require replacement; a repair is a strip swap, not a full unit replacement. See [`fpga/README.md`](../../fpga/README.md) for the outdoor hardware specification and replacement assumptions.*
+
 A screen-free LED map is deliberately the cheap, robust option vs. a
 commercial digital-signage screen (typically £800–2,000 installed per unit),
 and incurs no licensing cost.

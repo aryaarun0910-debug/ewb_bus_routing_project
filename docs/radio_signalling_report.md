@@ -42,13 +42,25 @@ A genuine strength of this approach: **no mains wiring required at each stop**. 
 
 Critically, **this requires no rework of the WS2812B driving logic** already built and reviewed in `fpga/bus_route.v` — `cur_color`, the bit-bang FSM, and the bus-animation state machines stay as-is. The only change is the *data source*: instead of selecting a row from an auto-generated ROM table via switches (`SW[1:0]`/`SW[4:2]`), the design would read the same shape of data (stop demand levels, active route) from a UART register fed by the LoRa receiver. This is a clean, additive next phase rather than a redesign.
 
-## 6. Honest limitations to flag
+## 6. Security
+
+A LoRa broadcast is visible to anyone with a receiver. Without authentication, a cheap SX1278 transmitter — available for around £15 — could broadcast false demand data to every stop unit in range, causing the LED maps to display misinformation to exactly the residents who can least afford to cross-check it on a smartphone. A deployed system addresses this at three levels.
+
+**Payload authentication — AES-128-CMAC on every packet.** LoRaWAN provides this natively via network and application session keys; even a bare point-to-point SX1278 link adds it in a few hundred bytes of firmware. The hub signs each packet's payload — `{stop_id, demand_tier, route_colour, ETA, frame_counter}` — and the stop unit rejects any packet whose MAC does not verify against the pre-shared key.
+
+**Replay protection — monotonic frame counter.** Each packet carries an incrementing counter; the receiver stores the last-seen value and drops anything ≤ it. A captured authentic packet cannot be replayed later to freeze the display on stale or attacker-chosen data.
+
+**Fail-safe default, not fail-dangerous.** On an invalid MAC, a stale frame counter, or no valid packet for *N* minutes, the stop unit does not continue displaying old or attacker-supplied data — it shows an explicit "no live data" state (all-amber dim, or the static timetable colour-coding). A blank or visibly uncertain display is honest; a confidently lying one is not. The people who depend on this information most are the least able to detect a lie — the equity argument for getting this right is the same as the equity argument for building the system in the first place.
+
+**Key management.** Keys are provisioned at installation and rotated on the maintenance schedule that CIVIC SQUARE already stewards for the physical stop units — tying cryptographic hygiene to the existing community maintenance model rather than requiring a separate technical process.
+
+## 7. Honest limitations to flag
 
 - **Latency**: LoRa packets take longer to transmit than Wi-Fi/Bluetooth — fine for "demand updates every few minutes," not for "exact live bus position to the metre."
 - **Urban range**: the "several km" figures are open-air; buildings and street furniture in a dense urban area like Ladywood will reduce effective range — a mesh topology (§3) mitigates this.
 - **Regulatory**: 433 MHz is a licence-free ISM band in the UK, but transmit duty-cycle and power limits apply (typically <10% duty cycle, ≤10 mW ERP in the relevant sub-band) — any real deployment would need to design the broadcast schedule around these limits.
 
-## 7. Suggested next step
+## 8. Suggested next step
 
 A small bench prototype: one LoRa transmitter on a Raspberry Pi (standing in for the hub backend) broadcasting a mock "stop demand" packet, and one receiver feeding a microcontroller driving a handful of WS2812B LEDs (standing in for a stop unit). This would prove the data path end-to-end before any integration with the full FPGA design — and would make for a compelling "here's the live version, in progress" demo addition alongside the existing static FPGA display.
 

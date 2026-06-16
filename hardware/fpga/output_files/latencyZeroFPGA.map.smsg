@@ -1,0 +1,3 @@
+Info (10281): Verilog HDL Declaration information at uart_tx.sv(6): object "start" differs only in case from object "START" in the same scope File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_tx.sv Line: 6
+Info (10281): Verilog HDL Declaration information at uart_tx.sv(5): object "data" differs only in case from object "DATA" in the same scope File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_tx.sv Line: 5
+Info (10281): Verilog HDL Declaration information at uart_rx.sv(5): object "data" differs only in case from object "DATA" in the same scope File: C:/Documents/EWBCompDay/latencyZeroFPGA/uart_rx.sv Line: 5

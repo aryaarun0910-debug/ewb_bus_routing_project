@@ -1,0 +1,251 @@
+============================================================
+  EWB LADYWOOD BUS — FULL SETUP GUIDE
+  (DE1-SoC FPGA + Raspberry Pi 5 + Arduino Uno R4 WiFi)
+============================================================
+
+────────────────────────────────────────────────────────────
+HARDWARE WIRING
+────────────────────────────────────────────────────────────
+Pi GPIO14 (TXD) → FPGA JP1 Pin 1  (GPIO_0[0], UART RX) [RED]
+Pi GPIO15 (RXD) → FPGA JP1 Pin 2  (GPIO_0[1], UART TX) [ORANGE]
+Pi GND          → FPGA JP1 Pin 12 (GND)		       [BROWN]
+
+Arduino pin 13  → LED strip DATA
+Arduino 5V      → LED strip 5V  (+ external PSU 5V rail)
+Arduino GND     → LED strip GND (+ external PSU GND)
+
+UART baud: 9600 8-N-1
+
+────────────────────────────────────────────────────────────
+1. FPGA — COMPILE (on Lenovo / Windows with Quartus Prime)
+────────────────────────────────────────────────────────────
+Source file:   EWBcomp/transfer.txt  (copy to .sv on Lenovo)
+Also needs:    uart_rx.sv, uart_tx.sv, frame_rx.sv  (submodules)
+
+1a. Open Quartus Prime
+1b. File > New Project Wizard  (or open existing .qpf)
+1c. Device: Cyclone V  5CSEMA5F31C6
+1d. Add latencyZeroFPGA.sv + submodule .sv files
+1e. Processing > Start Compilation
+
+────────────────────────────────────────────────────────────
+2. FPGA — PROGRAM
+────────────────────────────────────────────────────────────
+Connect USB-Blaster cable to DE1-SoC JTAG port.
+
+Option A — Quartus GUI:
+  Tools > Programmer > Auto-detect
+  Select device @2 (02D120DD = FPGA, NOT HPS)
+  Add output_files/latencyZeroFPGA.sof
+  Click Start
+
+Option B — Command line:
+  quartus_pgm -c "DE-SoC [USB-1]" -m JTAG \
+    -o "p;output_files/latencyZeroFPGA.sof@2"
+
+FPGA indicator lights (after programming):
+  HEX2   = scenario number (0-3)
+  HEX1/0 = time of day (06, 08, 10, 12, 14, 16, 18, 20)
+  HEX3   = 'A'=auto slow, 'F'=auto fast, '-'=manual switch
+  HEX4   = 'L' when Pi is connected and sending frames, '-' when idle
+  LEDR9  = blinks when no Pi frames for 60 s (stale)
+  LEDR0-8= demand > 0 for stops S01-S09
+
+FPGA controls:
+  SW[1:0]  = scenario (manual mode)
+  SW[4:2]  = timeslot (manual mode)
+  SW[9]    = auto mode (cycles through timeslots automatically)
+  SW[8]    = fast tick (3 s) vs slow tick (30 s) in auto mode
+  KEY[1]   = next timeslot
+  KEY[2]   = previous timeslot
+  KEY[3]   = next scenario
+
+────────────────────────────────────────────────────────────
+3. RASPBERRY PI — FIRST-TIME SETUP
+────────────────────────────────────────────────────────────
+3a. Enable UART (run once):
+  sudo nano /boot/firmware/config.txt
+  Add at end:
+    enable_uart=1
+    dtoverlay=disable-bt
+  sudo reboot
+
+  OR via raspi-config:
+    sudo raspi-config
+    Interface Options > Serial Port
+      "login shell via serial?" → No
+      "serial hardware enabled?" → Yes
+
+3b. Install Python deps:
+  pip3 install pyserial flask
+
+3c. Copy hub.py to Pi:
+  scp hub.py pi@<PI_IP>:~/hub.py
+  (Replace <PI_IP> with Pi's IP on your local network)
+
+────────────────────────────────────────────────────────────
+4. RASPBERRY PI — HOTSPOT SETUP (run once)
+────────────────────────────────────────────────────────────
+# Create hotspot
+sudo nmcli con add type wifi ifname wlan0 con-name hotspot ssid LadywoodBus
+
+# Configure security (WPA2 required for R4 WiFi)
+sudo nmcli con modify hotspot \
+  wifi.mode ap \
+  wifi-sec.key-mgmt wpa-psk \
+  wifi-sec.psk ewb2026bus \
+  wifi-sec.proto rsn \
+  wifi-sec.pairwise ccmp \
+  wifi-sec.group ccmp
+
+# Set static IP and auto-start
+sudo nmcli con modify hotspot \
+  ipv4.method shared \
+  ipv4.addresses 10.42.0.1/24 \
+  connection.autoconnect yes
+
+# Start it now
+sudo nmcli con up hotspot
+
+# Verify it's broadcasting:
+nmcli con show hotspot | grep -E 'state|ssid|ip4'
+
+Hotspot details:
+  SSID:     LadywoodBus
+  Password: ewb2026bus
+  Pi IP:    10.42.0.1
+
+# To change password later:
+sudo nmcli con modify hotspot wifi-sec.psk <NEW_PASSWORD>
+sudo nmcli con up hotspot
+
+────────────────────────────────────────────────────────────
+5. RASPBERRY PI — RUN SIMULATION
+────────────────────────────────────────────────────────────
+# Normal mode (FPGA + Arduino connected):
+python3 ~/hub.py
+
+# Test without FPGA (UDP only, demo routes):
+python3 ~/hub.py --no-uart
+
+# SSH into Pi from Mac (when on LadywoodBus hotspot):
+ssh pi@10.42.0.1
+
+# Web dashboard (once hub.py is running):
+http://10.42.0.1:5000
+
+────────────────────────────────────────────────────────────
+6. ARDUINO — PROGRAM
+────────────────────────────────────────────────────────────
+File:  EWBcomp/stop_unit/stop_unit.ino
+
+6a. Open Arduino IDE
+6b. Select board: Tools > Board > Arduino UNO R4 WiFi
+6c. Select port: Tools > Port > /dev/cu.usbmodem...
+6d. Click Upload (arrow button)
+
+Arduino status LED (LED 0, back of board):
+  Red    = no WiFi connection
+  Yellow = WiFi connected, no hub.py packets yet (demo mode)
+  Green  = receiving live UDP from hub.py
+
+WiFi credentials (hardcoded in sketch):
+  SSID: LadywoodBus
+  Pass: ewb2026bus
+
+────────────────────────────────────────────────────────────
+7. COMPETITION DAY — STARTUP SEQUENCE
+────────────────────────────────────────────────────────────
+1. Power on FPGA (USB-Blaster not needed if already programmed)
+   Wait ~5 s for boot
+   (FPGA is VOLATILE — loses program on power-off)
+   → Must reprogram FPGA each time power is cycled via Quartus
+
+2. Power on Raspberry Pi
+   Hotspot starts automatically (auto-connect = yes)
+   Wait ~20 s for boot + hotspot ready
+
+3. SSH in from Mac:
+   Connect Mac to "LadywoodBus" WiFi
+   ssh pi@10.42.0.1
+
+4. Start simulation:
+   python3 ~/hub.py
+
+5. Power on Arduino + LED map
+   LED 0: red → yellow → green (takes ~15 s to connect)
+
+6. Set FPGA scenario with switches or let auto mode cycle
+
+EVERYTHING IS READY when:
+  - FPGA HEX4 shows 'L'
+  - Arduino LED 0 is green
+  - Web dashboard shows live data at http://10.42.0.1:5000
+
+────────────────────────────────────────────────────────────
+8. QR CODE FOR WEB APP
+────────────────────────────────────────────────────────────
+Generate QR pointing to: http://10.42.0.1:5000
+(Use any QR generator offline — print and laminate for the stand)
+
+Anyone connected to "LadywoodBus" WiFi can open the dashboard.
+
+────────────────────────────────────────────────────────────
+9. TROUBLESHOOTING
+────────────────────────────────────────────────────────────
+FPGA HEX4 shows '-' (no 'L'):
+  → hub.py not running, or UART wired wrong
+  → Check GPIO14→JP1 Pin1, GPIO15→JP1 Pin2
+  → Check /boot/firmware/config.txt has enable_uart=1
+
+hub.py says "UART unavailable":
+  → UART not enabled → see step 3a
+  → Check 'ls /dev/serial0' exists
+
+Arduino stuck on red LED:
+  → Not seeing "LadywoodBus" network
+  → Hotspot not up → sudo nmcli con up hotspot
+  → WPA2 issue → re-run nmcli security commands from step 4
+
+Arduino on yellow (not green):
+  → hub.py not running or UDP not reaching Arduino
+  → Check hub.py is running and Pi IP is 10.42.0.1
+
+Web app not loading:
+  → Flask not installed → pip3 install flask
+  → hub.py must be running for web server to be active
+
+LEDR[9] blinking on FPGA:
+  → Pi stopped sending frames (stale for 60 s)
+  → Restart hub.py
+
+────────────────────────────────────────────────────────────
+10. USEFUL COMMANDS CHEATSHEET
+────────────────────────────────────────────────────────────
+# Pi network info:
+ip addr show wlan0
+nmcli con show
+
+# Check UART device:
+ls -la /dev/serial*
+
+# Kill hub.py (Ctrl+C won't work in background):
+pkill -f hub.py
+
+# Check Pi CPU temp (demo can warm things up):
+vcgencmd measure_temp
+
+# Hotspot up/down:
+sudo nmcli con up hotspot
+sudo nmcli con down hotspot
+
+# Check connected devices on hotspot:
+arp -n | grep 10.42.0
+
+# Quartus command-line compile (on Lenovo):
+quartus_sh --flow compile latencyZeroFPGA
+
+# Quartus command-line program (on Lenovo):
+quartus_pgm -c "DE-SoC [USB-1]" -m JTAG -o "p;output_files/latencyZeroFPGA.sof@2"
+
+============================================================

@@ -24,6 +24,16 @@ changes, just removing things that were actively hurting STA results):
    this much fan-out was reintroducing exactly the recovery/removal-timing
    problem the synchroniser exists to avoid.
 
+## Outdoor suitability
+
+The WS2812B strip used in the bench demo is a standard consumer LED component, not rated for outdoor deployment. A real stop-unit installation addresses this at three levels.
+
+**Weatherproofing.** LED modules are replaced with IP65 or IP67-rated WS2812B-on-PCB equivalents (or SK6812 modules in potted housings); the PCB is conformal-coated; the full assembly sits inside a polycarbonate-fronted enclosure. No mains connection is needed at the stop — see the LoRa architecture report at [`docs/radio_signalling_report.md`](../docs/radio_signalling_report.md).
+
+**Daylight readability.** Standard WS2812B wash out in direct sunlight. Two options: high-brightness modules (≥ 1,000 cd/m²) with an ambient-light sensor for automatic night dimming; or an e-paper + LED hybrid where the static stop map renders on a sunlight-readable e-paper panel and the LEDs carry only the live demand-glow overlay — this also reduces average current draw significantly, extending solar battery autonomy in a UK winter.
+
+**Maintenance.** A per-unit annual maintenance budget of approximately £30–50 covers one inspection visit and an occasional module swap; this is included in the running-costs model at [`docs/design/RUNNING_COSTS.md`](../docs/design/RUNNING_COSTS.md). The modular WS2812B format means a repair is a strip swap, not a full unit replacement, consistent with CIVIC SQUARE's existing community repair model.
+
 ## Known remaining issue — setup timing is NOT yet closed
 
 The legacy `.sta.summary` shows **Setup slack of −11.24 ns (TNS −1847 ns)**
