@@ -54,6 +54,44 @@ Claude updates this file each session — check off items as they land.
 
 ---
 
+## LIVING TWIN — Chris owns these (Mon 16 → Tue 17)
+
+- [ ] **LT1** — `fpga/uart_rx.sv` + `fpga/frame_rx.sv` + SW9 mux do not exist in the repo. Must be written. Spec: 9600-8-N-1 at 50 MHz (divider 5208); byte FSM wait `0xAA` → 15 bytes → XOR verify → double-buffer latch; SW9 mux live_regs vs rom_row. Resolve SW9 semantic conflict with existing demo-cycle logic in `fpga/bus_route.v` line 51. Staleness watchdog: no valid frame for 60 s → amber "no data" pulse.
+
+- [ ] **LT2** — `hub.py` (Pi side) does not exist in the repo. Must be written and committed. Reads `prediction model/route_plan.json` (demand nibble) + snaps BODS positions to `data/gtfs/ladywood_stops.json` (haversine). Sends 17-byte UART frame every 5 s (byte 0: 0xAA; bytes 1–15: [high nibble = vehicles at stop 0–9, low nibble = demand tier 0–3]; byte 16: XOR checksum).
+
+- [ ] **LT3** — Implement replay mode in `hub.py` (`--replay <file>` at 60× speed, same UART output). Not optional — this is the on-stage fallback if BODS/hotspot drops.
+
+- [ ] **LT4** — Register BODS key in `.bods_key` (gitignored) on the Pi before running `hub.py`.
+
+- [ ] **LT5** — Bench acceptance test (Mon 16 tonight): real bus move S06→S07 lights correctly; pull wire → amber pulse after 60 s; SW9 down → ROM snapshot demo. Chris + Jack integration test.
+
+- [ ] **LT6** — Record a replay file from live Tuesday data; commit it (or note path). On-stage label: "recorded Tuesday 17 Jun — replay mode, honest label."
+
+- [ ] **LT7** — WS2812B outdoors suitability paragraph → `fpga/README.md`; maintenance cost line → `docs/design/RUNNING_COSTS.md`. (Chris §5 in EVERYONE_TASKS, not yet in tracker.)
+
+> **ROM snapshot**: does NOT need regeneration. Stop importance tiers (major/medium/minor in `dashboard/ladywood_display.py`) did not change during the retrain — the ROM encodes colour tiers, not raw demand numbers. Raw demand numbers changed (weekend retrain) but those are read dynamically by `hub.py` from `route_plan.json`, not baked into the FPGA ROM.
+> **demand_model.pkl**: Pi does NOT load the pkl at runtime for the Living Twin — it reads the pre-computed `route_plan.json`. The pkl change is irrelevant to Chris's hardware.
+> **ladywood_stop_pois.json `__note__`**: hub.py does not read this file. No action.
+
+---
+
+## MISSING FROM TRACKER (surfaced in second audit pass)
+
+- [ ] **MT1** — `README.md` docs index: add a link to `docs/REFLECTIONS.md` once SK4 (banner delete) is confirmed. (EVERYONE_TASKS shared item.)
+
+- [ ] **MT2** — Dashboard commits push: day-lit map, compact controls, scrollable stop panel, metric-scale definitions, POI dash. (Arya §2 in EVERYONE_TASKS — not tracked here.)
+
+- [ ] **MT3** — Deck slide 18 CO₂ number: change "2.4–3.1 tCO₂e" to "~2–2.5 t" (model output is 1.95–2.54 tCO₂e/yr). `docs/EMISSIONS_QUANTIFICATION.md` is already correct; deck sync needed. (Arya §5 in EVERYONE_TASKS.)
+
+- [ ] **MT4** — Jack: sanity-check `prediction model/route_plan.json` after retrain: every stop served or in unserved list, capacities respected, no broken geometry. (Jack §2 in EVERYONE_TASKS.)
+
+- [ ] **MT5** — Jack + full team: end-to-end dry-run (dashboard + Living Twin + deck + replay-mode fallback). Target Tue 17. (Jack §4 in EVERYONE_TASKS.)
+
+- [ ] **MT6** — Dashboard crime tooltip in `StopPanel.tsx`: current text says "Used cautiously (see the crime-feature ablation)" — add "displayed as context only; excluded from the routing model" to close the live-demo attack vector. (See RH5.)
+
+---
+
 ## REHEARSAL (no code change needed — spoken answers)
 
 - [ ] **RH1** — README honestly reports 30.2% worst-case optimality gap. Prepare 10-second answer: "1.16% mean gap is the deployment metric; 30.2% is the worst-case upper bound on any single route in the largest scenario — the system average is what drives fuel savings."
