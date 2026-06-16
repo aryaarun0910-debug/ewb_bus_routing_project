@@ -34,7 +34,7 @@ Claude updates this file each session — check off items as they land.
 
 - [ ] **HP1** — `radio_signalling_report.md` has no §6 Security section. `tools/living_twin/FPGA_HARDENING.md` §1 flags this as "CURRENTLY UNADDRESSED — highest priority." Content exists in FPGA_HARDENING.md (AES-128-CMAC + monotonic counter + fail-safe blank on bad packet). Chris owns this (~30 min). Must be in the public repo before deck freeze.
 
-- [ ] **HP2** — `docs/EFFECT_SIZE_TRANSLATION.md`: the `[ ]` TODO action "Compute visits_per_day from route_plan.json, fill N in" is still open. The "N extra bus arrivals/day at the hospital corridor" number is missing from the doc and the deck. Arya owns this (~15 min one-liner on route_plan.json).
+- [x] **HP2** — `docs/EFFECT_SIZE_TRANSLATION.md`: `visits_per_day` computed from `route_plan.json` (116 route-stop assignments/weekday). N = 0.004 × 116 = 0.46 ≈ 0.5. Spoken answer updated: "roughly one additional route allocation every other day." Table and spoken-answer template filled in.
 
 - [x] **HP3** — `docs/FAILURE_MODES_AND_SERVICE_FLOOR.md` §4: broken `ASSUMPTION_LOG_ADDITIONS.md` reference replaced with "(see A15, A16 in `docs/ASSUMPTION_LOG.md`)".
 
@@ -46,7 +46,7 @@ Claude updates this file each session — check off items as they land.
 
 ## QUICK WINS (~30 min total)
 
-- [ ] **QW1** — `tools/living_twin/EVERYONE_TASKS.md` references `beast/hardening/CIRCULARITY_REBUTTAL.md` (local only, not in repo). Note the path is local; inline the key bullet points or commit the file to the repo.
+- [x] **QW1** — `tools/living_twin/EVERYONE_TASKS.md` was deleted (`git rm`'d) and consolidated into `AUDIT_TODO.md`. The broken `CIRCULARITY_REBUTTAL.md` reference is gone with it. No further action.
 
 - [x] **QW2** — `analysis/cost_model.py` line 64: comment changed to "passengers per vehicle (single-decker capacity)" — removed false claim of matching the optimizer's 320 window budget.
 
@@ -78,7 +78,7 @@ Claude updates this file each session — check off items as they land.
 
 ## MISSING FROM TRACKER (surfaced in second audit pass)
 
-- [ ] **MT1** — `README.md` docs index: add a link to `docs/REFLECTIONS.md` once SK4 (banner delete) is confirmed. (EVERYONE_TASKS shared item.)
+- [x] **MT1** — `README.md` docs index: "Team reflection" section added with link to `docs/REFLECTIONS.md`.
 
 - [ ] **MT2** — Dashboard commits push: day-lit map, compact controls, scrollable stop panel, metric-scale definitions, POI dash. (Arya §2 in EVERYONE_TASKS — not tracked here.)
 
@@ -88,7 +88,7 @@ Claude updates this file each session — check off items as they land.
 
 - [ ] **MT5** — Jack + full team: end-to-end dry-run (dashboard + Living Twin + deck + replay-mode fallback). Target Tue 17. (Jack §4 in EVERYONE_TASKS.)
 
-- [ ] **MT6** — Dashboard crime tooltip in `StopPanel.tsx`: current text says "Used cautiously (see the crime-feature ablation)" — add "displayed as context only; excluded from the routing model" to close the live-demo attack vector. (See RH5.)
+- [x] **MT6** — Crime removed entirely from dashboard (`demand.py` `_STATIC_COLS`, `api.ts` `Stop` interface, `StopPanel.tsx` `METRIC_DEFS` and stat-grid). No attack vector remains.
 
 ---
 
@@ -102,7 +102,7 @@ Claude updates this file each session — check off items as they land.
 
 - [ ] **RH4** — Latent demand attack ("if night buses are unreliable, your model can't see the suppressed demand"). Point to ASSUMPTION_LOG.md A5 (no induced-demand feedback loop — named, bounded, out of scope for Phase 1).
 
-- [ ] **RH5** — Dashboard crime tooltip: confirm the crime data in the UI explicitly says "displayed as context only — does not influence routing." Prevents a live demo attack on SK1.
+- [x] **RH5** — Crime removed entirely from dashboard. No tooltip to defend; no live-demo attack vector on SK1.
 
 - [ ] **RH6** — CIRCULARITY_REBUTTAL script: if it still cites r=0.945 anywhere, update to R²=0.9421 (the post-retrain figure) so what you say on stage matches the deck exactly.
 

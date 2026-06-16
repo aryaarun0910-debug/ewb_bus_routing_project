@@ -38,11 +38,9 @@ _STOP_IMPORTANCE = {
     "S13": "minor", "S14": "minor", "S15": "minor",
 }
 
-# Columns surfaced to the dashboard for DISPLAY (incl. crime as caveated area
-# context). The MODEL feature set deliberately excludes crime_total_2024 — see
-# analysis/crime_ablation/ — so the prediction row must use _MODEL_STATIC_COLS,
-# not the full display set, or it won't match the trained model.
-_STATIC_COLS = ["imd_score", "poi_total", "population", "crime_total_2024", "elevation_m"]
+# Static per-stop columns served to the dashboard. crime_total_2024 was removed
+# (ablated — rank 16/20, importance 0.000279 — see analysis/crime_ablation/).
+_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m"]
 _MODEL_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m"]
 
 
@@ -71,10 +69,9 @@ def _load_static_lookup() -> dict[str, dict]:
 
 _model, _encoders = _load_bundle()
 _static_lookup = _load_static_lookup()
-# Display lookup may include crime; the model row must not — filter to the model
-# feature set, preserving the training column order.
 _model_static_cols = [c for c in _MODEL_STATIC_COLS
                       if c in next(iter(_static_lookup.values()), {})]
+
 
 
 def _safe_encode(enc: LabelEncoder, value: str) -> int:

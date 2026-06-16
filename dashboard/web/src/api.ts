@@ -11,7 +11,6 @@ export interface Stop {
   imd_score?: number | null;
   poi_total?: number | null;
   population?: number | null;
-  crime_total_2024?: number | null;
   elevation_m?: number | null;
 }
 

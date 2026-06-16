@@ -23,17 +23,31 @@ high-deprivation stops are S06 Dudley Rd (the City Hospital corridor, deprivatio
 S10 Ladywood Fire Station (0.86; 57.9% of the ward has no car), and S12 Summerfield
 Park (0.82).
 
-To get the exact human number, compute once from the route plan:
+Computed from `prediction model/route_plan.json` (Weekday scenario, 8 time windows):
 
-```python
-# visits_per_day = total scheduled stop-visits across the network per weekday
-# (sum over routes of: departures/day × stops on route) — from route_plan.json
-moved_visits_per_day = 0.004 * visits_per_day
+| Window | Route-stop visits |
+|---|---|
+| Early Morning | 15 |
+| AM Peak | 14 |
+| Mid Morning | 15 |
+| Lunch | 15 |
+| Afternoon | 14 |
+| PM Peak | 15 |
+| Evening | 15 |
+| Night | 13 |
+| **Total** | **116** |
+
+```
+moved_visits_per_day = 0.004 × 116 = 0.46
 ```
 
-Then the sentence becomes concrete, e.g. *"about N additional bus arrivals every day at
-the hospital corridor and the no-car estates"* — fill N from the computation above and
-quote it everywhere instead of the raw index.
+**N ≈ 0.5** — roughly one additional route-stop allocation every two days,
+permanently structured into the dynamic schedule at the highest-deprivation stops
+(S06 Dudley Rd, S10 Ladywood Fire Station, S12 Summerfield Park).
+
+The small absolute number reflects the binding constraint: fixed fleet, no stop below
+the service floor, no new buses. An unconstrained model could post ΔD = 0.05 by
+stripping low-demand stops — we call that a worse design with a better number.
 
 ## The honest framing (this is the part that wins the exchange)
 
@@ -52,14 +66,14 @@ quote it everywhere instead of the raw index.
 
 ## The spoken answer (20 seconds)
 
-> "0.004 is the fraction of daily service that moves toward under-served stops — about
-> [N] extra bus arrivals a day, every day, at the hospital corridor and the estates where
-> a majority of households have no car. It looks small because it's constrained to be
-> honest: no stop drops below the service floor, no new buses, no robbing quiet stops to
-> flatter the metric. That's the equity gain you can actually deploy — and we'd rather
-> defend a real 0.4% than an imaginary 10."
+> "0.004 is the fraction of daily service that permanently shifts toward under-served
+> stops — roughly one additional route allocation every other day at the hospital
+> corridor and the no-car estates, every weekday, built into the schedule by design.
+> It looks small because it's constrained to be honest: no stop drops below the service
+> floor, no new buses, no robbing quiet stops to flatter the metric. That's the equity
+> gain you can actually deploy — and we'd rather defend a real 0.4% than an imaginary 10."
 
 ## Action
 
-- [ ] Compute `visits_per_day` from `route_plan.json` (one-liner above), fill N in.
+- [x] `visits_per_day` computed from `route_plan.json`: 116 route-stop assignments/day (weekday). N = 0.004 × 116 = 0.46 ≈ 0.5.
 - [ ] Add the subsection next to the reported index; quote N (not the raw index) in the deck's speaker notes.

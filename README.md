@@ -331,3 +331,7 @@ The remaining path to fully-observed accuracy: a direct TfWM Automatic Passenger
 - [FPGA & display hardening](docs/FPGA_HARDENING.md) — LoRa packet authentication, outdoor-rating, HDL verification
 - [Proposed live stop-unit architecture (render)](docs/renders/stop_unit_isometric.png)
 - [Dashboard README](dashboard/README.md)
+
+### Team reflection
+
+- [Reflections](docs/REFLECTIONS.md) — what we learned, what surprised us, and what we'd do differently

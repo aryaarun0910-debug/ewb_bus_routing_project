@@ -7,7 +7,6 @@ const METRIC_DEFS: { label: string; def: string }[] = [
   { label: "IMD score", def: "Index of Multiple Deprivation (2019) for the stop's Lower Super Output Area — England's official measure of relative deprivation (income, employment, health, education, crime, housing, environment). The score runs ~0 (least deprived) to ~90 (most); higher = more deprived. Ladywood's stops sit between 27 and 68 — most in England's more-deprived half." },
   { label: "Points of interest", def: "Count of amenities (shops, services, civic buildings) within 400 m, from OpenStreetMap — a proxy for footfall and local activity. Across these stops it ranges from ~10 (quiet residential) to ~190 (a busy interchange). A dash (—) means OpenStreetMap returned no data for that stop, not zero amenities." },
   { label: "Population", def: "Resident population of the stop's surrounding Census area (an LSOA, designed to hold ~1,500–3,000 people). Here it ranges ~1,450–2,500 — the size of the immediate community the stop serves." },
-  { label: "Crime (2024)", def: "Recorded crime incidents for 2024 (police.uk) across the stop's wider policing neighbourhood — which is why the figures run into the tens of thousands and are shared between nearby stops, rather than a single street's count. Used cautiously (see the crime-feature ablation): higher may indicate need for safer, more frequent evening service." },
   { label: "Elevation", def: "Height above sea level in metres (here 123–149 m — a modest spread). Included because hills affect walking distance to stops and journey times." },
 ];
 
@@ -62,7 +61,6 @@ export default function StopPanel({
             <Stat label="IMD score" value={fmt(stop.imd_score, 1)} />
             <Stat label="Points of interest" value={fmtCount(stop.poi_total)} />
             <Stat label="Population" value={fmt(stop.population)} />
-            <Stat label="Crime (2024)" value={fmt(stop.crime_total_2024)} />
             <Stat label="Elevation" value={stop.elevation_m == null ? "—" : `${fmt(stop.elevation_m)} m`} />
           </div>
 
