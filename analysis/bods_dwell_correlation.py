@@ -101,7 +101,7 @@ def run(dwell_path: Path) -> None:
 
     # Map ATCO codes to model stop IDs
     if "stop" in dwell_df.columns:
-        dwell_df["sid"] = dwell_df["stop"].map(atco_map)
+        dwell_df["sid"] = dwell_df["stop"].astype(str).map(atco_map)
     else:
         print(f"ERROR: expected 'stop' column in {dwell_path}, found: {list(dwell_df.columns)}")
         sys.exit(1)
@@ -122,8 +122,8 @@ def run(dwell_path: Path) -> None:
                             "note": "insufficient data"})
             continue
 
-        # Pivot: one row per hour, value = median_dwell_s
-        pivot = stop_rows.groupby("hour")["median_dwell_s"].median()
+        # Pivot: one row per hour, value = dwell_s (already median by hour)
+        pivot = stop_rows.groupby("hour")["dwell_s"].median()
         hours = sorted(pivot.index)
         observed = [pivot[h] for h in hours]
         predicted = [_PROFILE_WEEKDAY[tier][h] for h in hours]
