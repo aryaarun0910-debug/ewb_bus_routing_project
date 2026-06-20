@@ -1,0 +1,85 @@
+{
+  "fixed_schedule": {
+    "label": "Fixed schedule",
+    "route_lengths_km": {
+      "8A/8C Inner Circle": 22.0,
+      "Route 80": 18.0,
+      "Route 126": 12.0
+    },
+    "total_vkm_day": 52.0,
+    "vkm_cost_day": 232.44,
+    "driver_hrs_day": 8.666666666666666,
+    "driver_cost_day": 159.96586666666664,
+    "total_cost_day": 392.4058666666666,
+    "total_cost_yr": 117721.75999999998
+  },
+  "dynamic_routing": {
+    "label": "Dynamic routing",
+    "route_lengths_km": {
+      "8A/8C Inner Circle": 19.25,
+      "Route 80": 15.75,
+      "Route 126": 10.5
+    },
+    "total_vkm_day": 45.5,
+    "vkm_cost_day": 203.385,
+    "driver_hrs_day": 7.583333333333333,
+    "driver_cost_day": 139.97013333333334,
+    "total_cost_day": 343.35513333333336,
+    "total_cost_yr": 103006.54000000001
+  },
+  "opex_saving": {
+    "per_day_gbp": 49.05,
+    "per_year_gbp": 14715.22
+  },
+  "passenger_time_savings": {
+    "additional_passengers_per_day": 48.0,
+    "journey_min": 22.0,
+    "time_value_per_hr": 9.8,
+    "social_value_per_day": 172.48,
+    "social_value_per_yr": 51744.0
+  },
+  "deployment": {
+    "hardware_items": {
+      "Terasic DE1-SoC FPGA (per hub, \u00d73)": 450,
+      "WS2812B LED display modules (\u00d73 hubs)": 180,
+      "Edge compute (Raspberry Pi 5 \u00d71)": 85,
+      "Cabling + enclosure": 320,
+      "Installation labour (8 hrs \u00d7 \u00a335/hr)": 280
+    },
+    "total_hardware_gbp": 1315,
+    "software_annual_gbp": 640,
+    "annualised_hardware_gbp": 263.0,
+    "total_annual_deployment_gbp": 903.0
+  },
+  "net_annual_saving_gbp": 13812.22,
+  "breakeven_months": 1.1,
+  "social_value_per_yr_gbp": 51744.0,
+  "emissions": {
+    "vkm_saved_per_day": 6.5,
+    "vkm_saved_per_year": 1950.0,
+    "co2e_saved_per_yr_tonnes": [
+      1.95,
+      2.54
+    ],
+    "kgco2e_per_vkm_range": [
+      1.0,
+      1.3
+    ],
+    "basis": "300 operating days/yr, DESNZ/DfT-TAG local-bus factor range"
+  },
+  "ladywood_context": {
+    "car_free_household_pct": 57.9,
+    "fuel_poverty_pct": 26.6,
+    "median_wage_per_hr_gbp": 13.86,
+    "additional_passengers_carfree_daily": 27.8,
+    "dynamic_vkm_reduction_pct": 12.5
+  },
+  "data_sources": {
+    "vehicle_costs": "DfT Bus Statistics 2023, Table BUS0404",
+    "driver_wages": "National Express West Midlands 2024 pay scale",
+    "time_value": "DfT TAG Unit A1.3 (2023), low-income working",
+    "ladywood_wages": "ONS ASHE 2023, Ladywood Parliamentary Constituency",
+    "car_ownership": "ONS Census 2021, Ladywood Ward",
+    "fuel_poverty": "CIVIC SQUARE Neighbourhood Doughnut Portrait 2022"
+  }
+}

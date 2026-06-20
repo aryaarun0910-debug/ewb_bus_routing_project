@@ -62,7 +62,7 @@ and Framer Motion micro-interactions throughout.
 |---|---|
 | **Live demand-sized stops** | Marker size and colour scale with the XGBoost model's predicted boardings, recomputed for the selected hour |
 | **Animated bus routes** | Buses follow real Ladywood road geometry (not straight lines), looping continuously per scenario/time-window |
-| **Click-a-stop detail panel** | Name, importance tier, predicted boardings, IMD score, POI count, population, crime, elevation, and routes served |
+| **Click-a-stop detail panel** | Name, importance tier, predicted boardings, IMD score, POI count, population, elevation, and routes served |
 | **IMD equity overlay** | One-click toggle that recolours every stop on a deprivation gradient (grey → red), making the equity dimension immediately visible |
 | **What-if conditions panel** | Live toggles for day type, weather, special events, and school/university term — the demand predictions update in real time, demonstrating the model's responsiveness rather than relying on static pre-computed scenarios |
 | **Scenario comparison** | Side-by-side stats (buses deployed, demand served, unserved stops, with deltas) for two scenarios in the same time window — e.g. a sunny weekday vs. a storm — showing how the optimiser reallocates capacity under disruption |
@@ -91,6 +91,13 @@ All figures are reproducible — see [Getting Started](#getting-started).
 </p>
 <p align="center">
   <em>Left: R² holds steady (0.926–0.942) across six independent validation checks — see <a href="#model-validation--robustness">Model Validation</a>. Right: the dynamic optimiser tracks real predicted demand more closely than a fixed schedule can, averaged across every scenario the model was run against — see <a href="#equity">Equity</a>.</em>
+</p>
+
+<p align="center">
+  <img src="docs/figures/chart_cost.png" width="90%" />
+</p>
+<p align="center">
+  <em>The economic model behind the figures above, reproducible from <code>analysis/cost_model.py</code> — DfT BUS0404 operating costs (left) and where the saving goes once deployment cost and TAG A1.3 passenger time value are accounted for (right).</em>
 </p>
 
 ---
@@ -126,6 +133,40 @@ A single random-split R² is not enough to trust a demand model — it can hide 
 | **Domain shift** — train on one year/season, test on the other | Year shift avg R² = 0.9405; season shift avg R² = 0.9257 | Cross-year and cross-season transfer retain most of the in-distribution score — the model is mostly capturing stable structure (which stops are busy, when, in what weather), not memorising one year's quirks. The modest season-shift drop (0.9421 → 0.9257) is the honest bound on how far this model should be trusted to extrapolate without retraining |
 
 This is also why the **headline R² changed from 0.9424 (random 80/20 split) to 0.9421 (temporal split, train-2023/test-2024)** between the table above and this one — the temporal figure is the one we now report as primary, because it's the one that can't be inflated by within-period leakage.
+
+---
+
+## External Validation
+
+Everything above tests the model against itself — different splits, different perturbations of the same training data. None of it proves the demand *shape* the model learned resembles a real bus route anywhere in the world. These checks go further: they compare Ladywood's modelled curves, and the underlying pipeline, against real third-party transit data the model never saw.
+
+<p align="center">
+  <img src="analysis/shape_validation/shape_validation.png" width="95%" />
+</p>
+<p align="center">
+  <em>Modelled hour-of-day demand shape vs. 2.3M real London bus boardings (TfL BUSTO, autumn 2023) — r = 0.945 (major stops), 0.942 (medium), 0.796 (minor). Full note: <a href="analysis/shape_validation/SHAPE_VALIDATION.md">SHAPE_VALIDATION.md</a>.</em>
+</p>
+
+<p align="center">
+  <img src="analysis/wellington_validation/wellington_validation.png" width="95%" />
+</p>
+<p align="center">
+  <em>The same test against real hourly stop-level Automatic Passenger Counting data from Wellington, New Zealand — a second, independent city and country — r up to 0.963. The rightmost panel tests boarding/alighting asymmetry directly.</em>
+</p>
+
+<p align="center">
+  <img src="analysis/second_city_bootstrap/manchester_bootstrap_map.png" width="55%" />
+</p>
+<p align="center">
+  <em>The same pipeline run cold on Harpurhey, Manchester, from open data only — a day-1 route bootstrap with no Ladywood-specific tuning, testing whether the method generalises or only fits this one ward.</em>
+</p>
+
+<p align="center">
+  <img src="analysis/shape_stability/shape_stability.png" width="95%" />
+</p>
+<p align="center">
+  <em>And the real curve being validated against is itself stable across three consecutive years of TfL BUSTO data (min pairwise r = 0.998) — so the comparisons above aren't being checked against a one-off snapshot.</em>
+</p>
 
 ---
 
@@ -225,6 +266,15 @@ python analysis/explainability.py      # XGBoost feature importance
 python analysis/robustness_analysis.py --json   # i.i.d., sensitivity, domain-shift checks
 ```
 
+### Regenerate the README charts
+
+```bash
+python analysis/cost_model.py --json && python analysis/generate_cost_chart.py
+python analysis/equity.py --json && python analysis/generate_equity_chart.py
+python analysis/robustness_analysis.py --json && python analysis/generate_robustness_chart.py
+python analysis/explainability.py --json && python analysis/generate_feature_importance_chart.py
+```
+
 ### Run tests
 
 ```bash
@@ -248,11 +298,11 @@ Every number quoted in this README traces back to a script you can run yourself 
 
 | Claim | Computed by | Output |
 |---|---|---|
-| R² = 0.9421, robustness across 6 checks | `analysis/robustness_analysis.py` | [`robustness.json`](analysis/outputs/robustness.json) |
-| Allocation-mismatch 0.348 → 0.344 | `analysis/equity.py` | [`equity.json`](analysis/outputs/equity.json) |
-| Operating cost saving, break-even, social value | `analysis/cost_model.py` | DfT BUS0404 / TAG A1.3 methodology |
+| R² = 0.9421, robustness across 6 checks | `analysis/robustness_analysis.py` | [`robustness.json`](analysis/outputs/robustness.json) · [chart](docs/figures/chart_robustness.png) |
+| Allocation-mismatch 0.348 → 0.344 | `analysis/equity.py` | [`equity.json`](analysis/outputs/equity.json) · [chart](docs/figures/chart_equity.png) |
+| Operating cost saving, break-even, social value | `analysis/cost_model.py` | DfT BUS0404 / TAG A1.3 methodology · [chart](docs/figures/chart_cost.png) |
 | Synthetic vs. real GTFS pattern match | `analysis/gtfs_validate.py` | [`gtfs_validation.json`](analysis/outputs/gtfs_validation.json) |
-| Feature importance (what drives demand) | `analysis/explainability.py` | XGBoost permutation importance |
+| Feature importance (what drives demand) | `analysis/explainability.py` | XGBoost permutation importance · chart via `analysis/generate_feature_importance_chart.py` (run after `--json`) |
 
 ---
 
