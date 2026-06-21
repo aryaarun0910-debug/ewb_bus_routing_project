@@ -52,14 +52,15 @@ def _load_model_and_data():
         )
 
     with open(_MODEL_PKL, "rb") as f:
-        model_bundle = pickle.load(f)
+        bundle = pickle.load(f)
 
-    # model_bundle may be (model, feature_names) or just a model — handle both
-    if isinstance(model_bundle, tuple):
-        model, feature_names = model_bundle
+    # Current format: dict {"model","encoders","feature_cols"}; tolerate legacy tuple/bare.
+    if isinstance(bundle, dict):
+        model, feature_names, encoders = bundle["model"], bundle.get("feature_cols"), bundle.get("encoders")
+    elif isinstance(bundle, tuple):
+        model, feature_names, encoders = bundle[0], bundle[1], None
     else:
-        model = model_bundle
-        feature_names = None
+        model, feature_names, encoders = bundle, None, None
 
     # Load dataset
     rows = []
@@ -68,10 +69,47 @@ def _load_model_and_data():
         for row in reader:
             rows.append(row)
 
-    return model, feature_names, rows
+    return model, feature_names, encoders, rows
 
 
-def _build_feature_matrix(rows: list[dict], feature_names: list[str] | None):
+def _build_feature_matrix(rows: list[dict], feature_names: list[str] | None, encoders):
+    """Reconstruct the exact feature matrix the model was trained on, using the
+    saved LabelEncoders and feature_cols from the model bundle."""
+    import numpy as np
+    import pandas as pd
+
+    df = pd.DataFrame(rows)
+    cat_cols = ["stop_id", "stop_importance", "day_type",
+                "weather_type", "climate_event", "special_event"]
+
+    def _enc(col, val):
+        e = encoders[col]
+        classes = set(e.classes_)
+        v = val if val in classes else ("none" if "none" in classes else e.classes_[0])
+        return int(e.transform([v])[0])
+
+    for c in cat_cols:
+        df[c + "_enc"] = df[c].map(lambda v, c=c: _enc(c, v))
+
+    if feature_names is None:
+        feature_names = (
+            [c + "_enc" for c in cat_cols]
+            + ["hour", "month", "temperature_c", "wind_kmh", "precipitation_mm",
+               "is_school_term", "is_uni_term", "trips_per_hour", "stop_lat", "stop_lng",
+               "imd_score", "poi_total", "population", "elevation_m", "car_free_pct"]
+        )
+
+    for c in feature_names:
+        if c not in df.columns:
+            df[c] = np.nan
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    X = df[feature_names].astype(float).values
+    y = pd.to_numeric(df["boardings"], errors="coerce").fillna(0).astype(float).values
+    return X, y, list(feature_names)
+
+
+def _build_feature_matrix_legacy(rows: list[dict], feature_names: list[str] | None):
     """Reconstruct the feature matrix used during training."""
     import numpy as np
 
@@ -180,14 +218,14 @@ _FEATURE_NOTES: dict[str, str] = {
 def run_analysis(n_repeats: int = 5) -> dict:
     import numpy as np
 
-    model, feature_names_stored, rows = _load_model_and_data()
+    model, feature_names_stored, encoders, rows = _load_model_and_data()
 
     # Use a 10% stratified sample for permutation importance (fast but representative)
     rng = np.random.default_rng(0)
     sample_idx = rng.choice(len(rows), size=min(6500, len(rows)), replace=False)
     rows_sample = [rows[i] for i in sample_idx]
 
-    X, y, feature_names = _build_feature_matrix(rows_sample, feature_names_stored)
+    X, y, feature_names = _build_feature_matrix(rows_sample, feature_names_stored, encoders)
 
     # XGBoost built-in gain importance
     try:

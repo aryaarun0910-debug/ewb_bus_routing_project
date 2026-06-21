@@ -1,0 +1,233 @@
+{
+  "model_path": "C:\\Users\\aryaa\\Documents\\ewb_bus_routing_project\\prediction model\\demand_model.pkl",
+  "dataset_rows": 263160,
+  "sample_rows": 6500,
+  "n_features": 21,
+  "n_perm_repeats": 5,
+  "top_features": [
+    {
+      "feature": "stop_importance_enc",
+      "gain_importance": 0.4081,
+      "permutation_importance": 1.0,
+      "combined_rank_score": 0.7041,
+      "interpretation": ""
+    },
+    {
+      "feature": "trips_per_hour",
+      "gain_importance": 0.1175,
+      "permutation_importance": 0.6371,
+      "combined_rank_score": 0.3773,
+      "interpretation": ""
+    },
+    {
+      "feature": "hour",
+      "gain_importance": 0.0674,
+      "permutation_importance": 0.462,
+      "combined_rank_score": 0.2647,
+      "interpretation": "Time of day \u2014 the strongest driver of demand; captures AM/PM peaks and overnight suppression"
+    },
+    {
+      "feature": "day_type_enc",
+      "gain_importance": 0.0599,
+      "permutation_importance": 0.0869,
+      "combined_rank_score": 0.0734,
+      "interpretation": ""
+    },
+    {
+      "feature": "imd_score",
+      "gain_importance": 0.0803,
+      "permutation_importance": 0.0543,
+      "combined_rank_score": 0.0673,
+      "interpretation": ""
+    },
+    {
+      "feature": "special_event_enc",
+      "gain_importance": 0.0266,
+      "permutation_importance": 0.0874,
+      "combined_rank_score": 0.057,
+      "interpretation": ""
+    },
+    {
+      "feature": "stop_id_enc",
+      "gain_importance": 0.0336,
+      "permutation_importance": 0.063,
+      "combined_rank_score": 0.0483,
+      "interpretation": ""
+    },
+    {
+      "feature": "population",
+      "gain_importance": 0.0776,
+      "permutation_importance": 0.0159,
+      "combined_rank_score": 0.0468,
+      "interpretation": ""
+    },
+    {
+      "feature": "precipitation_mm",
+      "gain_importance": 0.0086,
+      "permutation_importance": 0.0354,
+      "combined_rank_score": 0.022,
+      "interpretation": "Rainfall \u2014 amplifies heavy_rain weather signal; orthogonal to wind"
+    },
+    {
+      "feature": "elevation_m",
+      "gain_importance": 0.0347,
+      "permutation_importance": 0.007,
+      "combined_rank_score": 0.0209,
+      "interpretation": ""
+    }
+  ],
+  "all_features": [
+    {
+      "feature": "stop_importance_enc",
+      "gain_importance": 0.4081,
+      "permutation_importance": 1.0,
+      "combined_rank_score": 0.7041,
+      "interpretation": ""
+    },
+    {
+      "feature": "trips_per_hour",
+      "gain_importance": 0.1175,
+      "permutation_importance": 0.6371,
+      "combined_rank_score": 0.3773,
+      "interpretation": ""
+    },
+    {
+      "feature": "hour",
+      "gain_importance": 0.0674,
+      "permutation_importance": 0.462,
+      "combined_rank_score": 0.2647,
+      "interpretation": "Time of day \u2014 the strongest driver of demand; captures AM/PM peaks and overnight suppression"
+    },
+    {
+      "feature": "day_type_enc",
+      "gain_importance": 0.0599,
+      "permutation_importance": 0.0869,
+      "combined_rank_score": 0.0734,
+      "interpretation": ""
+    },
+    {
+      "feature": "imd_score",
+      "gain_importance": 0.0803,
+      "permutation_importance": 0.0543,
+      "combined_rank_score": 0.0673,
+      "interpretation": ""
+    },
+    {
+      "feature": "special_event_enc",
+      "gain_importance": 0.0266,
+      "permutation_importance": 0.0874,
+      "combined_rank_score": 0.057,
+      "interpretation": ""
+    },
+    {
+      "feature": "stop_id_enc",
+      "gain_importance": 0.0336,
+      "permutation_importance": 0.063,
+      "combined_rank_score": 0.0483,
+      "interpretation": ""
+    },
+    {
+      "feature": "population",
+      "gain_importance": 0.0776,
+      "permutation_importance": 0.0159,
+      "combined_rank_score": 0.0468,
+      "interpretation": ""
+    },
+    {
+      "feature": "precipitation_mm",
+      "gain_importance": 0.0086,
+      "permutation_importance": 0.0354,
+      "combined_rank_score": 0.022,
+      "interpretation": "Rainfall \u2014 amplifies heavy_rain weather signal; orthogonal to wind"
+    },
+    {
+      "feature": "elevation_m",
+      "gain_importance": 0.0347,
+      "permutation_importance": 0.007,
+      "combined_rank_score": 0.0209,
+      "interpretation": ""
+    },
+    {
+      "feature": "stop_lat",
+      "gain_importance": 0.0202,
+      "permutation_importance": 0.0157,
+      "combined_rank_score": 0.0179,
+      "interpretation": ""
+    },
+    {
+      "feature": "stop_lng",
+      "gain_importance": 0.0225,
+      "permutation_importance": 0.0047,
+      "combined_rank_score": 0.0136,
+      "interpretation": ""
+    },
+    {
+      "feature": "poi_total",
+      "gain_importance": 0.023,
+      "permutation_importance": 0.0011,
+      "combined_rank_score": 0.0121,
+      "interpretation": ""
+    },
+    {
+      "feature": "month",
+      "gain_importance": 0.0041,
+      "permutation_importance": 0.0178,
+      "combined_rank_score": 0.011,
+      "interpretation": "Seasonal cycle \u2014 demand drops in summer holidays and rises in cold wet months"
+    },
+    {
+      "feature": "temperature_c",
+      "gain_importance": 0.0025,
+      "permutation_importance": 0.0077,
+      "combined_rank_score": 0.0051,
+      "interpretation": "Temperature \u2014 heatwaves suppress walking trips; cold snaps increase bus dependency"
+    },
+    {
+      "feature": "wind_kmh",
+      "gain_importance": 0.0017,
+      "permutation_importance": 0.0051,
+      "combined_rank_score": 0.0034,
+      "interpretation": "Wind speed \u2014 correlated with storm events; independent effect on cyclist\u2192bus modal shift"
+    },
+    {
+      "feature": "car_free_pct",
+      "gain_importance": 0.0042,
+      "permutation_importance": 0.0007,
+      "combined_rank_score": 0.0024,
+      "interpretation": ""
+    },
+    {
+      "feature": "is_school_term",
+      "gain_importance": 0.0039,
+      "permutation_importance": 0.0004,
+      "combined_rank_score": 0.0022,
+      "interpretation": "School term flag \u2014 large effect at minor stops near schools; smaller at interchanges"
+    },
+    {
+      "feature": "weather_type_enc",
+      "gain_importance": 0.0017,
+      "permutation_importance": 0.002,
+      "combined_rank_score": 0.0019,
+      "interpretation": ""
+    },
+    {
+      "feature": "is_uni_term",
+      "gain_importance": 0.0017,
+      "permutation_importance": 0.0005,
+      "combined_rank_score": 0.0011,
+      "interpretation": "University term \u2014 affects city-centre and Five Ways stops disproportionately"
+    },
+    {
+      "feature": "climate_event_enc",
+      "gain_importance": 0.0,
+      "permutation_importance": 0.0,
+      "combined_rank_score": 0.0,
+      "interpretation": ""
+    }
+  ],
+  "methodology": {
+    "gain_importance": "XGBoost built-in: average gain across all trees for splits on each feature. Fast but biased toward high-cardinality and continuous features.",
+    "permutation_importance": "Model-agnostic: MSE increase when a single feature column is randomly permuted. Unbiased but more expensive; computed on a 10% sample with 5 repeats.",
+    "combined_rank_score": "Mean of normalised gain and permutation scores."
+  }
+}

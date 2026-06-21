@@ -23,9 +23,9 @@ _MODEL_DIR = _REPO_ROOT / "prediction model"
 _MODEL_PKL = _MODEL_DIR / "demand_model.pkl"
 _DATASET_CSV = _MODEL_DIR / "map_demand_dataset.csv"
 
-# Real WGS84 stop coordinates — used as stop_lat/stop_lng model features.
-# Matches REAL_STOP_COORDS in generate_real_demand_dataset.py exactly.
-_STOP_LATLONG = {
+# Abstract 0-10 grid coordinates used as stop_x/stop_y during model training.
+# Matches the values in map_demand_dataset.csv exactly.
+_STOP_LATLNG = {
     "S01": (52.477558, -1.896240), "S02": (52.467575, -1.904080),
     "S03": (52.489780, -1.912559), "S04": (52.496273, -1.915020),
     "S05": (52.475674, -1.913573), "S06": (52.485722, -1.936805),
@@ -42,8 +42,7 @@ _STOP_IMPORTANCE = {
     "S13": "minor", "S14": "minor", "S15": "minor",
 }
 
-# Static per-stop columns. crime_total_2024 excluded (ablation rank 16/20).
-# car_free_pct added: Census 2021 TS045 transit-dependency measure.
+# Static per-stop columns matching the model's training feature_cols exactly.
 _STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m", "car_free_pct"]
 _MODEL_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m", "car_free_pct"]
 
@@ -81,7 +80,7 @@ def _load_static_lookup() -> dict[str, dict]:
     if not cols:
         return {}
     raw = df.drop_duplicates("stop_id").set_index("stop_id")[cols].to_dict("index")
-    return {sid: {k: (None if pd.isna(v) else v) for k, v in row.items()}
+    return {sid: {k: (float("nan") if pd.isna(v) else v) for k, v in row.items()}
             for sid, row in raw.items()}
 
 
@@ -104,8 +103,9 @@ def _build_row(
     temperature_c: float, wind_kmh: float, precipitation_mm: float,
     is_school_term: int, is_uni_term: int,
 ) -> list:
-    """Assemble one model feature row for a stop-hour (order matches FEATURE_COLS)."""
-    lat, lng = _STOP_LATLONG[stop_id]
+    """Assemble one model feature row for a stop-hour. Order matches FEATURE_COLS
+    in prediction model/demand_route_optimizer.py exactly."""
+    lat, lng = _STOP_LATLNG[stop_id]
     trips = _svc_profile.get(stop_id, {}).get(day_type, {}).get(hour, 0)
     row = [
         _safe_encode(_encoders["stop_id"], stop_id),
@@ -139,7 +139,7 @@ def predict_all_stops(hour: int, **conditions) -> dict[str, float]:
     looping `predict_stop_demand` (≈2.2s → ≈50ms for 15 stops), keeping the
     what-if panel and auto-play snappy.
     """
-    sids = list(_STOP_XY)
+    sids = list(_STOP_LATLNG)
     rows = [_build_row(sid, hour, **conditions) for sid in sids]
     preds = _model.predict(rows)
     return {sid: round(max(0.0, float(p)), 1) for sid, p in zip(sids, preds)}

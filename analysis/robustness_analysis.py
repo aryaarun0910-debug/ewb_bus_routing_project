@@ -53,7 +53,7 @@ CAT_COLS = [
 ]
 # crime_total_2024 deliberately excluded — mirrors the deployed model
 # (demand_route_optimizer.py); see analysis/crime_ablation/.
-_REAL_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m"]
+_REAL_STATIC_COLS = ["imd_score", "poi_total", "population", "elevation_m", "car_free_pct"]
 
 XGB_PARAMS = dict(
     n_estimators=400, max_depth=7, learning_rate=0.07,
@@ -81,7 +81,7 @@ def _encode(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     feature_cols = (
         [c + "_enc" for c in CAT_COLS]
         + ["hour", "month", "temperature_c", "wind_kmh", "precipitation_mm",
-           "is_school_term", "is_uni_term", "stop_x", "stop_y"]
+           "is_school_term", "is_uni_term", "trips_per_hour", "stop_lat", "stop_lng"]
         + [c for c in _REAL_STATIC_COLS if c in df.columns]
     )
     return df, feature_cols
