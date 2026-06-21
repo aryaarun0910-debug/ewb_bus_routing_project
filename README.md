@@ -7,7 +7,8 @@
 ![FPGA](https://img.shields.io/badge/FPGA-DE1--SoC-orange)
 ![Status](https://img.shields.io/badge/Status-Prototype-yellow)
 
-> Engineering Without Borders Design Challenge 2025–26 · UK2026-82 · Ladywood Ward, Birmingham
+> Engineers Without Borders Engineering for People Design Challenge 2025–26 · UK2026-82 · Ladywood Ward, Birmingham
+> **Grand Final team — one of the top 36 teams, from over 13,000 participants in this year's challenge.**
 
 ---
 
