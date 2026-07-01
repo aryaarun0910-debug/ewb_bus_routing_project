@@ -6,6 +6,7 @@
 ![Model](https://img.shields.io/badge/Model-XGBoost-green)
 ![FPGA](https://img.shields.io/badge/FPGA-DE1--SoC-orange)
 ![Status](https://img.shields.io/badge/Status-Prototype-yellow)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 > Engineers Without Borders Engineering for People Design Challenge 2025–26 · UK2026-82 · Ladywood Ward, Birmingham
 > **Grand Final team — one of the top 36 teams, from over 13,000 participants in this year's challenge.**
@@ -85,6 +86,8 @@ and Framer Motion micro-interactions throughout.
 | Allocation-mismatch index, fixed vs. dynamic | 0.348 → 0.344 (avg. across 32 scenario/window snapshots) |
 
 All figures are reproducible — see [Getting Started](#getting-started).
+
+**Why the worst-case routing gap is 30.2%, not close to the 1.16% mean.** The gap is measured as `100 × (2-opt time − brute-force-optimal time) / brute-force-optimal time` per route (see `route_gaps()` in [`demand_route_optimizer.py`](<prediction model/demand_route_optimizer.py>)) — a *percentage* of that route's own optimal travel time, not an absolute figure. The 30.2% outlier occurs on short, low-stop-count routes (typically off-peak windows where only 3–4 stops clear the minimum-demand threshold), where 2-opt's local search can settle one non-optimal-but-locally-irreducible stop ordering; because the denominator (optimal time) is small on a short route, even a 1–2 minute detour inflates the percentage sharply. On the longer, higher-stop-count peak-hour routes — the ones that carry the vast majority of daily demand — 89% are solved exactly optimally and the mean gap holds at 1.16%. In absolute terms the worst case is a low-single-digit-minutes detour on a route that was already short, not a structural failure of the optimiser.
 
 <p align="center">
   <img src="docs/figures/chart_robustness.png" width="58%" />
