@@ -426,6 +426,16 @@ if __name__ == "__main__":
                     sp_wts = SPECIAL_EVENT_PROBS
                 special = random.choices(SPECIAL_EVENTS, weights=sp_wts)[0]
 
+                # Synthetic calendar date — these are sampled representative
+                # days, not real dates, but demand_route_optimizer.py needs a
+                # `date` column to do its train-2023/test-2024 temporal split.
+                # Spreads scenarios across both years so both splits get rows
+                # every month; day-of-month is fixed at a safe value (<=28)
+                # so it's valid regardless of month length.
+                scenario_year = 2023 if scenario_idx < 3 else 2024
+                scenario_day  = 1 + scenario_idx * 5
+                synthetic_date = f"{scenario_year:04d}-{month:02d}-{scenario_day:02d}"
+
                 for stop in STOPS:
                     for hour in range(24):
                         boardings, alightings = get_demand(
@@ -448,6 +458,7 @@ if __name__ == "__main__":
                             "stop_y":           stop["y"],
                             "stop_importance":  stop["importance"],
                             "day_scenario":     scenario_counter,
+                            "date":             synthetic_date,
                             "month":            month,
                             "month_name":       MONTH_NAMES[month],
                             "day_type":         day_type,
@@ -473,7 +484,7 @@ if __name__ == "__main__":
 
     FIELDNAMES = [
         "stop_id", "stop_name", "stop_x", "stop_y", "stop_importance",
-        "day_scenario", "month", "month_name", "day_type",
+        "day_scenario", "date", "month", "month_name", "day_type",
         "hour", "time_label",
         "weather_type", "temperature_c", "wind_kmh", "precipitation_mm",
         "climate_event", "special_event",
