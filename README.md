@@ -1,6 +1,6 @@
 # Predictive Bus Routing — Ladywood, Birmingham
 
-[![CI](https://github.com/ChrisLegge/ewb_bus_routing_project/actions/workflows/ci.yml/badge.svg)](https://github.com/ChrisLegge/ewb_bus_routing_project/actions/workflows/ci.yml)
+[![CI](https://github.com/aryaarun0910-debug/ewb_bus_routing_project/actions/workflows/ci.yml/badge.svg)](https://github.com/aryaarun0910-debug/ewb_bus_routing_project/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![React](https://img.shields.io/badge/React-19-61dafb)
 ![Model](https://img.shields.io/badge/Model-XGBoost-green)
@@ -214,7 +214,7 @@ tests/              pytest suite — routing invariants + API contract
 ## Getting Started
 
 ```bash
-git clone https://github.com/ChrisLegge/ewb_bus_routing_project
+git clone https://github.com/aryaarun0910-debug/ewb_bus_routing_project
 cd ewb_bus_routing_project
 pip install -r requirements.txt
 
@@ -236,7 +236,7 @@ uvicorn dashboard.api:app --port 8000
 > **Windows / PowerShell:** the block above is written for bash (macOS/Linux/WSL/Git Bash). Native Windows PowerShell doesn't support `&&` chaining and may resolve `python`/`pip`/`uvicorn` to a different Python install than the one with your project dependencies. Use this instead:
 >
 > ```powershell
-> git clone https://github.com/ChrisLegge/ewb_bus_routing_project
+> git clone https://github.com/aryaarun0910-debug/ewb_bus_routing_project
 > cd ewb_bus_routing_project
 > py -3 -m pip install -r requirements.txt
 >
