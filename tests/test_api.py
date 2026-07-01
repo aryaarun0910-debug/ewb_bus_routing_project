@@ -22,6 +22,16 @@ def test_stops_returns_all_15_with_static_features():
         assert "imd_score" in s
 
 
+def test_stops_handles_missing_static_data_as_null_not_nan():
+    """A stop with a genuine data gap (e.g. no Census car_free_pct for its
+    LSOA) must serialise as JSON null, not float('nan') — the raw response
+    text must not contain the bare token 'NaN', which is not valid JSON and
+    previously crashed this endpoint outright for stop S14."""
+    r = client.get("/api/stops")
+    assert r.status_code == 200
+    assert "NaN" not in r.text
+
+
 def test_roads_keys_are_sorted_pairs_with_geometry():
     r = client.get("/api/roads")
     assert r.status_code == 200

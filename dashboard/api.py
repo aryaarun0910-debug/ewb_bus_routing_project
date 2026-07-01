@@ -64,9 +64,20 @@ def _route_geometry(route_stops: list[str]) -> list[list[float]]:
 
 @app.get("/api/stops")
 def get_stops():
-    """The 15 model stops — id, name, coordinates, routes, importance tier."""
+    """The 15 model stops — id, name, coordinates, routes, importance tier.
+
+    _static_lookup keeps missing values as float('nan') on purpose, since
+    the XGBoost model treats NaN as a legitimate missing-value signal. JSON
+    has no NaN, so it's converted to null here at the display boundary —
+    a stop with a genuine data gap (e.g. no Census car_free_pct for its
+    LSOA) reports that field as null rather than crashing the endpoint.
+    """
+    def _json_safe(v):
+        return None if isinstance(v, float) and v != v else v
+
     return [
-        {"stop_id": sid, **info, **_static_lookup.get(sid, {})}
+        {"stop_id": sid, **info,
+         **{k: _json_safe(v) for k, v in _static_lookup.get(sid, {}).items()}}
         for sid, info in STOPS_DISPLAY.items()
     ]
 

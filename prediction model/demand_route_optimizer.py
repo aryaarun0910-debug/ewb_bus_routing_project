@@ -472,215 +472,216 @@ def apply_service_floor(routes: list[dict], demand: dict[str, float],
 # 8.  SIMULATE FOUR CONTRASTING DAYS
 # ─────────────────────────────────────────────────────────────────────────────
 
-TIME_WINDOWS = [
-    ("Early Morning", list(range(5,  7))),
-    ("AM Peak",       list(range(7,  9))),
-    ("Mid Morning",   list(range(9,  11))),
-    ("Lunch",         list(range(11, 13))),
-    ("Afternoon",     list(range(13, 16))),
-    ("PM Peak",       list(range(16, 18))),
-    ("Evening",       list(range(18, 21))),
-    ("Night",         list(range(21, 24))),
-]
+if __name__ == "__main__":
+    TIME_WINDOWS = [
+        ("Early Morning", list(range(5,  7))),
+        ("AM Peak",       list(range(7,  9))),
+        ("Mid Morning",   list(range(9,  11))),
+        ("Lunch",         list(range(11, 13))),
+        ("Afternoon",     list(range(13, 16))),
+        ("PM Peak",       list(range(16, 18))),
+        ("Evening",       list(range(18, 21))),
+        ("Night",         list(range(21, 24))),
+    ]
 
-SCENARIO_DAYS = [
-    {
-        "label": "Weekday (Sunny, Sep)",
-        "conditions": dict(
-            day_type="weekday", month=9, weather="sunny",
-            climate_event="none", special_event="none",
-            temperature_c=19.0, wind_kmh=10.0, precipitation_mm=0.0,
-            is_school_term=1, is_uni_term=0,
-        ),
-    },
-    {
-        "label": "Weekday (Heavy Rain, Nov)",
-        "conditions": dict(
-            day_type="weekday", month=11, weather="heavy_rain",
-            climate_event="none", special_event="none",
-            temperature_c=9.0, wind_kmh=35.0, precipitation_mm=10.0,
-            is_school_term=1, is_uni_term=1,
-        ),
-    },
-    {
-        "label": "Saturday (Sunny Summer Festival @ North Hub)",
-        "conditions": dict(
-            day_type="saturday", month=7, weather="sunny",
-            climate_event="none", special_event="festival",
-            temperature_c=26.0, wind_kmh=8.0, precipitation_mm=0.0,
-            is_school_term=0, is_uni_term=0,
-        ),
-    },
-    {
-        "label": "Weekday (Named Storm, Jan)",
-        "conditions": dict(
-            day_type="weekday", month=1, weather="storm",
-            climate_event="named_storm", special_event="none",
-            temperature_c=4.0, wind_kmh=75.0, precipitation_mm=15.0,
-            is_school_term=1, is_uni_term=1,
-        ),
-    },
-]
+    SCENARIO_DAYS = [
+        {
+            "label": "Weekday (Sunny, Sep)",
+            "conditions": dict(
+                day_type="weekday", month=9, weather="sunny",
+                climate_event="none", special_event="none",
+                temperature_c=19.0, wind_kmh=10.0, precipitation_mm=0.0,
+                is_school_term=1, is_uni_term=0,
+            ),
+        },
+        {
+            "label": "Weekday (Heavy Rain, Nov)",
+            "conditions": dict(
+                day_type="weekday", month=11, weather="heavy_rain",
+                climate_event="none", special_event="none",
+                temperature_c=9.0, wind_kmh=35.0, precipitation_mm=10.0,
+                is_school_term=1, is_uni_term=1,
+            ),
+        },
+        {
+            "label": "Saturday (Sunny Summer Festival @ North Hub)",
+            "conditions": dict(
+                day_type="saturday", month=7, weather="sunny",
+                climate_event="none", special_event="festival",
+                temperature_c=26.0, wind_kmh=8.0, precipitation_mm=0.0,
+                is_school_term=0, is_uni_term=0,
+            ),
+        },
+        {
+            "label": "Weekday (Named Storm, Jan)",
+            "conditions": dict(
+                day_type="weekday", month=1, weather="storm",
+                climate_event="named_storm", special_event="none",
+                temperature_c=4.0, wind_kmh=75.0, precipitation_mm=15.0,
+                is_school_term=1, is_uni_term=1,
+            ),
+        },
+    ]
 
-print("\n" + "=" * 70)
-print("ROUTE OPTIMIZER — SIMULATING 4 SCENARIO DAYS")
-print("=" * 70)
+    print("\n" + "=" * 70)
+    print("ROUTE OPTIMIZER — SIMULATING 4 SCENARIO DAYS")
+    print("=" * 70)
 
-full_plan   = {}
-summary_lines = []
-optimality_gaps: list[float] = []
+    full_plan   = {}
+    summary_lines = []
+    optimality_gaps: list[float] = []
 
-for scenario in SCENARIO_DAYS:
-    label      = scenario["label"]
-    conditions = scenario["conditions"]
-
-    print(f"\n{'-'*70}")
-    print(f"SCENARIO: {label}")
-    print(f"{'-'*70}")
-    summary_lines.append(f"\n{'='*70}")
-    summary_lines.append(f"SCENARIO: {label}")
-    summary_lines.append(f"{'='*70}")
-
-    scenario_plan = {}
-    windows_since_served = {sid: 0 for sid in STOP_IDS}
-
-    for window_name, hours in TIME_WINDOWS:
-        hour_range = f"{hours[0]:02d}:00-{hours[-1]+1:02d}:00"
-
-        # ── Predict demand across the window ──────────────────────────────────
-        demand = predict_window_demand(hours, conditions)
-
-        # ── Run optimizer ─────────────────────────────────────────────────────
-        routes = greedy_route(demand)
-        optimality_gaps.extend(route_gaps(routes))
-
-        # ── Enforce the minimum-service floor ──────────────────────────────────
-        floor_additions = apply_service_floor(routes, demand, windows_since_served)
-
-        # ── Identify any unserved stops ───────────────────────────────────────
-        served = {s for r in routes for s in r["route_stops"]}
-        unserved = [
-            (sid, demand[sid]) for sid in STOP_IDS
-            if sid not in served and demand[sid] >= MIN_DEMAND_VISIT
-        ]
-        unserved.sort(key=lambda x: x[1], reverse=True)
-
-        scenario_plan[window_name] = {
-            "hours":           hour_range,
-            "demand_per_stop": {sid: demand[sid] for sid in STOP_IDS},
-            "routes":          routes,
-            "unserved_stops":  [{"stop": STOP_MAP[s]["name"], "demand": d}
-                                 for s, d in unserved],
-            "service_floor_additions": [STOP_MAP[s]["name"] for s in floor_additions],
-        }
-
-        # ── Console output ────────────────────────────────────────────────────
-        total_served   = sum(r["total_demand"] for r in routes)
-        total_network  = sum(demand.values())
-        coverage_pct   = 100 * total_served / max(total_network, 1)
-
-        print(f"\n  [{hour_range}]  {window_name}")
-        print(f"  Network demand: {total_network:.0f} boardings | "
-              f"Served: {total_served:.0f} ({coverage_pct:.0f}%)")
-
-        block = []
-        for r in routes:
-            arrow_route = " -> ".join(r["route_names"])
-            line = (f"    Bus {r['bus']}: {arrow_route}  "
-                    f"[{r['total_demand']:.0f} pass, "
-                    f"{r['route_time_min']} min]")
-            print(line)
-            block.append(line)
-
-        if unserved:
-            us_line = ("  !! Unserved: "
-                       + ", ".join(f"{STOP_MAP[s]['name']} ({d:.0f})"
-                                   for s, d in unserved[:4]))
-            print(us_line)
-            block.append(us_line)
-
-        if floor_additions:
-            sf_line = ("  >> Service floor: forced visit to "
-                       + ", ".join(STOP_MAP[s]["name"] for s in floor_additions))
-            print(sf_line)
-            block.append(sf_line)
-
-        # Build summary
-        summary_lines.append(f"\n  [{hour_range}]  {window_name}")
-        summary_lines.append(f"  Network demand: {total_network:.0f}  |  "
-                              f"Served: {total_served:.0f} ({coverage_pct:.0f}%)")
-        summary_lines.extend(block)
-
-    full_plan[label] = scenario_plan
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 9.  SAVE OUTPUTS
-# ─────────────────────────────────────────────────────────────────────────────
-
-with open(OUT_PLAN, "w", encoding="utf-8") as f:
-    json.dump(full_plan, f, indent=2)
-print(f"\n\nRoute plan saved: {OUT_PLAN}")
-
-with open(OUT_TXT, "w", encoding="utf-8") as f:
-    f.write("\n".join(summary_lines))
-print(f"Summary txt saved: {OUT_TXT}")
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 10.  CROSS-SCENARIO COMPARISON TABLE
-# ─────────────────────────────────────────────────────────────────────────────
-
-print("\n" + "=" * 70)
-print("CROSS-SCENARIO: TOTAL DAILY DEMAND vs DEMAND SERVED")
-print("=" * 70)
-print(f"  {'Scenario':<46} {'Total':>7} {'Served':>7} {'Cover%':>7}")
-print(f"  {'-'*46} {'-'*7} {'-'*7} {'-'*7}")
-for scenario in SCENARIO_DAYS:
-    label = scenario["label"]
-    sp    = full_plan[label]
-    total  = sum(v["demand_per_stop"][sid]
-                 for v in sp.values() for sid in STOP_IDS)
-    served = sum(r["total_demand"]
-                 for v in sp.values() for r in v["routes"])
-    cover  = 100 * served / max(total, 1)
-    print(f"  {label:<46} {total:>7.0f} {served:>7.0f} {cover:>6.0f}%")
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 11.  STOP-LEVEL DEMAND COMPARISON (AM Peak only)
-# ─────────────────────────────────────────────────────────────────────────────
-
-print("\n" + "=" * 70)
-print("AM PEAK DEMAND PER STOP — ALL 4 SCENARIOS")
-print("=" * 70)
-col_w = 16
-header_parts = ["Stop".ljust(22)] + [s["label"][:col_w].rjust(col_w+1)
-                                      for s in SCENARIO_DAYS]
-print("  " + "  ".join(header_parts))
-print("  " + "-" * (22 + (col_w + 3) * len(SCENARIO_DAYS)))
-
-for stop in STOPS:
-    sid = stop["id"]
-    vals = []
     for scenario in SCENARIO_DAYS:
-        val = full_plan[scenario["label"]]["AM Peak"]["demand_per_stop"].get(sid, 0)
-        vals.append(f"{val:>{col_w}.0f}")
-    print(f"  {stop['name']:<22}  {'  '.join(vals)}")
+        label      = scenario["label"]
+        conditions = scenario["conditions"]
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 12.  ROUTE QUALITY — MEASURED OPTIMALITY GAP (greedy + 2-opt vs brute force)
-# ─────────────────────────────────────────────────────────────────────────────
+        print(f"\n{'-'*70}")
+        print(f"SCENARIO: {label}")
+        print(f"{'-'*70}")
+        summary_lines.append(f"\n{'='*70}")
+        summary_lines.append(f"SCENARIO: {label}")
+        summary_lines.append(f"{'='*70}")
 
-print("\n" + "=" * 70)
-print("ROUTE QUALITY - 2-OPT vs OPTIMAL (brute force, per route)")
-print("=" * 70)
-if optimality_gaps:
-    mean_gap  = sum(optimality_gaps) / len(optimality_gaps)
-    worst_gap = max(optimality_gaps)
-    pct_opt   = 100 * sum(g < 0.01 for g in optimality_gaps) / len(optimality_gaps)
-    print(f"  Routes evaluated : {len(optimality_gaps)} (>= 3 stops)")
-    print(f"  Mean gap         : {mean_gap:.2f}% above optimal")
-    print(f"  Worst gap        : {worst_gap:.2f}% above optimal")
-    print(f"  Solved optimally : {pct_opt:.0f}% of routes")
-else:
-    print("  (no multi-stop routes to evaluate)")
+        scenario_plan = {}
+        windows_since_served = {sid: 0 for sid in STOP_IDS}
 
-print("\nDone.")
+        for window_name, hours in TIME_WINDOWS:
+            hour_range = f"{hours[0]:02d}:00-{hours[-1]+1:02d}:00"
+
+            # ── Predict demand across the window ──────────────────────────────────
+            demand = predict_window_demand(hours, conditions)
+
+            # ── Run optimizer ─────────────────────────────────────────────────────
+            routes = greedy_route(demand)
+            optimality_gaps.extend(route_gaps(routes))
+
+            # ── Enforce the minimum-service floor ──────────────────────────────────
+            floor_additions = apply_service_floor(routes, demand, windows_since_served)
+
+            # ── Identify any unserved stops ───────────────────────────────────────
+            served = {s for r in routes for s in r["route_stops"]}
+            unserved = [
+                (sid, demand[sid]) for sid in STOP_IDS
+                if sid not in served and demand[sid] >= MIN_DEMAND_VISIT
+            ]
+            unserved.sort(key=lambda x: x[1], reverse=True)
+
+            scenario_plan[window_name] = {
+                "hours":           hour_range,
+                "demand_per_stop": {sid: demand[sid] for sid in STOP_IDS},
+                "routes":          routes,
+                "unserved_stops":  [{"stop": STOP_MAP[s]["name"], "demand": d}
+                                     for s, d in unserved],
+                "service_floor_additions": [STOP_MAP[s]["name"] for s in floor_additions],
+            }
+
+            # ── Console output ────────────────────────────────────────────────────
+            total_served   = sum(r["total_demand"] for r in routes)
+            total_network  = sum(demand.values())
+            coverage_pct   = 100 * total_served / max(total_network, 1)
+
+            print(f"\n  [{hour_range}]  {window_name}")
+            print(f"  Network demand: {total_network:.0f} boardings | "
+                  f"Served: {total_served:.0f} ({coverage_pct:.0f}%)")
+
+            block = []
+            for r in routes:
+                arrow_route = " -> ".join(r["route_names"])
+                line = (f"    Bus {r['bus']}: {arrow_route}  "
+                        f"[{r['total_demand']:.0f} pass, "
+                        f"{r['route_time_min']} min]")
+                print(line)
+                block.append(line)
+
+            if unserved:
+                us_line = ("  !! Unserved: "
+                           + ", ".join(f"{STOP_MAP[s]['name']} ({d:.0f})"
+                                       for s, d in unserved[:4]))
+                print(us_line)
+                block.append(us_line)
+
+            if floor_additions:
+                sf_line = ("  >> Service floor: forced visit to "
+                           + ", ".join(STOP_MAP[s]["name"] for s in floor_additions))
+                print(sf_line)
+                block.append(sf_line)
+
+            # Build summary
+            summary_lines.append(f"\n  [{hour_range}]  {window_name}")
+            summary_lines.append(f"  Network demand: {total_network:.0f}  |  "
+                                  f"Served: {total_served:.0f} ({coverage_pct:.0f}%)")
+            summary_lines.extend(block)
+
+        full_plan[label] = scenario_plan
+
+    # ─────────────────────────────────────────────────────────────────────────────
+    # 9.  SAVE OUTPUTS
+    # ─────────────────────────────────────────────────────────────────────────────
+
+    with open(OUT_PLAN, "w", encoding="utf-8") as f:
+        json.dump(full_plan, f, indent=2)
+    print(f"\n\nRoute plan saved: {OUT_PLAN}")
+
+    with open(OUT_TXT, "w", encoding="utf-8") as f:
+        f.write("\n".join(summary_lines))
+    print(f"Summary txt saved: {OUT_TXT}")
+
+    # ─────────────────────────────────────────────────────────────────────────────
+    # 10.  CROSS-SCENARIO COMPARISON TABLE
+    # ─────────────────────────────────────────────────────────────────────────────
+
+    print("\n" + "=" * 70)
+    print("CROSS-SCENARIO: TOTAL DAILY DEMAND vs DEMAND SERVED")
+    print("=" * 70)
+    print(f"  {'Scenario':<46} {'Total':>7} {'Served':>7} {'Cover%':>7}")
+    print(f"  {'-'*46} {'-'*7} {'-'*7} {'-'*7}")
+    for scenario in SCENARIO_DAYS:
+        label = scenario["label"]
+        sp    = full_plan[label]
+        total  = sum(v["demand_per_stop"][sid]
+                     for v in sp.values() for sid in STOP_IDS)
+        served = sum(r["total_demand"]
+                     for v in sp.values() for r in v["routes"])
+        cover  = 100 * served / max(total, 1)
+        print(f"  {label:<46} {total:>7.0f} {served:>7.0f} {cover:>6.0f}%")
+
+    # ─────────────────────────────────────────────────────────────────────────────
+    # 11.  STOP-LEVEL DEMAND COMPARISON (AM Peak only)
+    # ─────────────────────────────────────────────────────────────────────────────
+
+    print("\n" + "=" * 70)
+    print("AM PEAK DEMAND PER STOP — ALL 4 SCENARIOS")
+    print("=" * 70)
+    col_w = 16
+    header_parts = ["Stop".ljust(22)] + [s["label"][:col_w].rjust(col_w+1)
+                                          for s in SCENARIO_DAYS]
+    print("  " + "  ".join(header_parts))
+    print("  " + "-" * (22 + (col_w + 3) * len(SCENARIO_DAYS)))
+
+    for stop in STOPS:
+        sid = stop["id"]
+        vals = []
+        for scenario in SCENARIO_DAYS:
+            val = full_plan[scenario["label"]]["AM Peak"]["demand_per_stop"].get(sid, 0)
+            vals.append(f"{val:>{col_w}.0f}")
+        print(f"  {stop['name']:<22}  {'  '.join(vals)}")
+
+    # ─────────────────────────────────────────────────────────────────────────────
+    # 12.  ROUTE QUALITY — MEASURED OPTIMALITY GAP (greedy + 2-opt vs brute force)
+    # ─────────────────────────────────────────────────────────────────────────────
+
+    print("\n" + "=" * 70)
+    print("ROUTE QUALITY - 2-OPT vs OPTIMAL (brute force, per route)")
+    print("=" * 70)
+    if optimality_gaps:
+        mean_gap  = sum(optimality_gaps) / len(optimality_gaps)
+        worst_gap = max(optimality_gaps)
+        pct_opt   = 100 * sum(g < 0.01 for g in optimality_gaps) / len(optimality_gaps)
+        print(f"  Routes evaluated : {len(optimality_gaps)} (>= 3 stops)")
+        print(f"  Mean gap         : {mean_gap:.2f}% above optimal")
+        print(f"  Worst gap        : {worst_gap:.2f}% above optimal")
+        print(f"  Solved optimally : {pct_opt:.0f}% of routes")
+    else:
+        print("  (no multi-stop routes to evaluate)")
+
+    print("\nDone.")
