@@ -8,7 +8,7 @@
 ![Status](https://img.shields.io/badge/Status-Prototype-yellow)
 
 > Engineers Without Borders Engineering for People Design Challenge 2025–26 · UK2026-82 · Ladywood Ward, Birmingham
-> **Grand Final team — one of the top 36 teams, from over 13,000 participants in this year's challenge.**
+> **Grand Final team — one of the top 36 teams, from over 13,800 participants in this year's challenge.**
 
 ---
 
