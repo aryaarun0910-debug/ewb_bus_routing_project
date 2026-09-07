@@ -1,15 +1,15 @@
-# Model Card — Ladywood Demand Predictor
+# Model Card: Ladywood Demand Predictor
 
 Following the spirit of [Mitchell et al., "Model Cards for Model Reporting"
 (2019)](https://arxiv.org/abs/1810.03993): what this model is, what it was
-trained on, how it performs, and — most importantly — exactly where its
+trained on, how it performs, and (most importantly) exactly where its
 limits are.
 
 ## Model details
 
 > Why XGBoost rather than ARIMA, an LSTM/GNN, or another tree ensemble? See
 > [`docs/design/MODEL_COMPARISON.md`](design/MODEL_COMPARISON.md) for the full,
-> sourced comparison — including the published results that *don't* favour us.
+> sourced comparison, including the published results that *don't* favour us.
 
 - **Type**: XGBoost gradient-boosted regression tree ensemble
 - **Task**: predict `boardings` (passenger count) for a given Ladywood bus
@@ -17,13 +17,13 @@ limits are.
   school/university term)
 - **Training script**: `prediction model/generate_real_demand_dataset.py`
 - **Artefact**: `prediction model/demand_model.pkl`
-- **Runtime entry point**: `predict_window_demand()` — called live by the
+- **Runtime entry point**: `predict_window_demand()`, called live by the
   dashboard's `/api/demand` endpoint and offline by the route optimiser
 
 ## Intended use
 
-Generating *relative* demand signals — which stops, at which times, under
-which conditions, are likely to see more or fewer boarders than others — to
+Generating *relative* demand signals (which stops, at which times, under
+which conditions, are likely to see more or fewer boarders than others) to
 drive a capacitated VRP route optimiser and a public-facing demand
 visualisation. **It is not** intended as a source of absolute, audited
 ridership counts, nor as a substitute for a direct Automatic Passenger
