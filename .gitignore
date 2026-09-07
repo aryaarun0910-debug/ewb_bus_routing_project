@@ -68,3 +68,8 @@ legacy/fpga/output_files/
 
 # Internal planning documents
 AUDIT_TODO.md
+
+# Nested working clones of ChrisLegge/bus-routing-project. Kept locally at times
+# for cross-referencing; never part of this repo. Re-clone if needed.
+brp-main/
+bus-routing-project/
